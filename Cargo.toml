@@ -1,0 +1,5 @@
+[package]
+
+name = "resos"
+version = "0.0.1"
+authors = ["Connor Doyle <connor@mesosphere.io>"]
