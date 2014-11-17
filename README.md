@@ -2,6 +2,11 @@
 
 Rust language bindings for Apache Mesos.
 
+## Prerequisites
+
+- [Rust](http://rust-lang.org)
+- `libmesos.{so, dylib}` on your shared library search path
+
 ## Building
 
 This project is built using [cargo](http://doc.crates.io).
