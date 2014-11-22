@@ -1,4 +1,8 @@
-# Resos [![Build Status](https://travis-ci.org/ConnorDoyle/resos.png?branch=master)](https://travis-ci.org/ConnorDoyle/resos)
+# Resos 
+
+<!--
+[![Build Status](https://travis-ci.org/ConnorDoyle/resos.png?branch=master)](https://travis-ci.org/ConnorDoyle/resos)
+-->
 
 Rust language bindings for Apache Mesos.
 
