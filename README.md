@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/ConnorDoyle/resos.png?branch=master)](https://travis-ci.org/ConnorDoyle/resos)
 -->
 
-Rust language bindings for Apache Mesos.
+Rust language bindings for [Apache Mesos](http://mesos.apache.org).
 
 ## Prerequisites
 
