@@ -9,7 +9,7 @@ Rust language bindings for Apache Mesos.
 
 ## Building
 
-This project is built using [cargo](http://doc.crates.io).
+This project is built using [cargo](http://doc.crates.io) against the 0.13 nightlies.
 
 ```
 $ cargo build
