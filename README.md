@@ -18,3 +18,5 @@ $ cargo build
 The initial FFI declarations were generated using
 [cxx2rs](https://github.com/manuels/cxx2rs).
 
+The protobuf code was generated using
+[rust-protobuf](https://github.com/stepancheg/rust-protobuf).
