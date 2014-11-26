@@ -162,8 +162,8 @@ extern "C" {
 */
 #[repr(C)]
 pub struct ProtobufObj {
-    data: libc::c_void,
-    size: libc::size_t,
+    pub data: *mut libc::c_void,
+    pub size: libc::size_t,
 }
 
 /*
