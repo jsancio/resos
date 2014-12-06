@@ -7,4 +7,5 @@ authors = ["Connor Doyle <connor@mesosphere.io>"]
 [dependencies.protobuf]
 
 git = "https://github.com/stepancheg/rust-protobuf.git"
+rev = "27a83a1ed6b84fbd5218a8911bc7743ddd32a875"
 

@@ -9,6 +9,7 @@ use scheduler;
 /// it, stop it, or wait for it to finish) and to interact with Mesos
 /// (e.g., launch tasks, kill tasks, etc.).
 trait SchedulerDriver {
+
     /// @param offerId The offer ID.
     /// @param tasks   The collection of tasks to be launched.
     /// @param filters The filters to set for any remaining resources.

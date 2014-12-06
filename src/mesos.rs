@@ -5,11 +5,14 @@
 #![allow(non_upper_case_globals)]
 #![allow(unused_imports)]
 
+use protobuf::Message as Message_imported_for_functions;
+use protobuf::ProtobufEnum as ProtobufEnum_imported_for_functions;
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct FrameworkID {
     value: ::protobuf::SingularField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> FrameworkID {
@@ -27,6 +30,7 @@ impl<'a> FrameworkID {
                 FrameworkID {
                     value: ::protobuf::SingularField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -54,6 +58,11 @@ impl<'a> FrameworkID {
             self.value.set_default();
         };
         self.value.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_value(&mut self) -> ::std::string::String {
+        self.value.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_value(&'a self) -> &'a str {
@@ -97,23 +106,17 @@ impl ::protobuf::Message for FrameworkID {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.value.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.value.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -122,6 +125,10 @@ impl ::protobuf::Message for FrameworkID {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -163,9 +170,15 @@ impl ::protobuf::Clear for FrameworkID {
     }
 }
 
+impl ::std::cmp::PartialEq for FrameworkID {
+    fn eq(&self, other: &FrameworkID) -> bool {
+        self.value == other.value &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for FrameworkID {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -189,10 +202,11 @@ impl ::protobuf::reflect::FieldAccessor<FrameworkID> for FrameworkID_value_acc_t
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct OfferID {
     value: ::protobuf::SingularField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> OfferID {
@@ -210,6 +224,7 @@ impl<'a> OfferID {
                 OfferID {
                     value: ::protobuf::SingularField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -237,6 +252,11 @@ impl<'a> OfferID {
             self.value.set_default();
         };
         self.value.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_value(&mut self) -> ::std::string::String {
+        self.value.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_value(&'a self) -> &'a str {
@@ -280,23 +300,17 @@ impl ::protobuf::Message for OfferID {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.value.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.value.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -305,6 +319,10 @@ impl ::protobuf::Message for OfferID {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -346,9 +364,15 @@ impl ::protobuf::Clear for OfferID {
     }
 }
 
+impl ::std::cmp::PartialEq for OfferID {
+    fn eq(&self, other: &OfferID) -> bool {
+        self.value == other.value &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for OfferID {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -372,10 +396,11 @@ impl ::protobuf::reflect::FieldAccessor<OfferID> for OfferID_value_acc_type {
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct SlaveID {
     value: ::protobuf::SingularField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> SlaveID {
@@ -393,6 +418,7 @@ impl<'a> SlaveID {
                 SlaveID {
                     value: ::protobuf::SingularField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -420,6 +446,11 @@ impl<'a> SlaveID {
             self.value.set_default();
         };
         self.value.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_value(&mut self) -> ::std::string::String {
+        self.value.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_value(&'a self) -> &'a str {
@@ -463,23 +494,17 @@ impl ::protobuf::Message for SlaveID {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.value.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.value.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -488,6 +513,10 @@ impl ::protobuf::Message for SlaveID {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -529,9 +558,15 @@ impl ::protobuf::Clear for SlaveID {
     }
 }
 
+impl ::std::cmp::PartialEq for SlaveID {
+    fn eq(&self, other: &SlaveID) -> bool {
+        self.value == other.value &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for SlaveID {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -555,10 +590,11 @@ impl ::protobuf::reflect::FieldAccessor<SlaveID> for SlaveID_value_acc_type {
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct TaskID {
     value: ::protobuf::SingularField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> TaskID {
@@ -576,6 +612,7 @@ impl<'a> TaskID {
                 TaskID {
                     value: ::protobuf::SingularField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -603,6 +640,11 @@ impl<'a> TaskID {
             self.value.set_default();
         };
         self.value.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_value(&mut self) -> ::std::string::String {
+        self.value.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_value(&'a self) -> &'a str {
@@ -646,23 +688,17 @@ impl ::protobuf::Message for TaskID {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.value.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.value.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -671,6 +707,10 @@ impl ::protobuf::Message for TaskID {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -712,9 +752,15 @@ impl ::protobuf::Clear for TaskID {
     }
 }
 
+impl ::std::cmp::PartialEq for TaskID {
+    fn eq(&self, other: &TaskID) -> bool {
+        self.value == other.value &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for TaskID {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -738,10 +784,11 @@ impl ::protobuf::reflect::FieldAccessor<TaskID> for TaskID_value_acc_type {
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct ExecutorID {
     value: ::protobuf::SingularField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> ExecutorID {
@@ -759,6 +806,7 @@ impl<'a> ExecutorID {
                 ExecutorID {
                     value: ::protobuf::SingularField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -786,6 +834,11 @@ impl<'a> ExecutorID {
             self.value.set_default();
         };
         self.value.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_value(&mut self) -> ::std::string::String {
+        self.value.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_value(&'a self) -> &'a str {
@@ -829,23 +882,17 @@ impl ::protobuf::Message for ExecutorID {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.value.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.value.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -854,6 +901,10 @@ impl ::protobuf::Message for ExecutorID {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -895,9 +946,15 @@ impl ::protobuf::Clear for ExecutorID {
     }
 }
 
+impl ::std::cmp::PartialEq for ExecutorID {
+    fn eq(&self, other: &ExecutorID) -> bool {
+        self.value == other.value &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for ExecutorID {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -921,10 +978,11 @@ impl ::protobuf::reflect::FieldAccessor<ExecutorID> for ExecutorID_value_acc_typ
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct ContainerID {
     value: ::protobuf::SingularField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> ContainerID {
@@ -942,6 +1000,7 @@ impl<'a> ContainerID {
                 ContainerID {
                     value: ::protobuf::SingularField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -969,6 +1028,11 @@ impl<'a> ContainerID {
             self.value.set_default();
         };
         self.value.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_value(&mut self) -> ::std::string::String {
+        self.value.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_value(&'a self) -> &'a str {
@@ -1012,23 +1076,17 @@ impl ::protobuf::Message for ContainerID {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.value.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.value.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -1037,6 +1095,10 @@ impl ::protobuf::Message for ContainerID {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -1078,9 +1140,15 @@ impl ::protobuf::Clear for ContainerID {
     }
 }
 
+impl ::std::cmp::PartialEq for ContainerID {
+    fn eq(&self, other: &ContainerID) -> bool {
+        self.value == other.value &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for ContainerID {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -1104,7 +1172,7 @@ impl ::protobuf::reflect::FieldAccessor<ContainerID> for ContainerID_value_acc_t
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct FrameworkInfo {
     user: ::protobuf::SingularField<::std::string::String>,
     name: ::protobuf::SingularField<::std::string::String>,
@@ -1116,6 +1184,7 @@ pub struct FrameworkInfo {
     principal: ::protobuf::SingularField<::std::string::String>,
     webui_url: ::protobuf::SingularField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> FrameworkInfo {
@@ -1141,6 +1210,7 @@ impl<'a> FrameworkInfo {
                     principal: ::protobuf::SingularField::none(),
                     webui_url: ::protobuf::SingularField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -1168,6 +1238,11 @@ impl<'a> FrameworkInfo {
             self.user.set_default();
         };
         self.user.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_user(&mut self) -> ::std::string::String {
+        self.user.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_user(&'a self) -> &'a str {
@@ -1201,6 +1276,11 @@ impl<'a> FrameworkInfo {
         self.name.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_name(&mut self) -> ::std::string::String {
+        self.name.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_name(&'a self) -> &'a str {
         match self.name.as_ref() {
             Some(v) => v.as_slice(),
@@ -1232,6 +1312,11 @@ impl<'a> FrameworkInfo {
         self.id.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_id(&mut self) -> FrameworkID {
+        self.id.take().unwrap_or_else(|| FrameworkID::new())
+    }
+
     pub fn get_id(&'a self) -> &'a FrameworkID {
         self.id.as_ref().unwrap_or_else(|| FrameworkID::default_instance())
     }
@@ -1239,7 +1324,7 @@ impl<'a> FrameworkInfo {
     // optional double failover_timeout = 4;
 
     pub fn clear_failover_timeout(&mut self) {
-        self.failover_timeout = None;
+        self.failover_timeout = ::std::option::None;
     }
 
     pub fn has_failover_timeout(&self) -> bool {
@@ -1248,7 +1333,7 @@ impl<'a> FrameworkInfo {
 
     // Param is passed by value, moved
     pub fn set_failover_timeout(&mut self, v: f64) {
-        self.failover_timeout = Some(v);
+        self.failover_timeout = ::std::option::Some(v);
     }
 
     pub fn get_failover_timeout(&self) -> f64 {
@@ -1258,7 +1343,7 @@ impl<'a> FrameworkInfo {
     // optional bool checkpoint = 5;
 
     pub fn clear_checkpoint(&mut self) {
-        self.checkpoint = None;
+        self.checkpoint = ::std::option::None;
     }
 
     pub fn has_checkpoint(&self) -> bool {
@@ -1267,7 +1352,7 @@ impl<'a> FrameworkInfo {
 
     // Param is passed by value, moved
     pub fn set_checkpoint(&mut self, v: bool) {
-        self.checkpoint = Some(v);
+        self.checkpoint = ::std::option::Some(v);
     }
 
     pub fn get_checkpoint(&self) -> bool {
@@ -1296,6 +1381,11 @@ impl<'a> FrameworkInfo {
             self.role.set_default();
         };
         self.role.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_role(&mut self) -> ::std::string::String {
+        self.role.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_role(&'a self) -> &'a str {
@@ -1329,6 +1419,11 @@ impl<'a> FrameworkInfo {
         self.hostname.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_hostname(&mut self) -> ::std::string::String {
+        self.hostname.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_hostname(&'a self) -> &'a str {
         match self.hostname.as_ref() {
             Some(v) => v.as_slice(),
@@ -1360,6 +1455,11 @@ impl<'a> FrameworkInfo {
         self.principal.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_principal(&mut self) -> ::std::string::String {
+        self.principal.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_principal(&'a self) -> &'a str {
         match self.principal.as_ref() {
             Some(v) => v.as_slice(),
@@ -1389,6 +1489,11 @@ impl<'a> FrameworkInfo {
             self.webui_url.set_default();
         };
         self.webui_url.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_webui_url(&mut self) -> ::std::string::String {
+        self.webui_url.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_webui_url(&'a self) -> &'a str {
@@ -1444,14 +1549,14 @@ impl ::protobuf::Message for FrameworkInfo {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.failover_timeout = Some(tmp);
+                    self.failover_timeout = ::std::option::Some(tmp);
                 },
                 5 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_bool());
-                    self.checkpoint = Some(tmp);
+                    self.checkpoint = ::std::option::Some(tmp);
                 },
                 6 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -1491,10 +1596,7 @@ impl ::protobuf::Message for FrameworkInfo {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.user.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
@@ -1503,7 +1605,7 @@ impl ::protobuf::Message for FrameworkInfo {
             my_size += ::protobuf::rt::string_size(2, value.as_slice());
         };
         for value in self.id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         if self.failover_timeout.is_some() {
@@ -1525,13 +1627,11 @@ impl ::protobuf::Message for FrameworkInfo {
             my_size += ::protobuf::rt::string_size(9, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.user.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -1547,9 +1647,8 @@ impl ::protobuf::Message for FrameworkInfo {
         match self.id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(3, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
@@ -1591,6 +1690,10 @@ impl ::protobuf::Message for FrameworkInfo {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -1648,9 +1751,23 @@ impl ::protobuf::Clear for FrameworkInfo {
     }
 }
 
+impl ::std::cmp::PartialEq for FrameworkInfo {
+    fn eq(&self, other: &FrameworkInfo) -> bool {
+        self.user == other.user &&
+        self.name == other.name &&
+        self.id == other.id &&
+        self.failover_timeout == other.failover_timeout &&
+        self.checkpoint == other.checkpoint &&
+        self.role == other.role &&
+        self.hostname == other.hostname &&
+        self.principal == other.principal &&
+        self.webui_url == other.webui_url &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for FrameworkInfo {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -1818,7 +1935,7 @@ impl ::protobuf::reflect::FieldAccessor<FrameworkInfo> for FrameworkInfo_webui_u
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct HealthCheck {
     http: ::protobuf::SingularPtrField<HealthCheck_HTTP>,
     delay_seconds: ::std::option::Option<f64>,
@@ -1828,6 +1945,7 @@ pub struct HealthCheck {
     grace_period_seconds: ::std::option::Option<f64>,
     command: ::protobuf::SingularPtrField<CommandInfo>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> HealthCheck {
@@ -1851,6 +1969,7 @@ impl<'a> HealthCheck {
                     grace_period_seconds: ::std::option::None,
                     command: ::protobuf::SingularPtrField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -1880,6 +1999,11 @@ impl<'a> HealthCheck {
         self.http.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_http(&mut self) -> HealthCheck_HTTP {
+        self.http.take().unwrap_or_else(|| HealthCheck_HTTP::new())
+    }
+
     pub fn get_http(&'a self) -> &'a HealthCheck_HTTP {
         self.http.as_ref().unwrap_or_else(|| HealthCheck_HTTP::default_instance())
     }
@@ -1887,7 +2011,7 @@ impl<'a> HealthCheck {
     // optional double delay_seconds = 2;
 
     pub fn clear_delay_seconds(&mut self) {
-        self.delay_seconds = None;
+        self.delay_seconds = ::std::option::None;
     }
 
     pub fn has_delay_seconds(&self) -> bool {
@@ -1896,7 +2020,7 @@ impl<'a> HealthCheck {
 
     // Param is passed by value, moved
     pub fn set_delay_seconds(&mut self, v: f64) {
-        self.delay_seconds = Some(v);
+        self.delay_seconds = ::std::option::Some(v);
     }
 
     pub fn get_delay_seconds(&self) -> f64 {
@@ -1906,7 +2030,7 @@ impl<'a> HealthCheck {
     // optional double interval_seconds = 3;
 
     pub fn clear_interval_seconds(&mut self) {
-        self.interval_seconds = None;
+        self.interval_seconds = ::std::option::None;
     }
 
     pub fn has_interval_seconds(&self) -> bool {
@@ -1915,7 +2039,7 @@ impl<'a> HealthCheck {
 
     // Param is passed by value, moved
     pub fn set_interval_seconds(&mut self, v: f64) {
-        self.interval_seconds = Some(v);
+        self.interval_seconds = ::std::option::Some(v);
     }
 
     pub fn get_interval_seconds(&self) -> f64 {
@@ -1925,7 +2049,7 @@ impl<'a> HealthCheck {
     // optional double timeout_seconds = 4;
 
     pub fn clear_timeout_seconds(&mut self) {
-        self.timeout_seconds = None;
+        self.timeout_seconds = ::std::option::None;
     }
 
     pub fn has_timeout_seconds(&self) -> bool {
@@ -1934,7 +2058,7 @@ impl<'a> HealthCheck {
 
     // Param is passed by value, moved
     pub fn set_timeout_seconds(&mut self, v: f64) {
-        self.timeout_seconds = Some(v);
+        self.timeout_seconds = ::std::option::Some(v);
     }
 
     pub fn get_timeout_seconds(&self) -> f64 {
@@ -1944,7 +2068,7 @@ impl<'a> HealthCheck {
     // optional uint32 consecutive_failures = 5;
 
     pub fn clear_consecutive_failures(&mut self) {
-        self.consecutive_failures = None;
+        self.consecutive_failures = ::std::option::None;
     }
 
     pub fn has_consecutive_failures(&self) -> bool {
@@ -1953,7 +2077,7 @@ impl<'a> HealthCheck {
 
     // Param is passed by value, moved
     pub fn set_consecutive_failures(&mut self, v: u32) {
-        self.consecutive_failures = Some(v);
+        self.consecutive_failures = ::std::option::Some(v);
     }
 
     pub fn get_consecutive_failures(&self) -> u32 {
@@ -1963,7 +2087,7 @@ impl<'a> HealthCheck {
     // optional double grace_period_seconds = 6;
 
     pub fn clear_grace_period_seconds(&mut self) {
-        self.grace_period_seconds = None;
+        self.grace_period_seconds = ::std::option::None;
     }
 
     pub fn has_grace_period_seconds(&self) -> bool {
@@ -1972,7 +2096,7 @@ impl<'a> HealthCheck {
 
     // Param is passed by value, moved
     pub fn set_grace_period_seconds(&mut self, v: f64) {
-        self.grace_period_seconds = Some(v);
+        self.grace_period_seconds = ::std::option::Some(v);
     }
 
     pub fn get_grace_period_seconds(&self) -> f64 {
@@ -2001,6 +2125,11 @@ impl<'a> HealthCheck {
             self.command.set_default();
         };
         self.command.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_command(&mut self) -> CommandInfo {
+        self.command.take().unwrap_or_else(|| CommandInfo::new())
     }
 
     pub fn get_command(&'a self) -> &'a CommandInfo {
@@ -2033,35 +2162,35 @@ impl ::protobuf::Message for HealthCheck {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.delay_seconds = Some(tmp);
+                    self.delay_seconds = ::std::option::Some(tmp);
                 },
                 3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.interval_seconds = Some(tmp);
+                    self.interval_seconds = ::std::option::Some(tmp);
                 },
                 4 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.timeout_seconds = Some(tmp);
+                    self.timeout_seconds = ::std::option::Some(tmp);
                 },
                 5 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint32());
-                    self.consecutive_failures = Some(tmp);
+                    self.consecutive_failures = ::std::option::Some(tmp);
                 },
                 6 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.grace_period_seconds = Some(tmp);
+                    self.grace_period_seconds = ::std::option::Some(tmp);
                 },
                 7 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -2080,13 +2209,10 @@ impl ::protobuf::Message for HealthCheck {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.http.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         if self.delay_seconds.is_some() {
@@ -2105,23 +2231,20 @@ impl ::protobuf::Message for HealthCheck {
             my_size += 9;
         };
         for value in self.command.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.http.as_ref() {
             Some(v) => {
                 try!(os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
@@ -2158,14 +2281,17 @@ impl ::protobuf::Message for HealthCheck {
         match self.command.as_ref() {
             Some(v) => {
                 try!(os.write_tag(7, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -2219,9 +2345,21 @@ impl ::protobuf::Clear for HealthCheck {
     }
 }
 
+impl ::std::cmp::PartialEq for HealthCheck {
+    fn eq(&self, other: &HealthCheck) -> bool {
+        self.http == other.http &&
+        self.delay_seconds == other.delay_seconds &&
+        self.interval_seconds == other.interval_seconds &&
+        self.timeout_seconds == other.timeout_seconds &&
+        self.consecutive_failures == other.consecutive_failures &&
+        self.grace_period_seconds == other.grace_period_seconds &&
+        self.command == other.command &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for HealthCheck {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -2353,12 +2491,13 @@ impl ::protobuf::reflect::FieldAccessor<HealthCheck> for HealthCheck_command_acc
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct HealthCheck_HTTP {
     port: ::std::option::Option<u32>,
     path: ::protobuf::SingularField<::std::string::String>,
     statuses: ::std::vec::Vec<u32>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> HealthCheck_HTTP {
@@ -2378,6 +2517,7 @@ impl<'a> HealthCheck_HTTP {
                     path: ::protobuf::SingularField::none(),
                     statuses: ::std::vec::Vec::new(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -2386,7 +2526,7 @@ impl<'a> HealthCheck_HTTP {
     // required uint32 port = 1;
 
     pub fn clear_port(&mut self) {
-        self.port = None;
+        self.port = ::std::option::None;
     }
 
     pub fn has_port(&self) -> bool {
@@ -2395,7 +2535,7 @@ impl<'a> HealthCheck_HTTP {
 
     // Param is passed by value, moved
     pub fn set_port(&mut self, v: u32) {
-        self.port = Some(v);
+        self.port = ::std::option::Some(v);
     }
 
     pub fn get_port(&self) -> u32 {
@@ -2426,6 +2566,11 @@ impl<'a> HealthCheck_HTTP {
         self.path.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_path(&mut self) -> ::std::string::String {
+        self.path.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_path(&'a self) -> &'a str {
         match self.path.as_ref() {
             Some(v) => v.as_slice(),
@@ -2447,6 +2592,11 @@ impl<'a> HealthCheck_HTTP {
     // Mutable pointer to the field.
     pub fn mut_statuses(&'a mut self) -> &'a mut ::std::vec::Vec<u32> {
         &mut self.statuses
+    }
+
+    // Take field
+    pub fn take_statuses(&mut self) -> ::std::vec::Vec<u32> {
+        ::std::mem::replace(&mut self.statuses, ::std::vec::Vec::new())
     }
 
     pub fn get_statuses(&'a self) -> &'a [u32] {
@@ -2475,7 +2625,7 @@ impl ::protobuf::Message for HealthCheck_HTTP {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint32());
-                    self.port = Some(tmp);
+                    self.port = ::std::option::Some(tmp);
                 },
                 2 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -2485,19 +2635,17 @@ impl ::protobuf::Message for HealthCheck_HTTP {
                     try!(is.read_string_into(tmp))
                 },
                 4 => {
-                    if wire_type == ::protobuf::wire_format::WireTypeLengthDelimited {
-                        let len = try!(is.read_raw_varint32());
-                        let old_limit = is.push_limit(len);
-                        while !try!(is.eof()) {
+                    match wire_type {
+                        ::protobuf::wire_format::WireTypeLengthDelimited => {
+                            try!(is.read_repeated_packed_uint32_into(&mut self.statuses));
+                        },
+                        ::protobuf::wire_format::WireTypeVarint => {
                             self.statuses.push(try!(is.read_uint32()));
-                        }
-                        is.pop_limit(old_limit);
-                    } else {
-                        if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        },
+                        _ => {
                             return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
-                        };
-                        self.statuses.push(try!(is.read_uint32()));
-                    }
+                        },
+                    };
                 },
                 _ => {
                     let unknown = try!(is.read_unknown(wire_type));
@@ -2509,10 +2657,7 @@ impl ::protobuf::Message for HealthCheck_HTTP {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.port.iter() {
             my_size += ::protobuf::rt::value_size(1, *value, ::protobuf::wire_format::WireTypeVarint);
@@ -2524,14 +2669,11 @@ impl ::protobuf::Message for HealthCheck_HTTP {
             my_size += ::protobuf::rt::value_size(4, *value, ::protobuf::wire_format::WireTypeVarint);
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.port {
             Some(v) => {
                 try!(os.write_uint32(1, v));
@@ -2549,6 +2691,10 @@ impl ::protobuf::Message for HealthCheck_HTTP {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -2594,9 +2740,17 @@ impl ::protobuf::Clear for HealthCheck_HTTP {
     }
 }
 
+impl ::std::cmp::PartialEq for HealthCheck_HTTP {
+    fn eq(&self, other: &HealthCheck_HTTP) -> bool {
+        self.port == other.port &&
+        self.path == other.path &&
+        self.statuses == other.statuses &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for HealthCheck_HTTP {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -2656,7 +2810,7 @@ impl ::protobuf::reflect::FieldAccessor<HealthCheck_HTTP> for HealthCheck_HTTP_s
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct CommandInfo {
     container: ::protobuf::SingularPtrField<CommandInfo_ContainerInfo>,
     uris: ::protobuf::RepeatedField<CommandInfo_URI>,
@@ -2666,6 +2820,7 @@ pub struct CommandInfo {
     arguments: ::protobuf::RepeatedField<::std::string::String>,
     user: ::protobuf::SingularField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> CommandInfo {
@@ -2689,6 +2844,7 @@ impl<'a> CommandInfo {
                     arguments: ::protobuf::RepeatedField::new(),
                     user: ::protobuf::SingularField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -2718,6 +2874,11 @@ impl<'a> CommandInfo {
         self.container.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_container(&mut self) -> CommandInfo_ContainerInfo {
+        self.container.take().unwrap_or_else(|| CommandInfo_ContainerInfo::new())
+    }
+
     pub fn get_container(&'a self) -> &'a CommandInfo_ContainerInfo {
         self.container.as_ref().unwrap_or_else(|| CommandInfo_ContainerInfo::default_instance())
     }
@@ -2736,6 +2897,11 @@ impl<'a> CommandInfo {
     // Mutable pointer to the field.
     pub fn mut_uris(&'a mut self) -> &'a mut ::protobuf::RepeatedField<CommandInfo_URI> {
         &mut self.uris
+    }
+
+    // Take field
+    pub fn take_uris(&mut self) -> ::protobuf::RepeatedField<CommandInfo_URI> {
+        ::std::mem::replace(&mut self.uris, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_uris(&'a self) -> &'a [CommandInfo_URI] {
@@ -2766,6 +2932,11 @@ impl<'a> CommandInfo {
         self.environment.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_environment(&mut self) -> Environment {
+        self.environment.take().unwrap_or_else(|| Environment::new())
+    }
+
     pub fn get_environment(&'a self) -> &'a Environment {
         self.environment.as_ref().unwrap_or_else(|| Environment::default_instance())
     }
@@ -2773,7 +2944,7 @@ impl<'a> CommandInfo {
     // optional bool shell = 6;
 
     pub fn clear_shell(&mut self) {
-        self.shell = None;
+        self.shell = ::std::option::None;
     }
 
     pub fn has_shell(&self) -> bool {
@@ -2782,7 +2953,7 @@ impl<'a> CommandInfo {
 
     // Param is passed by value, moved
     pub fn set_shell(&mut self, v: bool) {
-        self.shell = Some(v);
+        self.shell = ::std::option::Some(v);
     }
 
     pub fn get_shell(&self) -> bool {
@@ -2813,6 +2984,11 @@ impl<'a> CommandInfo {
         self.value.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_value(&mut self) -> ::std::string::String {
+        self.value.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_value(&'a self) -> &'a str {
         match self.value.as_ref() {
             Some(v) => v.as_slice(),
@@ -2834,6 +3010,11 @@ impl<'a> CommandInfo {
     // Mutable pointer to the field.
     pub fn mut_arguments(&'a mut self) -> &'a mut ::protobuf::RepeatedField<::std::string::String> {
         &mut self.arguments
+    }
+
+    // Take field
+    pub fn take_arguments(&mut self) -> ::protobuf::RepeatedField<::std::string::String> {
+        ::std::mem::replace(&mut self.arguments, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_arguments(&'a self) -> &'a [::std::string::String] {
@@ -2862,6 +3043,11 @@ impl<'a> CommandInfo {
             self.user.set_default();
         };
         self.user.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_user(&mut self) -> ::std::string::String {
+        self.user.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_user(&'a self) -> &'a str {
@@ -2911,7 +3097,7 @@ impl ::protobuf::Message for CommandInfo {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_bool());
-                    self.shell = Some(tmp);
+                    self.shell = ::std::option::Some(tmp);
                 },
                 3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -2944,21 +3130,18 @@ impl ::protobuf::Message for CommandInfo {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.container.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.uris.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.environment.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         if self.shell.is_some() {
@@ -2974,34 +3157,29 @@ impl ::protobuf::Message for CommandInfo {
             my_size += ::protobuf::rt::string_size(5, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.container.as_ref() {
             Some(v) => {
                 try!(os.write_tag(4, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         for v in self.uris.iter() {
             try!(os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         match self.environment.as_ref() {
             Some(v) => {
                 try!(os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
@@ -3028,6 +3206,10 @@ impl ::protobuf::Message for CommandInfo {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -3081,9 +3263,21 @@ impl ::protobuf::Clear for CommandInfo {
     }
 }
 
+impl ::std::cmp::PartialEq for CommandInfo {
+    fn eq(&self, other: &CommandInfo) -> bool {
+        self.container == other.container &&
+        self.uris == other.uris &&
+        self.environment == other.environment &&
+        self.shell == other.shell &&
+        self.value == other.value &&
+        self.arguments == other.arguments &&
+        self.user == other.user &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for CommandInfo {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -3215,12 +3409,13 @@ impl ::protobuf::reflect::FieldAccessor<CommandInfo> for CommandInfo_user_acc_ty
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct CommandInfo_URI {
     value: ::protobuf::SingularField<::std::string::String>,
     executable: ::std::option::Option<bool>,
     extract: ::std::option::Option<bool>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> CommandInfo_URI {
@@ -3240,6 +3435,7 @@ impl<'a> CommandInfo_URI {
                     executable: ::std::option::None,
                     extract: ::std::option::None,
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -3269,6 +3465,11 @@ impl<'a> CommandInfo_URI {
         self.value.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_value(&mut self) -> ::std::string::String {
+        self.value.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_value(&'a self) -> &'a str {
         match self.value.as_ref() {
             Some(v) => v.as_slice(),
@@ -3279,7 +3480,7 @@ impl<'a> CommandInfo_URI {
     // optional bool executable = 2;
 
     pub fn clear_executable(&mut self) {
-        self.executable = None;
+        self.executable = ::std::option::None;
     }
 
     pub fn has_executable(&self) -> bool {
@@ -3288,7 +3489,7 @@ impl<'a> CommandInfo_URI {
 
     // Param is passed by value, moved
     pub fn set_executable(&mut self, v: bool) {
-        self.executable = Some(v);
+        self.executable = ::std::option::Some(v);
     }
 
     pub fn get_executable(&self) -> bool {
@@ -3298,7 +3499,7 @@ impl<'a> CommandInfo_URI {
     // optional bool extract = 3;
 
     pub fn clear_extract(&mut self) {
-        self.extract = None;
+        self.extract = ::std::option::None;
     }
 
     pub fn has_extract(&self) -> bool {
@@ -3307,7 +3508,7 @@ impl<'a> CommandInfo_URI {
 
     // Param is passed by value, moved
     pub fn set_extract(&mut self, v: bool) {
-        self.extract = Some(v);
+        self.extract = ::std::option::Some(v);
     }
 
     pub fn get_extract(&self) -> bool {
@@ -3343,14 +3544,14 @@ impl ::protobuf::Message for CommandInfo_URI {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_bool());
-                    self.executable = Some(tmp);
+                    self.executable = ::std::option::Some(tmp);
                 },
                 3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_bool());
-                    self.extract = Some(tmp);
+                    self.extract = ::std::option::Some(tmp);
                 },
                 _ => {
                     let unknown = try!(is.read_unknown(wire_type));
@@ -3362,10 +3563,7 @@ impl ::protobuf::Message for CommandInfo_URI {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.value.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
@@ -3377,14 +3575,11 @@ impl ::protobuf::Message for CommandInfo_URI {
             my_size += 2;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.value.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -3405,6 +3600,10 @@ impl ::protobuf::Message for CommandInfo_URI {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -3450,9 +3649,17 @@ impl ::protobuf::Clear for CommandInfo_URI {
     }
 }
 
+impl ::std::cmp::PartialEq for CommandInfo_URI {
+    fn eq(&self, other: &CommandInfo_URI) -> bool {
+        self.value == other.value &&
+        self.executable == other.executable &&
+        self.extract == other.extract &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for CommandInfo_URI {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -3512,11 +3719,12 @@ impl ::protobuf::reflect::FieldAccessor<CommandInfo_URI> for CommandInfo_URI_ext
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct CommandInfo_ContainerInfo {
     image: ::protobuf::SingularField<::std::string::String>,
     options: ::protobuf::RepeatedField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> CommandInfo_ContainerInfo {
@@ -3535,6 +3743,7 @@ impl<'a> CommandInfo_ContainerInfo {
                     image: ::protobuf::SingularField::none(),
                     options: ::protobuf::RepeatedField::new(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -3564,6 +3773,11 @@ impl<'a> CommandInfo_ContainerInfo {
         self.image.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_image(&mut self) -> ::std::string::String {
+        self.image.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_image(&'a self) -> &'a str {
         match self.image.as_ref() {
             Some(v) => v.as_slice(),
@@ -3585,6 +3799,11 @@ impl<'a> CommandInfo_ContainerInfo {
     // Mutable pointer to the field.
     pub fn mut_options(&'a mut self) -> &'a mut ::protobuf::RepeatedField<::std::string::String> {
         &mut self.options
+    }
+
+    // Take field
+    pub fn take_options(&mut self) -> ::protobuf::RepeatedField<::std::string::String> {
+        ::std::mem::replace(&mut self.options, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_options(&'a self) -> &'a [::std::string::String] {
@@ -3632,10 +3851,7 @@ impl ::protobuf::Message for CommandInfo_ContainerInfo {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.image.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
@@ -3644,14 +3860,11 @@ impl ::protobuf::Message for CommandInfo_ContainerInfo {
             my_size += ::protobuf::rt::string_size(2, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.image.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -3663,6 +3876,10 @@ impl ::protobuf::Message for CommandInfo_ContainerInfo {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -3706,9 +3923,16 @@ impl ::protobuf::Clear for CommandInfo_ContainerInfo {
     }
 }
 
+impl ::std::cmp::PartialEq for CommandInfo_ContainerInfo {
+    fn eq(&self, other: &CommandInfo_ContainerInfo) -> bool {
+        self.image == other.image &&
+        self.options == other.options &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for CommandInfo_ContainerInfo {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -3750,7 +3974,7 @@ impl ::protobuf::reflect::FieldAccessor<CommandInfo_ContainerInfo> for CommandIn
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct ExecutorInfo {
     executor_id: ::protobuf::SingularPtrField<ExecutorID>,
     framework_id: ::protobuf::SingularPtrField<FrameworkID>,
@@ -3761,6 +3985,7 @@ pub struct ExecutorInfo {
     source: ::protobuf::SingularField<::std::string::String>,
     data: ::protobuf::SingularField<::std::vec::Vec<u8>>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> ExecutorInfo {
@@ -3785,6 +4010,7 @@ impl<'a> ExecutorInfo {
                     source: ::protobuf::SingularField::none(),
                     data: ::protobuf::SingularField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -3812,6 +4038,11 @@ impl<'a> ExecutorInfo {
             self.executor_id.set_default();
         };
         self.executor_id.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_executor_id(&mut self) -> ExecutorID {
+        self.executor_id.take().unwrap_or_else(|| ExecutorID::new())
     }
 
     pub fn get_executor_id(&'a self) -> &'a ExecutorID {
@@ -3842,6 +4073,11 @@ impl<'a> ExecutorInfo {
         self.framework_id.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_framework_id(&mut self) -> FrameworkID {
+        self.framework_id.take().unwrap_or_else(|| FrameworkID::new())
+    }
+
     pub fn get_framework_id(&'a self) -> &'a FrameworkID {
         self.framework_id.as_ref().unwrap_or_else(|| FrameworkID::default_instance())
     }
@@ -3868,6 +4104,11 @@ impl<'a> ExecutorInfo {
             self.command.set_default();
         };
         self.command.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_command(&mut self) -> CommandInfo {
+        self.command.take().unwrap_or_else(|| CommandInfo::new())
     }
 
     pub fn get_command(&'a self) -> &'a CommandInfo {
@@ -3898,6 +4139,11 @@ impl<'a> ExecutorInfo {
         self.container.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_container(&mut self) -> ContainerInfo {
+        self.container.take().unwrap_or_else(|| ContainerInfo::new())
+    }
+
     pub fn get_container(&'a self) -> &'a ContainerInfo {
         self.container.as_ref().unwrap_or_else(|| ContainerInfo::default_instance())
     }
@@ -3916,6 +4162,11 @@ impl<'a> ExecutorInfo {
     // Mutable pointer to the field.
     pub fn mut_resources(&'a mut self) -> &'a mut ::protobuf::RepeatedField<Resource> {
         &mut self.resources
+    }
+
+    // Take field
+    pub fn take_resources(&mut self) -> ::protobuf::RepeatedField<Resource> {
+        ::std::mem::replace(&mut self.resources, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_resources(&'a self) -> &'a [Resource] {
@@ -3944,6 +4195,11 @@ impl<'a> ExecutorInfo {
             self.name.set_default();
         };
         self.name.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_name(&mut self) -> ::std::string::String {
+        self.name.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_name(&'a self) -> &'a str {
@@ -3977,6 +4233,11 @@ impl<'a> ExecutorInfo {
         self.source.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_source(&mut self) -> ::std::string::String {
+        self.source.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_source(&'a self) -> &'a str {
         match self.source.as_ref() {
             Some(v) => v.as_slice(),
@@ -4006,6 +4267,11 @@ impl<'a> ExecutorInfo {
             self.data.set_default();
         };
         self.data.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_data(&mut self) -> ::std::vec::Vec<u8> {
+        self.data.take().unwrap_or_else(|| ::std::vec::Vec::new())
     }
 
     pub fn get_data(&'a self) -> &'a [u8] {
@@ -4101,29 +4367,26 @@ impl ::protobuf::Message for ExecutorInfo {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.executor_id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.framework_id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.command.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.container.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.resources.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.name.iter() {
@@ -4136,54 +4399,47 @@ impl ::protobuf::Message for ExecutorInfo {
             my_size += ::protobuf::rt::bytes_size(4, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.executor_id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.framework_id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(8, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.command.as_ref() {
             Some(v) => {
                 try!(os.write_tag(7, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.container.as_ref() {
             Some(v) => {
                 try!(os.write_tag(11, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         for v in self.resources.iter() {
             try!(os.write_tag(5, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         match self.name.as_ref() {
             Some(v) => {
@@ -4205,6 +4461,10 @@ impl ::protobuf::Message for ExecutorInfo {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -4260,9 +4520,22 @@ impl ::protobuf::Clear for ExecutorInfo {
     }
 }
 
+impl ::std::cmp::PartialEq for ExecutorInfo {
+    fn eq(&self, other: &ExecutorInfo) -> bool {
+        self.executor_id == other.executor_id &&
+        self.framework_id == other.framework_id &&
+        self.command == other.command &&
+        self.container == other.container &&
+        self.resources == other.resources &&
+        self.name == other.name &&
+        self.source == other.source &&
+        self.data == other.data &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for ExecutorInfo {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -4412,7 +4685,7 @@ impl ::protobuf::reflect::FieldAccessor<ExecutorInfo> for ExecutorInfo_data_acc_
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct MasterInfo {
     id: ::protobuf::SingularField<::std::string::String>,
     ip: ::std::option::Option<u32>,
@@ -4420,6 +4693,7 @@ pub struct MasterInfo {
     pid: ::protobuf::SingularField<::std::string::String>,
     hostname: ::protobuf::SingularField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> MasterInfo {
@@ -4441,6 +4715,7 @@ impl<'a> MasterInfo {
                     pid: ::protobuf::SingularField::none(),
                     hostname: ::protobuf::SingularField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -4470,6 +4745,11 @@ impl<'a> MasterInfo {
         self.id.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_id(&mut self) -> ::std::string::String {
+        self.id.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_id(&'a self) -> &'a str {
         match self.id.as_ref() {
             Some(v) => v.as_slice(),
@@ -4480,7 +4760,7 @@ impl<'a> MasterInfo {
     // required uint32 ip = 2;
 
     pub fn clear_ip(&mut self) {
-        self.ip = None;
+        self.ip = ::std::option::None;
     }
 
     pub fn has_ip(&self) -> bool {
@@ -4489,7 +4769,7 @@ impl<'a> MasterInfo {
 
     // Param is passed by value, moved
     pub fn set_ip(&mut self, v: u32) {
-        self.ip = Some(v);
+        self.ip = ::std::option::Some(v);
     }
 
     pub fn get_ip(&self) -> u32 {
@@ -4499,7 +4779,7 @@ impl<'a> MasterInfo {
     // required uint32 port = 3;
 
     pub fn clear_port(&mut self) {
-        self.port = None;
+        self.port = ::std::option::None;
     }
 
     pub fn has_port(&self) -> bool {
@@ -4508,7 +4788,7 @@ impl<'a> MasterInfo {
 
     // Param is passed by value, moved
     pub fn set_port(&mut self, v: u32) {
-        self.port = Some(v);
+        self.port = ::std::option::Some(v);
     }
 
     pub fn get_port(&self) -> u32 {
@@ -4537,6 +4817,11 @@ impl<'a> MasterInfo {
             self.pid.set_default();
         };
         self.pid.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_pid(&mut self) -> ::std::string::String {
+        self.pid.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_pid(&'a self) -> &'a str {
@@ -4568,6 +4853,11 @@ impl<'a> MasterInfo {
             self.hostname.set_default();
         };
         self.hostname.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_hostname(&mut self) -> ::std::string::String {
+        self.hostname.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_hostname(&'a self) -> &'a str {
@@ -4612,14 +4902,14 @@ impl ::protobuf::Message for MasterInfo {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint32());
-                    self.ip = Some(tmp);
+                    self.ip = ::std::option::Some(tmp);
                 },
                 3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint32());
-                    self.port = Some(tmp);
+                    self.port = ::std::option::Some(tmp);
                 },
                 4 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -4645,10 +4935,7 @@ impl ::protobuf::Message for MasterInfo {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.id.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
@@ -4666,14 +4953,11 @@ impl ::protobuf::Message for MasterInfo {
             my_size += ::protobuf::rt::string_size(5, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.id.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -4706,6 +4990,10 @@ impl ::protobuf::Message for MasterInfo {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -4755,9 +5043,19 @@ impl ::protobuf::Clear for MasterInfo {
     }
 }
 
+impl ::std::cmp::PartialEq for MasterInfo {
+    fn eq(&self, other: &MasterInfo) -> bool {
+        self.id == other.id &&
+        self.ip == other.ip &&
+        self.port == other.port &&
+        self.pid == other.pid &&
+        self.hostname == other.hostname &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for MasterInfo {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -4853,7 +5151,7 @@ impl ::protobuf::reflect::FieldAccessor<MasterInfo> for MasterInfo_hostname_acc_
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct SlaveInfo {
     hostname: ::protobuf::SingularField<::std::string::String>,
     port: ::std::option::Option<i32>,
@@ -4862,6 +5160,7 @@ pub struct SlaveInfo {
     id: ::protobuf::SingularPtrField<SlaveID>,
     checkpoint: ::std::option::Option<bool>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> SlaveInfo {
@@ -4884,6 +5183,7 @@ impl<'a> SlaveInfo {
                     id: ::protobuf::SingularPtrField::none(),
                     checkpoint: ::std::option::None,
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -4913,6 +5213,11 @@ impl<'a> SlaveInfo {
         self.hostname.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_hostname(&mut self) -> ::std::string::String {
+        self.hostname.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_hostname(&'a self) -> &'a str {
         match self.hostname.as_ref() {
             Some(v) => v.as_slice(),
@@ -4923,7 +5228,7 @@ impl<'a> SlaveInfo {
     // optional int32 port = 8;
 
     pub fn clear_port(&mut self) {
-        self.port = None;
+        self.port = ::std::option::None;
     }
 
     pub fn has_port(&self) -> bool {
@@ -4932,7 +5237,7 @@ impl<'a> SlaveInfo {
 
     // Param is passed by value, moved
     pub fn set_port(&mut self, v: i32) {
-        self.port = Some(v);
+        self.port = ::std::option::Some(v);
     }
 
     pub fn get_port(&self) -> i32 {
@@ -4955,6 +5260,11 @@ impl<'a> SlaveInfo {
         &mut self.resources
     }
 
+    // Take field
+    pub fn take_resources(&mut self) -> ::protobuf::RepeatedField<Resource> {
+        ::std::mem::replace(&mut self.resources, ::protobuf::RepeatedField::new())
+    }
+
     pub fn get_resources(&'a self) -> &'a [Resource] {
         self.resources.as_slice()
     }
@@ -4973,6 +5283,11 @@ impl<'a> SlaveInfo {
     // Mutable pointer to the field.
     pub fn mut_attributes(&'a mut self) -> &'a mut ::protobuf::RepeatedField<Attribute> {
         &mut self.attributes
+    }
+
+    // Take field
+    pub fn take_attributes(&mut self) -> ::protobuf::RepeatedField<Attribute> {
+        ::std::mem::replace(&mut self.attributes, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_attributes(&'a self) -> &'a [Attribute] {
@@ -5003,6 +5318,11 @@ impl<'a> SlaveInfo {
         self.id.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_id(&mut self) -> SlaveID {
+        self.id.take().unwrap_or_else(|| SlaveID::new())
+    }
+
     pub fn get_id(&'a self) -> &'a SlaveID {
         self.id.as_ref().unwrap_or_else(|| SlaveID::default_instance())
     }
@@ -5010,7 +5330,7 @@ impl<'a> SlaveInfo {
     // optional bool checkpoint = 7;
 
     pub fn clear_checkpoint(&mut self) {
-        self.checkpoint = None;
+        self.checkpoint = ::std::option::None;
     }
 
     pub fn has_checkpoint(&self) -> bool {
@@ -5019,7 +5339,7 @@ impl<'a> SlaveInfo {
 
     // Param is passed by value, moved
     pub fn set_checkpoint(&mut self, v: bool) {
-        self.checkpoint = Some(v);
+        self.checkpoint = ::std::option::Some(v);
     }
 
     pub fn get_checkpoint(&self) -> bool {
@@ -5055,7 +5375,7 @@ impl ::protobuf::Message for SlaveInfo {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_int32());
-                    self.port = Some(tmp);
+                    self.port = ::std::option::Some(tmp);
                 },
                 3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -5083,7 +5403,7 @@ impl ::protobuf::Message for SlaveInfo {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_bool());
-                    self.checkpoint = Some(tmp);
+                    self.checkpoint = ::std::option::Some(tmp);
                 },
                 _ => {
                     let unknown = try!(is.read_unknown(wire_type));
@@ -5095,10 +5415,7 @@ impl ::protobuf::Message for SlaveInfo {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.hostname.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
@@ -5107,28 +5424,26 @@ impl ::protobuf::Message for SlaveInfo {
             my_size += ::protobuf::rt::value_size(8, *value, ::protobuf::wire_format::WireTypeVarint);
         };
         for value in self.resources.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.attributes.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         if self.checkpoint.is_some() {
             my_size += 2;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.hostname.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -5143,22 +5458,19 @@ impl ::protobuf::Message for SlaveInfo {
         };
         for v in self.resources.iter() {
             try!(os.write_tag(3, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         for v in self.attributes.iter() {
             try!(os.write_tag(5, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         match self.id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(6, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
@@ -5170,6 +5482,10 @@ impl ::protobuf::Message for SlaveInfo {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -5221,9 +5537,20 @@ impl ::protobuf::Clear for SlaveInfo {
     }
 }
 
+impl ::std::cmp::PartialEq for SlaveInfo {
+    fn eq(&self, other: &SlaveInfo) -> bool {
+        self.hostname == other.hostname &&
+        self.port == other.port &&
+        self.resources == other.resources &&
+        self.attributes == other.attributes &&
+        self.id == other.id &&
+        self.checkpoint == other.checkpoint &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for SlaveInfo {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -5337,7 +5664,7 @@ impl ::protobuf::reflect::FieldAccessor<SlaveInfo> for SlaveInfo_checkpoint_acc_
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Value {
     field_type: ::std::option::Option<Value_Type>,
     scalar: ::protobuf::SingularPtrField<Value_Scalar>,
@@ -5345,6 +5672,7 @@ pub struct Value {
     set: ::protobuf::SingularPtrField<Value_Set>,
     text: ::protobuf::SingularPtrField<Value_Text>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Value {
@@ -5366,6 +5694,7 @@ impl<'a> Value {
                     set: ::protobuf::SingularPtrField::none(),
                     text: ::protobuf::SingularPtrField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -5374,7 +5703,7 @@ impl<'a> Value {
     // required .mesos.Value.Type type = 1;
 
     pub fn clear_field_type(&mut self) {
-        self.field_type = None;
+        self.field_type = ::std::option::None;
     }
 
     pub fn has_field_type(&self) -> bool {
@@ -5383,7 +5712,7 @@ impl<'a> Value {
 
     // Param is passed by value, moved
     pub fn set_field_type(&mut self, v: Value_Type) {
-        self.field_type = Some(v);
+        self.field_type = ::std::option::Some(v);
     }
 
     pub fn get_field_type(&self) -> Value_Type {
@@ -5414,6 +5743,11 @@ impl<'a> Value {
         self.scalar.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_scalar(&mut self) -> Value_Scalar {
+        self.scalar.take().unwrap_or_else(|| Value_Scalar::new())
+    }
+
     pub fn get_scalar(&'a self) -> &'a Value_Scalar {
         self.scalar.as_ref().unwrap_or_else(|| Value_Scalar::default_instance())
     }
@@ -5440,6 +5774,11 @@ impl<'a> Value {
             self.ranges.set_default();
         };
         self.ranges.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_ranges(&mut self) -> Value_Ranges {
+        self.ranges.take().unwrap_or_else(|| Value_Ranges::new())
     }
 
     pub fn get_ranges(&'a self) -> &'a Value_Ranges {
@@ -5470,6 +5809,11 @@ impl<'a> Value {
         self.set.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_set(&mut self) -> Value_Set {
+        self.set.take().unwrap_or_else(|| Value_Set::new())
+    }
+
     pub fn get_set(&'a self) -> &'a Value_Set {
         self.set.as_ref().unwrap_or_else(|| Value_Set::default_instance())
     }
@@ -5498,6 +5842,11 @@ impl<'a> Value {
         self.text.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_text(&mut self) -> Value_Text {
+        self.text.take().unwrap_or_else(|| Value_Text::new())
+    }
+
     pub fn get_text(&'a self) -> &'a Value_Text {
         self.text.as_ref().unwrap_or_else(|| Value_Text::default_instance())
     }
@@ -5523,8 +5872,8 @@ impl ::protobuf::Message for Value {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
-                    let tmp = Value_Type::new(try!(is.read_int32()));
-                    self.field_type = Some(tmp);
+                    let tmp = try!(is.read_enum());
+                    self.field_type = ::std::option::Some(tmp);
                 },
                 2 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -5564,38 +5913,33 @@ impl ::protobuf::Message for Value {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.field_type.iter() {
             my_size += ::protobuf::rt::enum_size(1, *value);
         };
         for value in self.scalar.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.ranges.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.set.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.text.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.field_type {
             Some(v) => {
                 try!(os.write_enum(1, v as i32));
@@ -5605,41 +5949,41 @@ impl ::protobuf::Message for Value {
         match self.scalar.as_ref() {
             Some(v) => {
                 try!(os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.ranges.as_ref() {
             Some(v) => {
                 try!(os.write_tag(3, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.set.as_ref() {
             Some(v) => {
                 try!(os.write_tag(4, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.text.as_ref() {
             Some(v) => {
                 try!(os.write_tag(5, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -5689,9 +6033,19 @@ impl ::protobuf::Clear for Value {
     }
 }
 
+impl ::std::cmp::PartialEq for Value {
+    fn eq(&self, other: &Value) -> bool {
+        self.field_type == other.field_type &&
+        self.scalar == other.scalar &&
+        self.ranges == other.ranges &&
+        self.set == other.set &&
+        self.text == other.text &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Value {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -5711,7 +6065,6 @@ impl ::protobuf::reflect::FieldAccessor<Value> for Value_field_type_acc_type {
     }
 
     fn get_enum<'a>(&self, m: &Value) -> &'static ::protobuf::reflect::EnumValueDescriptor {
-        use protobuf::{ProtobufEnum};
         m.get_field_type().descriptor()
     }
 }
@@ -5788,10 +6141,11 @@ impl ::protobuf::reflect::FieldAccessor<Value> for Value_text_acc_type {
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Value_Scalar {
     value: ::std::option::Option<f64>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Value_Scalar {
@@ -5809,6 +6163,7 @@ impl<'a> Value_Scalar {
                 Value_Scalar {
                     value: ::std::option::None,
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -5817,7 +6172,7 @@ impl<'a> Value_Scalar {
     // required double value = 1;
 
     pub fn clear_value(&mut self) {
-        self.value = None;
+        self.value = ::std::option::None;
     }
 
     pub fn has_value(&self) -> bool {
@@ -5826,7 +6181,7 @@ impl<'a> Value_Scalar {
 
     // Param is passed by value, moved
     pub fn set_value(&mut self, v: f64) {
-        self.value = Some(v);
+        self.value = ::std::option::Some(v);
     }
 
     pub fn get_value(&self) -> f64 {
@@ -5855,7 +6210,7 @@ impl ::protobuf::Message for Value_Scalar {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.value = Some(tmp);
+                    self.value = ::std::option::Some(tmp);
                 },
                 _ => {
                     let unknown = try!(is.read_unknown(wire_type));
@@ -5867,23 +6222,17 @@ impl ::protobuf::Message for Value_Scalar {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         if self.value.is_some() {
             my_size += 9;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.value {
             Some(v) => {
                 try!(os.write_double(1, v));
@@ -5892,6 +6241,10 @@ impl ::protobuf::Message for Value_Scalar {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -5933,9 +6286,15 @@ impl ::protobuf::Clear for Value_Scalar {
     }
 }
 
+impl ::std::cmp::PartialEq for Value_Scalar {
+    fn eq(&self, other: &Value_Scalar) -> bool {
+        self.value == other.value &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Value_Scalar {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -5959,11 +6318,12 @@ impl ::protobuf::reflect::FieldAccessor<Value_Scalar> for Value_Scalar_value_acc
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Value_Range {
     begin: ::std::option::Option<u64>,
     end: ::std::option::Option<u64>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Value_Range {
@@ -5982,6 +6342,7 @@ impl<'a> Value_Range {
                     begin: ::std::option::None,
                     end: ::std::option::None,
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -5990,7 +6351,7 @@ impl<'a> Value_Range {
     // required uint64 begin = 1;
 
     pub fn clear_begin(&mut self) {
-        self.begin = None;
+        self.begin = ::std::option::None;
     }
 
     pub fn has_begin(&self) -> bool {
@@ -5999,7 +6360,7 @@ impl<'a> Value_Range {
 
     // Param is passed by value, moved
     pub fn set_begin(&mut self, v: u64) {
-        self.begin = Some(v);
+        self.begin = ::std::option::Some(v);
     }
 
     pub fn get_begin(&self) -> u64 {
@@ -6009,7 +6370,7 @@ impl<'a> Value_Range {
     // required uint64 end = 2;
 
     pub fn clear_end(&mut self) {
-        self.end = None;
+        self.end = ::std::option::None;
     }
 
     pub fn has_end(&self) -> bool {
@@ -6018,7 +6379,7 @@ impl<'a> Value_Range {
 
     // Param is passed by value, moved
     pub fn set_end(&mut self, v: u64) {
-        self.end = Some(v);
+        self.end = ::std::option::Some(v);
     }
 
     pub fn get_end(&self) -> u64 {
@@ -6050,14 +6411,14 @@ impl ::protobuf::Message for Value_Range {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.begin = Some(tmp);
+                    self.begin = ::std::option::Some(tmp);
                 },
                 2 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.end = Some(tmp);
+                    self.end = ::std::option::Some(tmp);
                 },
                 _ => {
                     let unknown = try!(is.read_unknown(wire_type));
@@ -6069,10 +6430,7 @@ impl ::protobuf::Message for Value_Range {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.begin.iter() {
             my_size += ::protobuf::rt::value_size(1, *value, ::protobuf::wire_format::WireTypeVarint);
@@ -6081,14 +6439,11 @@ impl ::protobuf::Message for Value_Range {
             my_size += ::protobuf::rt::value_size(2, *value, ::protobuf::wire_format::WireTypeVarint);
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.begin {
             Some(v) => {
                 try!(os.write_uint64(1, v));
@@ -6103,6 +6458,10 @@ impl ::protobuf::Message for Value_Range {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -6146,9 +6505,16 @@ impl ::protobuf::Clear for Value_Range {
     }
 }
 
+impl ::std::cmp::PartialEq for Value_Range {
+    fn eq(&self, other: &Value_Range) -> bool {
+        self.begin == other.begin &&
+        self.end == other.end &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Value_Range {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -6190,10 +6556,11 @@ impl ::protobuf::reflect::FieldAccessor<Value_Range> for Value_Range_end_acc_typ
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Value_Ranges {
     range: ::protobuf::RepeatedField<Value_Range>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Value_Ranges {
@@ -6211,6 +6578,7 @@ impl<'a> Value_Ranges {
                 Value_Ranges {
                     range: ::protobuf::RepeatedField::new(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -6230,6 +6598,11 @@ impl<'a> Value_Ranges {
     // Mutable pointer to the field.
     pub fn mut_range(&'a mut self) -> &'a mut ::protobuf::RepeatedField<Value_Range> {
         &mut self.range
+    }
+
+    // Take field
+    pub fn take_range(&mut self) -> ::protobuf::RepeatedField<Value_Range> {
+        ::std::mem::replace(&mut self.range, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_range(&'a self) -> &'a [Value_Range] {
@@ -6267,31 +6640,29 @@ impl ::protobuf::Message for Value_Ranges {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.range.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         for v in self.range.iter() {
             try!(os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -6333,9 +6704,15 @@ impl ::protobuf::Clear for Value_Ranges {
     }
 }
 
+impl ::std::cmp::PartialEq for Value_Ranges {
+    fn eq(&self, other: &Value_Ranges) -> bool {
+        self.range == other.range &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Value_Ranges {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -6359,10 +6736,11 @@ impl ::protobuf::reflect::FieldAccessor<Value_Ranges> for Value_Ranges_range_acc
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Value_Set {
     item: ::protobuf::RepeatedField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Value_Set {
@@ -6380,6 +6758,7 @@ impl<'a> Value_Set {
                 Value_Set {
                     item: ::protobuf::RepeatedField::new(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -6399,6 +6778,11 @@ impl<'a> Value_Set {
     // Mutable pointer to the field.
     pub fn mut_item(&'a mut self) -> &'a mut ::protobuf::RepeatedField<::std::string::String> {
         &mut self.item
+    }
+
+    // Take field
+    pub fn take_item(&mut self) -> ::protobuf::RepeatedField<::std::string::String> {
+        ::std::mem::replace(&mut self.item, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_item(&'a self) -> &'a [::std::string::String] {
@@ -6436,28 +6820,26 @@ impl ::protobuf::Message for Value_Set {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.item.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         for v in self.item.iter() {
             try!(os.write_string(1, v.as_slice()));
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -6499,9 +6881,15 @@ impl ::protobuf::Clear for Value_Set {
     }
 }
 
+impl ::std::cmp::PartialEq for Value_Set {
+    fn eq(&self, other: &Value_Set) -> bool {
+        self.item == other.item &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Value_Set {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -6525,10 +6913,11 @@ impl ::protobuf::reflect::FieldAccessor<Value_Set> for Value_Set_item_acc_type {
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Value_Text {
     value: ::protobuf::SingularField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Value_Text {
@@ -6546,6 +6935,7 @@ impl<'a> Value_Text {
                 Value_Text {
                     value: ::protobuf::SingularField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -6573,6 +6963,11 @@ impl<'a> Value_Text {
             self.value.set_default();
         };
         self.value.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_value(&mut self) -> ::std::string::String {
+        self.value.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_value(&'a self) -> &'a str {
@@ -6616,23 +7011,17 @@ impl ::protobuf::Message for Value_Text {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.value.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.value.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -6641,6 +7030,10 @@ impl ::protobuf::Message for Value_Text {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -6682,9 +7075,15 @@ impl ::protobuf::Clear for Value_Text {
     }
 }
 
+impl ::std::cmp::PartialEq for Value_Text {
+    fn eq(&self, other: &Value_Text) -> bool {
+        self.value == other.value &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Value_Text {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -6716,21 +7115,20 @@ pub enum Value_Type {
     TEXT = 3,
 }
 
-impl Value_Type {
-    pub fn new(value: i32) -> Value_Type {
-        match value {
-            0 => Value_Type::SCALAR,
-            1 => Value_Type::RANGES,
-            2 => Value_Type::SET,
-            3 => Value_Type::TEXT,
-            _ => panic!()
-        }
-    }
-}
 
 impl ::protobuf::ProtobufEnum for Value_Type {
     fn value(&self) -> i32 {
         *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<Value_Type> {
+        match value {
+            0 => ::std::option::Some(Value_Type::SCALAR),
+            1 => ::std::option::Some(Value_Type::RANGES),
+            2 => ::std::option::Some(Value_Type::SET),
+            3 => ::std::option::Some(Value_Type::TEXT),
+            _ => ::std::option::None
+        }
     }
 
     fn enum_descriptor_static(_: Option<Value_Type>) -> &'static ::protobuf::reflect::EnumDescriptor {
@@ -6746,7 +7144,7 @@ impl ::protobuf::ProtobufEnum for Value_Type {
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Attribute {
     name: ::protobuf::SingularField<::std::string::String>,
     field_type: ::std::option::Option<Value_Type>,
@@ -6755,6 +7153,7 @@ pub struct Attribute {
     set: ::protobuf::SingularPtrField<Value_Set>,
     text: ::protobuf::SingularPtrField<Value_Text>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Attribute {
@@ -6777,6 +7176,7 @@ impl<'a> Attribute {
                     set: ::protobuf::SingularPtrField::none(),
                     text: ::protobuf::SingularPtrField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -6806,6 +7206,11 @@ impl<'a> Attribute {
         self.name.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_name(&mut self) -> ::std::string::String {
+        self.name.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_name(&'a self) -> &'a str {
         match self.name.as_ref() {
             Some(v) => v.as_slice(),
@@ -6816,7 +7221,7 @@ impl<'a> Attribute {
     // required .mesos.Value.Type type = 2;
 
     pub fn clear_field_type(&mut self) {
-        self.field_type = None;
+        self.field_type = ::std::option::None;
     }
 
     pub fn has_field_type(&self) -> bool {
@@ -6825,7 +7230,7 @@ impl<'a> Attribute {
 
     // Param is passed by value, moved
     pub fn set_field_type(&mut self, v: Value_Type) {
-        self.field_type = Some(v);
+        self.field_type = ::std::option::Some(v);
     }
 
     pub fn get_field_type(&self) -> Value_Type {
@@ -6856,6 +7261,11 @@ impl<'a> Attribute {
         self.scalar.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_scalar(&mut self) -> Value_Scalar {
+        self.scalar.take().unwrap_or_else(|| Value_Scalar::new())
+    }
+
     pub fn get_scalar(&'a self) -> &'a Value_Scalar {
         self.scalar.as_ref().unwrap_or_else(|| Value_Scalar::default_instance())
     }
@@ -6882,6 +7292,11 @@ impl<'a> Attribute {
             self.ranges.set_default();
         };
         self.ranges.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_ranges(&mut self) -> Value_Ranges {
+        self.ranges.take().unwrap_or_else(|| Value_Ranges::new())
     }
 
     pub fn get_ranges(&'a self) -> &'a Value_Ranges {
@@ -6912,6 +7327,11 @@ impl<'a> Attribute {
         self.set.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_set(&mut self) -> Value_Set {
+        self.set.take().unwrap_or_else(|| Value_Set::new())
+    }
+
     pub fn get_set(&'a self) -> &'a Value_Set {
         self.set.as_ref().unwrap_or_else(|| Value_Set::default_instance())
     }
@@ -6938,6 +7358,11 @@ impl<'a> Attribute {
             self.text.set_default();
         };
         self.text.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_text(&mut self) -> Value_Text {
+        self.text.take().unwrap_or_else(|| Value_Text::new())
     }
 
     pub fn get_text(&'a self) -> &'a Value_Text {
@@ -6975,8 +7400,8 @@ impl ::protobuf::Message for Attribute {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
-                    let tmp = Value_Type::new(try!(is.read_int32()));
-                    self.field_type = Some(tmp);
+                    let tmp = try!(is.read_enum());
+                    self.field_type = ::std::option::Some(tmp);
                 },
                 3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -7016,10 +7441,7 @@ impl ::protobuf::Message for Attribute {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.name.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
@@ -7028,29 +7450,27 @@ impl ::protobuf::Message for Attribute {
             my_size += ::protobuf::rt::enum_size(2, *value);
         };
         for value in self.scalar.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.ranges.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.set.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.text.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.name.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -7066,41 +7486,41 @@ impl ::protobuf::Message for Attribute {
         match self.scalar.as_ref() {
             Some(v) => {
                 try!(os.write_tag(3, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.ranges.as_ref() {
             Some(v) => {
                 try!(os.write_tag(4, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.set.as_ref() {
             Some(v) => {
                 try!(os.write_tag(6, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.text.as_ref() {
             Some(v) => {
                 try!(os.write_tag(5, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -7152,9 +7572,20 @@ impl ::protobuf::Clear for Attribute {
     }
 }
 
+impl ::std::cmp::PartialEq for Attribute {
+    fn eq(&self, other: &Attribute) -> bool {
+        self.name == other.name &&
+        self.field_type == other.field_type &&
+        self.scalar == other.scalar &&
+        self.ranges == other.ranges &&
+        self.set == other.set &&
+        self.text == other.text &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Attribute {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -7192,7 +7623,6 @@ impl ::protobuf::reflect::FieldAccessor<Attribute> for Attribute_field_type_acc_
     }
 
     fn get_enum<'a>(&self, m: &Attribute) -> &'static ::protobuf::reflect::EnumValueDescriptor {
-        use protobuf::{ProtobufEnum};
         m.get_field_type().descriptor()
     }
 }
@@ -7269,7 +7699,7 @@ impl ::protobuf::reflect::FieldAccessor<Attribute> for Attribute_text_acc_type {
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Resource {
     name: ::protobuf::SingularField<::std::string::String>,
     field_type: ::std::option::Option<Value_Type>,
@@ -7278,6 +7708,7 @@ pub struct Resource {
     set: ::protobuf::SingularPtrField<Value_Set>,
     role: ::protobuf::SingularField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Resource {
@@ -7300,6 +7731,7 @@ impl<'a> Resource {
                     set: ::protobuf::SingularPtrField::none(),
                     role: ::protobuf::SingularField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -7329,6 +7761,11 @@ impl<'a> Resource {
         self.name.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_name(&mut self) -> ::std::string::String {
+        self.name.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_name(&'a self) -> &'a str {
         match self.name.as_ref() {
             Some(v) => v.as_slice(),
@@ -7339,7 +7776,7 @@ impl<'a> Resource {
     // required .mesos.Value.Type type = 2;
 
     pub fn clear_field_type(&mut self) {
-        self.field_type = None;
+        self.field_type = ::std::option::None;
     }
 
     pub fn has_field_type(&self) -> bool {
@@ -7348,7 +7785,7 @@ impl<'a> Resource {
 
     // Param is passed by value, moved
     pub fn set_field_type(&mut self, v: Value_Type) {
-        self.field_type = Some(v);
+        self.field_type = ::std::option::Some(v);
     }
 
     pub fn get_field_type(&self) -> Value_Type {
@@ -7379,6 +7816,11 @@ impl<'a> Resource {
         self.scalar.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_scalar(&mut self) -> Value_Scalar {
+        self.scalar.take().unwrap_or_else(|| Value_Scalar::new())
+    }
+
     pub fn get_scalar(&'a self) -> &'a Value_Scalar {
         self.scalar.as_ref().unwrap_or_else(|| Value_Scalar::default_instance())
     }
@@ -7405,6 +7847,11 @@ impl<'a> Resource {
             self.ranges.set_default();
         };
         self.ranges.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_ranges(&mut self) -> Value_Ranges {
+        self.ranges.take().unwrap_or_else(|| Value_Ranges::new())
     }
 
     pub fn get_ranges(&'a self) -> &'a Value_Ranges {
@@ -7435,6 +7882,11 @@ impl<'a> Resource {
         self.set.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_set(&mut self) -> Value_Set {
+        self.set.take().unwrap_or_else(|| Value_Set::new())
+    }
+
     pub fn get_set(&'a self) -> &'a Value_Set {
         self.set.as_ref().unwrap_or_else(|| Value_Set::default_instance())
     }
@@ -7461,6 +7913,11 @@ impl<'a> Resource {
             self.role.set_default();
         };
         self.role.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_role(&mut self) -> ::std::string::String {
+        self.role.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_role(&'a self) -> &'a str {
@@ -7501,8 +7958,8 @@ impl ::protobuf::Message for Resource {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
-                    let tmp = Value_Type::new(try!(is.read_int32()));
-                    self.field_type = Some(tmp);
+                    let tmp = try!(is.read_enum());
+                    self.field_type = ::std::option::Some(tmp);
                 },
                 3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -7542,10 +7999,7 @@ impl ::protobuf::Message for Resource {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.name.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
@@ -7554,28 +8008,26 @@ impl ::protobuf::Message for Resource {
             my_size += ::protobuf::rt::enum_size(2, *value);
         };
         for value in self.scalar.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.ranges.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.set.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.role.iter() {
             my_size += ::protobuf::rt::string_size(6, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.name.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -7591,27 +8043,24 @@ impl ::protobuf::Message for Resource {
         match self.scalar.as_ref() {
             Some(v) => {
                 try!(os.write_tag(3, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.ranges.as_ref() {
             Some(v) => {
                 try!(os.write_tag(4, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.set.as_ref() {
             Some(v) => {
                 try!(os.write_tag(5, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
@@ -7623,6 +8072,10 @@ impl ::protobuf::Message for Resource {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -7674,9 +8127,20 @@ impl ::protobuf::Clear for Resource {
     }
 }
 
+impl ::std::cmp::PartialEq for Resource {
+    fn eq(&self, other: &Resource) -> bool {
+        self.name == other.name &&
+        self.field_type == other.field_type &&
+        self.scalar == other.scalar &&
+        self.ranges == other.ranges &&
+        self.set == other.set &&
+        self.role == other.role &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Resource {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -7714,7 +8178,6 @@ impl ::protobuf::reflect::FieldAccessor<Resource> for Resource_field_type_acc_ty
     }
 
     fn get_enum<'a>(&self, m: &Resource) -> &'static ::protobuf::reflect::EnumValueDescriptor {
-        use protobuf::{ProtobufEnum};
         m.get_field_type().descriptor()
     }
 }
@@ -7791,7 +8254,7 @@ impl ::protobuf::reflect::FieldAccessor<Resource> for Resource_role_acc_type {
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct ResourceStatistics {
     timestamp: ::std::option::Option<f64>,
     cpus_user_time_secs: ::std::option::Option<f64>,
@@ -7819,6 +8282,7 @@ pub struct ResourceStatistics {
     net_tcp_rtt_microsecs_p95: ::std::option::Option<f64>,
     net_tcp_rtt_microsecs_p99: ::std::option::Option<f64>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> ResourceStatistics {
@@ -7860,6 +8324,7 @@ impl<'a> ResourceStatistics {
                     net_tcp_rtt_microsecs_p95: ::std::option::None,
                     net_tcp_rtt_microsecs_p99: ::std::option::None,
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -7868,7 +8333,7 @@ impl<'a> ResourceStatistics {
     // required double timestamp = 1;
 
     pub fn clear_timestamp(&mut self) {
-        self.timestamp = None;
+        self.timestamp = ::std::option::None;
     }
 
     pub fn has_timestamp(&self) -> bool {
@@ -7877,7 +8342,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_timestamp(&mut self, v: f64) {
-        self.timestamp = Some(v);
+        self.timestamp = ::std::option::Some(v);
     }
 
     pub fn get_timestamp(&self) -> f64 {
@@ -7887,7 +8352,7 @@ impl<'a> ResourceStatistics {
     // optional double cpus_user_time_secs = 2;
 
     pub fn clear_cpus_user_time_secs(&mut self) {
-        self.cpus_user_time_secs = None;
+        self.cpus_user_time_secs = ::std::option::None;
     }
 
     pub fn has_cpus_user_time_secs(&self) -> bool {
@@ -7896,7 +8361,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_cpus_user_time_secs(&mut self, v: f64) {
-        self.cpus_user_time_secs = Some(v);
+        self.cpus_user_time_secs = ::std::option::Some(v);
     }
 
     pub fn get_cpus_user_time_secs(&self) -> f64 {
@@ -7906,7 +8371,7 @@ impl<'a> ResourceStatistics {
     // optional double cpus_system_time_secs = 3;
 
     pub fn clear_cpus_system_time_secs(&mut self) {
-        self.cpus_system_time_secs = None;
+        self.cpus_system_time_secs = ::std::option::None;
     }
 
     pub fn has_cpus_system_time_secs(&self) -> bool {
@@ -7915,7 +8380,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_cpus_system_time_secs(&mut self, v: f64) {
-        self.cpus_system_time_secs = Some(v);
+        self.cpus_system_time_secs = ::std::option::Some(v);
     }
 
     pub fn get_cpus_system_time_secs(&self) -> f64 {
@@ -7925,7 +8390,7 @@ impl<'a> ResourceStatistics {
     // optional double cpus_limit = 4;
 
     pub fn clear_cpus_limit(&mut self) {
-        self.cpus_limit = None;
+        self.cpus_limit = ::std::option::None;
     }
 
     pub fn has_cpus_limit(&self) -> bool {
@@ -7934,7 +8399,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_cpus_limit(&mut self, v: f64) {
-        self.cpus_limit = Some(v);
+        self.cpus_limit = ::std::option::Some(v);
     }
 
     pub fn get_cpus_limit(&self) -> f64 {
@@ -7944,7 +8409,7 @@ impl<'a> ResourceStatistics {
     // optional uint32 cpus_nr_periods = 7;
 
     pub fn clear_cpus_nr_periods(&mut self) {
-        self.cpus_nr_periods = None;
+        self.cpus_nr_periods = ::std::option::None;
     }
 
     pub fn has_cpus_nr_periods(&self) -> bool {
@@ -7953,7 +8418,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_cpus_nr_periods(&mut self, v: u32) {
-        self.cpus_nr_periods = Some(v);
+        self.cpus_nr_periods = ::std::option::Some(v);
     }
 
     pub fn get_cpus_nr_periods(&self) -> u32 {
@@ -7963,7 +8428,7 @@ impl<'a> ResourceStatistics {
     // optional uint32 cpus_nr_throttled = 8;
 
     pub fn clear_cpus_nr_throttled(&mut self) {
-        self.cpus_nr_throttled = None;
+        self.cpus_nr_throttled = ::std::option::None;
     }
 
     pub fn has_cpus_nr_throttled(&self) -> bool {
@@ -7972,7 +8437,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_cpus_nr_throttled(&mut self, v: u32) {
-        self.cpus_nr_throttled = Some(v);
+        self.cpus_nr_throttled = ::std::option::Some(v);
     }
 
     pub fn get_cpus_nr_throttled(&self) -> u32 {
@@ -7982,7 +8447,7 @@ impl<'a> ResourceStatistics {
     // optional double cpus_throttled_time_secs = 9;
 
     pub fn clear_cpus_throttled_time_secs(&mut self) {
-        self.cpus_throttled_time_secs = None;
+        self.cpus_throttled_time_secs = ::std::option::None;
     }
 
     pub fn has_cpus_throttled_time_secs(&self) -> bool {
@@ -7991,7 +8456,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_cpus_throttled_time_secs(&mut self, v: f64) {
-        self.cpus_throttled_time_secs = Some(v);
+        self.cpus_throttled_time_secs = ::std::option::Some(v);
     }
 
     pub fn get_cpus_throttled_time_secs(&self) -> f64 {
@@ -8001,7 +8466,7 @@ impl<'a> ResourceStatistics {
     // optional uint64 mem_rss_bytes = 5;
 
     pub fn clear_mem_rss_bytes(&mut self) {
-        self.mem_rss_bytes = None;
+        self.mem_rss_bytes = ::std::option::None;
     }
 
     pub fn has_mem_rss_bytes(&self) -> bool {
@@ -8010,7 +8475,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_mem_rss_bytes(&mut self, v: u64) {
-        self.mem_rss_bytes = Some(v);
+        self.mem_rss_bytes = ::std::option::Some(v);
     }
 
     pub fn get_mem_rss_bytes(&self) -> u64 {
@@ -8020,7 +8485,7 @@ impl<'a> ResourceStatistics {
     // optional uint64 mem_limit_bytes = 6;
 
     pub fn clear_mem_limit_bytes(&mut self) {
-        self.mem_limit_bytes = None;
+        self.mem_limit_bytes = ::std::option::None;
     }
 
     pub fn has_mem_limit_bytes(&self) -> bool {
@@ -8029,7 +8494,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_mem_limit_bytes(&mut self, v: u64) {
-        self.mem_limit_bytes = Some(v);
+        self.mem_limit_bytes = ::std::option::Some(v);
     }
 
     pub fn get_mem_limit_bytes(&self) -> u64 {
@@ -8039,7 +8504,7 @@ impl<'a> ResourceStatistics {
     // optional uint64 mem_file_bytes = 10;
 
     pub fn clear_mem_file_bytes(&mut self) {
-        self.mem_file_bytes = None;
+        self.mem_file_bytes = ::std::option::None;
     }
 
     pub fn has_mem_file_bytes(&self) -> bool {
@@ -8048,7 +8513,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_mem_file_bytes(&mut self, v: u64) {
-        self.mem_file_bytes = Some(v);
+        self.mem_file_bytes = ::std::option::Some(v);
     }
 
     pub fn get_mem_file_bytes(&self) -> u64 {
@@ -8058,7 +8523,7 @@ impl<'a> ResourceStatistics {
     // optional uint64 mem_anon_bytes = 11;
 
     pub fn clear_mem_anon_bytes(&mut self) {
-        self.mem_anon_bytes = None;
+        self.mem_anon_bytes = ::std::option::None;
     }
 
     pub fn has_mem_anon_bytes(&self) -> bool {
@@ -8067,7 +8532,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_mem_anon_bytes(&mut self, v: u64) {
-        self.mem_anon_bytes = Some(v);
+        self.mem_anon_bytes = ::std::option::Some(v);
     }
 
     pub fn get_mem_anon_bytes(&self) -> u64 {
@@ -8077,7 +8542,7 @@ impl<'a> ResourceStatistics {
     // optional uint64 mem_mapped_file_bytes = 12;
 
     pub fn clear_mem_mapped_file_bytes(&mut self) {
-        self.mem_mapped_file_bytes = None;
+        self.mem_mapped_file_bytes = ::std::option::None;
     }
 
     pub fn has_mem_mapped_file_bytes(&self) -> bool {
@@ -8086,7 +8551,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_mem_mapped_file_bytes(&mut self, v: u64) {
-        self.mem_mapped_file_bytes = Some(v);
+        self.mem_mapped_file_bytes = ::std::option::Some(v);
     }
 
     pub fn get_mem_mapped_file_bytes(&self) -> u64 {
@@ -8117,6 +8582,11 @@ impl<'a> ResourceStatistics {
         self.perf.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_perf(&mut self) -> PerfStatistics {
+        self.perf.take().unwrap_or_else(|| PerfStatistics::new())
+    }
+
     pub fn get_perf(&'a self) -> &'a PerfStatistics {
         self.perf.as_ref().unwrap_or_else(|| PerfStatistics::default_instance())
     }
@@ -8124,7 +8594,7 @@ impl<'a> ResourceStatistics {
     // optional uint64 net_rx_packets = 14;
 
     pub fn clear_net_rx_packets(&mut self) {
-        self.net_rx_packets = None;
+        self.net_rx_packets = ::std::option::None;
     }
 
     pub fn has_net_rx_packets(&self) -> bool {
@@ -8133,7 +8603,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_net_rx_packets(&mut self, v: u64) {
-        self.net_rx_packets = Some(v);
+        self.net_rx_packets = ::std::option::Some(v);
     }
 
     pub fn get_net_rx_packets(&self) -> u64 {
@@ -8143,7 +8613,7 @@ impl<'a> ResourceStatistics {
     // optional uint64 net_rx_bytes = 15;
 
     pub fn clear_net_rx_bytes(&mut self) {
-        self.net_rx_bytes = None;
+        self.net_rx_bytes = ::std::option::None;
     }
 
     pub fn has_net_rx_bytes(&self) -> bool {
@@ -8152,7 +8622,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_net_rx_bytes(&mut self, v: u64) {
-        self.net_rx_bytes = Some(v);
+        self.net_rx_bytes = ::std::option::Some(v);
     }
 
     pub fn get_net_rx_bytes(&self) -> u64 {
@@ -8162,7 +8632,7 @@ impl<'a> ResourceStatistics {
     // optional uint64 net_rx_errors = 16;
 
     pub fn clear_net_rx_errors(&mut self) {
-        self.net_rx_errors = None;
+        self.net_rx_errors = ::std::option::None;
     }
 
     pub fn has_net_rx_errors(&self) -> bool {
@@ -8171,7 +8641,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_net_rx_errors(&mut self, v: u64) {
-        self.net_rx_errors = Some(v);
+        self.net_rx_errors = ::std::option::Some(v);
     }
 
     pub fn get_net_rx_errors(&self) -> u64 {
@@ -8181,7 +8651,7 @@ impl<'a> ResourceStatistics {
     // optional uint64 net_rx_dropped = 17;
 
     pub fn clear_net_rx_dropped(&mut self) {
-        self.net_rx_dropped = None;
+        self.net_rx_dropped = ::std::option::None;
     }
 
     pub fn has_net_rx_dropped(&self) -> bool {
@@ -8190,7 +8660,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_net_rx_dropped(&mut self, v: u64) {
-        self.net_rx_dropped = Some(v);
+        self.net_rx_dropped = ::std::option::Some(v);
     }
 
     pub fn get_net_rx_dropped(&self) -> u64 {
@@ -8200,7 +8670,7 @@ impl<'a> ResourceStatistics {
     // optional uint64 net_tx_packets = 18;
 
     pub fn clear_net_tx_packets(&mut self) {
-        self.net_tx_packets = None;
+        self.net_tx_packets = ::std::option::None;
     }
 
     pub fn has_net_tx_packets(&self) -> bool {
@@ -8209,7 +8679,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_net_tx_packets(&mut self, v: u64) {
-        self.net_tx_packets = Some(v);
+        self.net_tx_packets = ::std::option::Some(v);
     }
 
     pub fn get_net_tx_packets(&self) -> u64 {
@@ -8219,7 +8689,7 @@ impl<'a> ResourceStatistics {
     // optional uint64 net_tx_bytes = 19;
 
     pub fn clear_net_tx_bytes(&mut self) {
-        self.net_tx_bytes = None;
+        self.net_tx_bytes = ::std::option::None;
     }
 
     pub fn has_net_tx_bytes(&self) -> bool {
@@ -8228,7 +8698,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_net_tx_bytes(&mut self, v: u64) {
-        self.net_tx_bytes = Some(v);
+        self.net_tx_bytes = ::std::option::Some(v);
     }
 
     pub fn get_net_tx_bytes(&self) -> u64 {
@@ -8238,7 +8708,7 @@ impl<'a> ResourceStatistics {
     // optional uint64 net_tx_errors = 20;
 
     pub fn clear_net_tx_errors(&mut self) {
-        self.net_tx_errors = None;
+        self.net_tx_errors = ::std::option::None;
     }
 
     pub fn has_net_tx_errors(&self) -> bool {
@@ -8247,7 +8717,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_net_tx_errors(&mut self, v: u64) {
-        self.net_tx_errors = Some(v);
+        self.net_tx_errors = ::std::option::Some(v);
     }
 
     pub fn get_net_tx_errors(&self) -> u64 {
@@ -8257,7 +8727,7 @@ impl<'a> ResourceStatistics {
     // optional uint64 net_tx_dropped = 21;
 
     pub fn clear_net_tx_dropped(&mut self) {
-        self.net_tx_dropped = None;
+        self.net_tx_dropped = ::std::option::None;
     }
 
     pub fn has_net_tx_dropped(&self) -> bool {
@@ -8266,7 +8736,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_net_tx_dropped(&mut self, v: u64) {
-        self.net_tx_dropped = Some(v);
+        self.net_tx_dropped = ::std::option::Some(v);
     }
 
     pub fn get_net_tx_dropped(&self) -> u64 {
@@ -8276,7 +8746,7 @@ impl<'a> ResourceStatistics {
     // optional double net_tcp_rtt_microsecs_p50 = 22;
 
     pub fn clear_net_tcp_rtt_microsecs_p50(&mut self) {
-        self.net_tcp_rtt_microsecs_p50 = None;
+        self.net_tcp_rtt_microsecs_p50 = ::std::option::None;
     }
 
     pub fn has_net_tcp_rtt_microsecs_p50(&self) -> bool {
@@ -8285,7 +8755,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_net_tcp_rtt_microsecs_p50(&mut self, v: f64) {
-        self.net_tcp_rtt_microsecs_p50 = Some(v);
+        self.net_tcp_rtt_microsecs_p50 = ::std::option::Some(v);
     }
 
     pub fn get_net_tcp_rtt_microsecs_p50(&self) -> f64 {
@@ -8295,7 +8765,7 @@ impl<'a> ResourceStatistics {
     // optional double net_tcp_rtt_microsecs_p90 = 23;
 
     pub fn clear_net_tcp_rtt_microsecs_p90(&mut self) {
-        self.net_tcp_rtt_microsecs_p90 = None;
+        self.net_tcp_rtt_microsecs_p90 = ::std::option::None;
     }
 
     pub fn has_net_tcp_rtt_microsecs_p90(&self) -> bool {
@@ -8304,7 +8774,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_net_tcp_rtt_microsecs_p90(&mut self, v: f64) {
-        self.net_tcp_rtt_microsecs_p90 = Some(v);
+        self.net_tcp_rtt_microsecs_p90 = ::std::option::Some(v);
     }
 
     pub fn get_net_tcp_rtt_microsecs_p90(&self) -> f64 {
@@ -8314,7 +8784,7 @@ impl<'a> ResourceStatistics {
     // optional double net_tcp_rtt_microsecs_p95 = 24;
 
     pub fn clear_net_tcp_rtt_microsecs_p95(&mut self) {
-        self.net_tcp_rtt_microsecs_p95 = None;
+        self.net_tcp_rtt_microsecs_p95 = ::std::option::None;
     }
 
     pub fn has_net_tcp_rtt_microsecs_p95(&self) -> bool {
@@ -8323,7 +8793,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_net_tcp_rtt_microsecs_p95(&mut self, v: f64) {
-        self.net_tcp_rtt_microsecs_p95 = Some(v);
+        self.net_tcp_rtt_microsecs_p95 = ::std::option::Some(v);
     }
 
     pub fn get_net_tcp_rtt_microsecs_p95(&self) -> f64 {
@@ -8333,7 +8803,7 @@ impl<'a> ResourceStatistics {
     // optional double net_tcp_rtt_microsecs_p99 = 25;
 
     pub fn clear_net_tcp_rtt_microsecs_p99(&mut self) {
-        self.net_tcp_rtt_microsecs_p99 = None;
+        self.net_tcp_rtt_microsecs_p99 = ::std::option::None;
     }
 
     pub fn has_net_tcp_rtt_microsecs_p99(&self) -> bool {
@@ -8342,7 +8812,7 @@ impl<'a> ResourceStatistics {
 
     // Param is passed by value, moved
     pub fn set_net_tcp_rtt_microsecs_p99(&mut self, v: f64) {
-        self.net_tcp_rtt_microsecs_p99 = Some(v);
+        self.net_tcp_rtt_microsecs_p99 = ::std::option::Some(v);
     }
 
     pub fn get_net_tcp_rtt_microsecs_p99(&self) -> f64 {
@@ -8371,84 +8841,84 @@ impl ::protobuf::Message for ResourceStatistics {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.timestamp = Some(tmp);
+                    self.timestamp = ::std::option::Some(tmp);
                 },
                 2 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.cpus_user_time_secs = Some(tmp);
+                    self.cpus_user_time_secs = ::std::option::Some(tmp);
                 },
                 3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.cpus_system_time_secs = Some(tmp);
+                    self.cpus_system_time_secs = ::std::option::Some(tmp);
                 },
                 4 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.cpus_limit = Some(tmp);
+                    self.cpus_limit = ::std::option::Some(tmp);
                 },
                 7 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint32());
-                    self.cpus_nr_periods = Some(tmp);
+                    self.cpus_nr_periods = ::std::option::Some(tmp);
                 },
                 8 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint32());
-                    self.cpus_nr_throttled = Some(tmp);
+                    self.cpus_nr_throttled = ::std::option::Some(tmp);
                 },
                 9 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.cpus_throttled_time_secs = Some(tmp);
+                    self.cpus_throttled_time_secs = ::std::option::Some(tmp);
                 },
                 5 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.mem_rss_bytes = Some(tmp);
+                    self.mem_rss_bytes = ::std::option::Some(tmp);
                 },
                 6 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.mem_limit_bytes = Some(tmp);
+                    self.mem_limit_bytes = ::std::option::Some(tmp);
                 },
                 10 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.mem_file_bytes = Some(tmp);
+                    self.mem_file_bytes = ::std::option::Some(tmp);
                 },
                 11 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.mem_anon_bytes = Some(tmp);
+                    self.mem_anon_bytes = ::std::option::Some(tmp);
                 },
                 12 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.mem_mapped_file_bytes = Some(tmp);
+                    self.mem_mapped_file_bytes = ::std::option::Some(tmp);
                 },
                 13 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -8462,84 +8932,84 @@ impl ::protobuf::Message for ResourceStatistics {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.net_rx_packets = Some(tmp);
+                    self.net_rx_packets = ::std::option::Some(tmp);
                 },
                 15 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.net_rx_bytes = Some(tmp);
+                    self.net_rx_bytes = ::std::option::Some(tmp);
                 },
                 16 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.net_rx_errors = Some(tmp);
+                    self.net_rx_errors = ::std::option::Some(tmp);
                 },
                 17 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.net_rx_dropped = Some(tmp);
+                    self.net_rx_dropped = ::std::option::Some(tmp);
                 },
                 18 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.net_tx_packets = Some(tmp);
+                    self.net_tx_packets = ::std::option::Some(tmp);
                 },
                 19 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.net_tx_bytes = Some(tmp);
+                    self.net_tx_bytes = ::std::option::Some(tmp);
                 },
                 20 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.net_tx_errors = Some(tmp);
+                    self.net_tx_errors = ::std::option::Some(tmp);
                 },
                 21 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.net_tx_dropped = Some(tmp);
+                    self.net_tx_dropped = ::std::option::Some(tmp);
                 },
                 22 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.net_tcp_rtt_microsecs_p50 = Some(tmp);
+                    self.net_tcp_rtt_microsecs_p50 = ::std::option::Some(tmp);
                 },
                 23 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.net_tcp_rtt_microsecs_p90 = Some(tmp);
+                    self.net_tcp_rtt_microsecs_p90 = ::std::option::Some(tmp);
                 },
                 24 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.net_tcp_rtt_microsecs_p95 = Some(tmp);
+                    self.net_tcp_rtt_microsecs_p95 = ::std::option::Some(tmp);
                 },
                 25 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.net_tcp_rtt_microsecs_p99 = Some(tmp);
+                    self.net_tcp_rtt_microsecs_p99 = ::std::option::Some(tmp);
                 },
                 _ => {
                     let unknown = try!(is.read_unknown(wire_type));
@@ -8551,10 +9021,7 @@ impl ::protobuf::Message for ResourceStatistics {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         if self.timestamp.is_some() {
             my_size += 9;
@@ -8593,7 +9060,7 @@ impl ::protobuf::Message for ResourceStatistics {
             my_size += ::protobuf::rt::value_size(12, *value, ::protobuf::wire_format::WireTypeVarint);
         };
         for value in self.perf.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.net_rx_packets.iter() {
@@ -8633,13 +9100,11 @@ impl ::protobuf::Message for ResourceStatistics {
             my_size += 10;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.timestamp {
             Some(v) => {
                 try!(os.write_double(1, v));
@@ -8715,9 +9180,8 @@ impl ::protobuf::Message for ResourceStatistics {
         match self.perf.as_ref() {
             Some(v) => {
                 try!(os.write_tag(13, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
@@ -8795,6 +9259,10 @@ impl ::protobuf::Message for ResourceStatistics {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -8884,9 +9352,39 @@ impl ::protobuf::Clear for ResourceStatistics {
     }
 }
 
+impl ::std::cmp::PartialEq for ResourceStatistics {
+    fn eq(&self, other: &ResourceStatistics) -> bool {
+        self.timestamp == other.timestamp &&
+        self.cpus_user_time_secs == other.cpus_user_time_secs &&
+        self.cpus_system_time_secs == other.cpus_system_time_secs &&
+        self.cpus_limit == other.cpus_limit &&
+        self.cpus_nr_periods == other.cpus_nr_periods &&
+        self.cpus_nr_throttled == other.cpus_nr_throttled &&
+        self.cpus_throttled_time_secs == other.cpus_throttled_time_secs &&
+        self.mem_rss_bytes == other.mem_rss_bytes &&
+        self.mem_limit_bytes == other.mem_limit_bytes &&
+        self.mem_file_bytes == other.mem_file_bytes &&
+        self.mem_anon_bytes == other.mem_anon_bytes &&
+        self.mem_mapped_file_bytes == other.mem_mapped_file_bytes &&
+        self.perf == other.perf &&
+        self.net_rx_packets == other.net_rx_packets &&
+        self.net_rx_bytes == other.net_rx_bytes &&
+        self.net_rx_errors == other.net_rx_errors &&
+        self.net_rx_dropped == other.net_rx_dropped &&
+        self.net_tx_packets == other.net_tx_packets &&
+        self.net_tx_bytes == other.net_tx_bytes &&
+        self.net_tx_errors == other.net_tx_errors &&
+        self.net_tx_dropped == other.net_tx_dropped &&
+        self.net_tcp_rtt_microsecs_p50 == other.net_tcp_rtt_microsecs_p50 &&
+        self.net_tcp_rtt_microsecs_p90 == other.net_tcp_rtt_microsecs_p90 &&
+        self.net_tcp_rtt_microsecs_p95 == other.net_tcp_rtt_microsecs_p95 &&
+        self.net_tcp_rtt_microsecs_p99 == other.net_tcp_rtt_microsecs_p99 &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for ResourceStatistics {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -9342,7 +9840,7 @@ impl ::protobuf::reflect::FieldAccessor<ResourceStatistics> for ResourceStatisti
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct ResourceUsage {
     slave_id: ::protobuf::SingularPtrField<SlaveID>,
     framework_id: ::protobuf::SingularPtrField<FrameworkID>,
@@ -9351,6 +9849,7 @@ pub struct ResourceUsage {
     task_id: ::protobuf::SingularPtrField<TaskID>,
     statistics: ::protobuf::SingularPtrField<ResourceStatistics>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> ResourceUsage {
@@ -9373,6 +9872,7 @@ impl<'a> ResourceUsage {
                     task_id: ::protobuf::SingularPtrField::none(),
                     statistics: ::protobuf::SingularPtrField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -9400,6 +9900,11 @@ impl<'a> ResourceUsage {
             self.slave_id.set_default();
         };
         self.slave_id.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_slave_id(&mut self) -> SlaveID {
+        self.slave_id.take().unwrap_or_else(|| SlaveID::new())
     }
 
     pub fn get_slave_id(&'a self) -> &'a SlaveID {
@@ -9430,6 +9935,11 @@ impl<'a> ResourceUsage {
         self.framework_id.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_framework_id(&mut self) -> FrameworkID {
+        self.framework_id.take().unwrap_or_else(|| FrameworkID::new())
+    }
+
     pub fn get_framework_id(&'a self) -> &'a FrameworkID {
         self.framework_id.as_ref().unwrap_or_else(|| FrameworkID::default_instance())
     }
@@ -9458,6 +9968,11 @@ impl<'a> ResourceUsage {
         self.executor_id.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_executor_id(&mut self) -> ExecutorID {
+        self.executor_id.take().unwrap_or_else(|| ExecutorID::new())
+    }
+
     pub fn get_executor_id(&'a self) -> &'a ExecutorID {
         self.executor_id.as_ref().unwrap_or_else(|| ExecutorID::default_instance())
     }
@@ -9484,6 +9999,11 @@ impl<'a> ResourceUsage {
             self.executor_name.set_default();
         };
         self.executor_name.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_executor_name(&mut self) -> ::std::string::String {
+        self.executor_name.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_executor_name(&'a self) -> &'a str {
@@ -9517,6 +10037,11 @@ impl<'a> ResourceUsage {
         self.task_id.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_task_id(&mut self) -> TaskID {
+        self.task_id.take().unwrap_or_else(|| TaskID::new())
+    }
+
     pub fn get_task_id(&'a self) -> &'a TaskID {
         self.task_id.as_ref().unwrap_or_else(|| TaskID::default_instance())
     }
@@ -9543,6 +10068,11 @@ impl<'a> ResourceUsage {
             self.statistics.set_default();
         };
         self.statistics.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_statistics(&mut self) -> ResourceStatistics {
+        self.statistics.take().unwrap_or_else(|| ResourceStatistics::new())
     }
 
     pub fn get_statistics(&'a self) -> &'a ResourceStatistics {
@@ -9621,66 +10151,58 @@ impl ::protobuf::Message for ResourceUsage {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.slave_id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.framework_id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.executor_id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.executor_name.iter() {
             my_size += ::protobuf::rt::string_size(4, value.as_slice());
         };
         for value in self.task_id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.statistics.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.slave_id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.framework_id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.executor_id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(3, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
@@ -9693,23 +10215,25 @@ impl ::protobuf::Message for ResourceUsage {
         match self.task_id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(5, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.statistics.as_ref() {
             Some(v) => {
                 try!(os.write_tag(6, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -9761,9 +10285,20 @@ impl ::protobuf::Clear for ResourceUsage {
     }
 }
 
+impl ::std::cmp::PartialEq for ResourceUsage {
+    fn eq(&self, other: &ResourceUsage) -> bool {
+        self.slave_id == other.slave_id &&
+        self.framework_id == other.framework_id &&
+        self.executor_id == other.executor_id &&
+        self.executor_name == other.executor_name &&
+        self.task_id == other.task_id &&
+        self.statistics == other.statistics &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for ResourceUsage {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -9877,7 +10412,7 @@ impl ::protobuf::reflect::FieldAccessor<ResourceUsage> for ResourceUsage_statist
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct PerfStatistics {
     timestamp: ::std::option::Option<f64>,
     duration: ::std::option::Option<f64>,
@@ -9933,6 +10468,7 @@ pub struct PerfStatistics {
     node_prefetches: ::std::option::Option<u64>,
     node_prefetch_misses: ::std::option::Option<u64>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> PerfStatistics {
@@ -10002,6 +10538,7 @@ impl<'a> PerfStatistics {
                     node_prefetches: ::std::option::None,
                     node_prefetch_misses: ::std::option::None,
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -10010,7 +10547,7 @@ impl<'a> PerfStatistics {
     // required double timestamp = 1;
 
     pub fn clear_timestamp(&mut self) {
-        self.timestamp = None;
+        self.timestamp = ::std::option::None;
     }
 
     pub fn has_timestamp(&self) -> bool {
@@ -10019,7 +10556,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_timestamp(&mut self, v: f64) {
-        self.timestamp = Some(v);
+        self.timestamp = ::std::option::Some(v);
     }
 
     pub fn get_timestamp(&self) -> f64 {
@@ -10029,7 +10566,7 @@ impl<'a> PerfStatistics {
     // required double duration = 2;
 
     pub fn clear_duration(&mut self) {
-        self.duration = None;
+        self.duration = ::std::option::None;
     }
 
     pub fn has_duration(&self) -> bool {
@@ -10038,7 +10575,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_duration(&mut self, v: f64) {
-        self.duration = Some(v);
+        self.duration = ::std::option::Some(v);
     }
 
     pub fn get_duration(&self) -> f64 {
@@ -10048,7 +10585,7 @@ impl<'a> PerfStatistics {
     // optional uint64 cycles = 3;
 
     pub fn clear_cycles(&mut self) {
-        self.cycles = None;
+        self.cycles = ::std::option::None;
     }
 
     pub fn has_cycles(&self) -> bool {
@@ -10057,7 +10594,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_cycles(&mut self, v: u64) {
-        self.cycles = Some(v);
+        self.cycles = ::std::option::Some(v);
     }
 
     pub fn get_cycles(&self) -> u64 {
@@ -10067,7 +10604,7 @@ impl<'a> PerfStatistics {
     // optional uint64 stalled_cycles_frontend = 4;
 
     pub fn clear_stalled_cycles_frontend(&mut self) {
-        self.stalled_cycles_frontend = None;
+        self.stalled_cycles_frontend = ::std::option::None;
     }
 
     pub fn has_stalled_cycles_frontend(&self) -> bool {
@@ -10076,7 +10613,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_stalled_cycles_frontend(&mut self, v: u64) {
-        self.stalled_cycles_frontend = Some(v);
+        self.stalled_cycles_frontend = ::std::option::Some(v);
     }
 
     pub fn get_stalled_cycles_frontend(&self) -> u64 {
@@ -10086,7 +10623,7 @@ impl<'a> PerfStatistics {
     // optional uint64 stalled_cycles_backend = 5;
 
     pub fn clear_stalled_cycles_backend(&mut self) {
-        self.stalled_cycles_backend = None;
+        self.stalled_cycles_backend = ::std::option::None;
     }
 
     pub fn has_stalled_cycles_backend(&self) -> bool {
@@ -10095,7 +10632,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_stalled_cycles_backend(&mut self, v: u64) {
-        self.stalled_cycles_backend = Some(v);
+        self.stalled_cycles_backend = ::std::option::Some(v);
     }
 
     pub fn get_stalled_cycles_backend(&self) -> u64 {
@@ -10105,7 +10642,7 @@ impl<'a> PerfStatistics {
     // optional uint64 instructions = 6;
 
     pub fn clear_instructions(&mut self) {
-        self.instructions = None;
+        self.instructions = ::std::option::None;
     }
 
     pub fn has_instructions(&self) -> bool {
@@ -10114,7 +10651,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_instructions(&mut self, v: u64) {
-        self.instructions = Some(v);
+        self.instructions = ::std::option::Some(v);
     }
 
     pub fn get_instructions(&self) -> u64 {
@@ -10124,7 +10661,7 @@ impl<'a> PerfStatistics {
     // optional uint64 cache_references = 7;
 
     pub fn clear_cache_references(&mut self) {
-        self.cache_references = None;
+        self.cache_references = ::std::option::None;
     }
 
     pub fn has_cache_references(&self) -> bool {
@@ -10133,7 +10670,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_cache_references(&mut self, v: u64) {
-        self.cache_references = Some(v);
+        self.cache_references = ::std::option::Some(v);
     }
 
     pub fn get_cache_references(&self) -> u64 {
@@ -10143,7 +10680,7 @@ impl<'a> PerfStatistics {
     // optional uint64 cache_misses = 8;
 
     pub fn clear_cache_misses(&mut self) {
-        self.cache_misses = None;
+        self.cache_misses = ::std::option::None;
     }
 
     pub fn has_cache_misses(&self) -> bool {
@@ -10152,7 +10689,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_cache_misses(&mut self, v: u64) {
-        self.cache_misses = Some(v);
+        self.cache_misses = ::std::option::Some(v);
     }
 
     pub fn get_cache_misses(&self) -> u64 {
@@ -10162,7 +10699,7 @@ impl<'a> PerfStatistics {
     // optional uint64 branches = 9;
 
     pub fn clear_branches(&mut self) {
-        self.branches = None;
+        self.branches = ::std::option::None;
     }
 
     pub fn has_branches(&self) -> bool {
@@ -10171,7 +10708,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_branches(&mut self, v: u64) {
-        self.branches = Some(v);
+        self.branches = ::std::option::Some(v);
     }
 
     pub fn get_branches(&self) -> u64 {
@@ -10181,7 +10718,7 @@ impl<'a> PerfStatistics {
     // optional uint64 branch_misses = 10;
 
     pub fn clear_branch_misses(&mut self) {
-        self.branch_misses = None;
+        self.branch_misses = ::std::option::None;
     }
 
     pub fn has_branch_misses(&self) -> bool {
@@ -10190,7 +10727,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_branch_misses(&mut self, v: u64) {
-        self.branch_misses = Some(v);
+        self.branch_misses = ::std::option::Some(v);
     }
 
     pub fn get_branch_misses(&self) -> u64 {
@@ -10200,7 +10737,7 @@ impl<'a> PerfStatistics {
     // optional uint64 bus_cycles = 11;
 
     pub fn clear_bus_cycles(&mut self) {
-        self.bus_cycles = None;
+        self.bus_cycles = ::std::option::None;
     }
 
     pub fn has_bus_cycles(&self) -> bool {
@@ -10209,7 +10746,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_bus_cycles(&mut self, v: u64) {
-        self.bus_cycles = Some(v);
+        self.bus_cycles = ::std::option::Some(v);
     }
 
     pub fn get_bus_cycles(&self) -> u64 {
@@ -10219,7 +10756,7 @@ impl<'a> PerfStatistics {
     // optional uint64 ref_cycles = 12;
 
     pub fn clear_ref_cycles(&mut self) {
-        self.ref_cycles = None;
+        self.ref_cycles = ::std::option::None;
     }
 
     pub fn has_ref_cycles(&self) -> bool {
@@ -10228,7 +10765,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_ref_cycles(&mut self, v: u64) {
-        self.ref_cycles = Some(v);
+        self.ref_cycles = ::std::option::Some(v);
     }
 
     pub fn get_ref_cycles(&self) -> u64 {
@@ -10238,7 +10775,7 @@ impl<'a> PerfStatistics {
     // optional double cpu_clock = 13;
 
     pub fn clear_cpu_clock(&mut self) {
-        self.cpu_clock = None;
+        self.cpu_clock = ::std::option::None;
     }
 
     pub fn has_cpu_clock(&self) -> bool {
@@ -10247,7 +10784,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_cpu_clock(&mut self, v: f64) {
-        self.cpu_clock = Some(v);
+        self.cpu_clock = ::std::option::Some(v);
     }
 
     pub fn get_cpu_clock(&self) -> f64 {
@@ -10257,7 +10794,7 @@ impl<'a> PerfStatistics {
     // optional double task_clock = 14;
 
     pub fn clear_task_clock(&mut self) {
-        self.task_clock = None;
+        self.task_clock = ::std::option::None;
     }
 
     pub fn has_task_clock(&self) -> bool {
@@ -10266,7 +10803,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_task_clock(&mut self, v: f64) {
-        self.task_clock = Some(v);
+        self.task_clock = ::std::option::Some(v);
     }
 
     pub fn get_task_clock(&self) -> f64 {
@@ -10276,7 +10813,7 @@ impl<'a> PerfStatistics {
     // optional uint64 page_faults = 15;
 
     pub fn clear_page_faults(&mut self) {
-        self.page_faults = None;
+        self.page_faults = ::std::option::None;
     }
 
     pub fn has_page_faults(&self) -> bool {
@@ -10285,7 +10822,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_page_faults(&mut self, v: u64) {
-        self.page_faults = Some(v);
+        self.page_faults = ::std::option::Some(v);
     }
 
     pub fn get_page_faults(&self) -> u64 {
@@ -10295,7 +10832,7 @@ impl<'a> PerfStatistics {
     // optional uint64 minor_faults = 16;
 
     pub fn clear_minor_faults(&mut self) {
-        self.minor_faults = None;
+        self.minor_faults = ::std::option::None;
     }
 
     pub fn has_minor_faults(&self) -> bool {
@@ -10304,7 +10841,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_minor_faults(&mut self, v: u64) {
-        self.minor_faults = Some(v);
+        self.minor_faults = ::std::option::Some(v);
     }
 
     pub fn get_minor_faults(&self) -> u64 {
@@ -10314,7 +10851,7 @@ impl<'a> PerfStatistics {
     // optional uint64 major_faults = 17;
 
     pub fn clear_major_faults(&mut self) {
-        self.major_faults = None;
+        self.major_faults = ::std::option::None;
     }
 
     pub fn has_major_faults(&self) -> bool {
@@ -10323,7 +10860,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_major_faults(&mut self, v: u64) {
-        self.major_faults = Some(v);
+        self.major_faults = ::std::option::Some(v);
     }
 
     pub fn get_major_faults(&self) -> u64 {
@@ -10333,7 +10870,7 @@ impl<'a> PerfStatistics {
     // optional uint64 context_switches = 18;
 
     pub fn clear_context_switches(&mut self) {
-        self.context_switches = None;
+        self.context_switches = ::std::option::None;
     }
 
     pub fn has_context_switches(&self) -> bool {
@@ -10342,7 +10879,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_context_switches(&mut self, v: u64) {
-        self.context_switches = Some(v);
+        self.context_switches = ::std::option::Some(v);
     }
 
     pub fn get_context_switches(&self) -> u64 {
@@ -10352,7 +10889,7 @@ impl<'a> PerfStatistics {
     // optional uint64 cpu_migrations = 19;
 
     pub fn clear_cpu_migrations(&mut self) {
-        self.cpu_migrations = None;
+        self.cpu_migrations = ::std::option::None;
     }
 
     pub fn has_cpu_migrations(&self) -> bool {
@@ -10361,7 +10898,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_cpu_migrations(&mut self, v: u64) {
-        self.cpu_migrations = Some(v);
+        self.cpu_migrations = ::std::option::Some(v);
     }
 
     pub fn get_cpu_migrations(&self) -> u64 {
@@ -10371,7 +10908,7 @@ impl<'a> PerfStatistics {
     // optional uint64 alignment_faults = 20;
 
     pub fn clear_alignment_faults(&mut self) {
-        self.alignment_faults = None;
+        self.alignment_faults = ::std::option::None;
     }
 
     pub fn has_alignment_faults(&self) -> bool {
@@ -10380,7 +10917,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_alignment_faults(&mut self, v: u64) {
-        self.alignment_faults = Some(v);
+        self.alignment_faults = ::std::option::Some(v);
     }
 
     pub fn get_alignment_faults(&self) -> u64 {
@@ -10390,7 +10927,7 @@ impl<'a> PerfStatistics {
     // optional uint64 emulation_faults = 21;
 
     pub fn clear_emulation_faults(&mut self) {
-        self.emulation_faults = None;
+        self.emulation_faults = ::std::option::None;
     }
 
     pub fn has_emulation_faults(&self) -> bool {
@@ -10399,7 +10936,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_emulation_faults(&mut self, v: u64) {
-        self.emulation_faults = Some(v);
+        self.emulation_faults = ::std::option::Some(v);
     }
 
     pub fn get_emulation_faults(&self) -> u64 {
@@ -10409,7 +10946,7 @@ impl<'a> PerfStatistics {
     // optional uint64 l1_dcache_loads = 22;
 
     pub fn clear_l1_dcache_loads(&mut self) {
-        self.l1_dcache_loads = None;
+        self.l1_dcache_loads = ::std::option::None;
     }
 
     pub fn has_l1_dcache_loads(&self) -> bool {
@@ -10418,7 +10955,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_l1_dcache_loads(&mut self, v: u64) {
-        self.l1_dcache_loads = Some(v);
+        self.l1_dcache_loads = ::std::option::Some(v);
     }
 
     pub fn get_l1_dcache_loads(&self) -> u64 {
@@ -10428,7 +10965,7 @@ impl<'a> PerfStatistics {
     // optional uint64 l1_dcache_load_misses = 23;
 
     pub fn clear_l1_dcache_load_misses(&mut self) {
-        self.l1_dcache_load_misses = None;
+        self.l1_dcache_load_misses = ::std::option::None;
     }
 
     pub fn has_l1_dcache_load_misses(&self) -> bool {
@@ -10437,7 +10974,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_l1_dcache_load_misses(&mut self, v: u64) {
-        self.l1_dcache_load_misses = Some(v);
+        self.l1_dcache_load_misses = ::std::option::Some(v);
     }
 
     pub fn get_l1_dcache_load_misses(&self) -> u64 {
@@ -10447,7 +10984,7 @@ impl<'a> PerfStatistics {
     // optional uint64 l1_dcache_stores = 24;
 
     pub fn clear_l1_dcache_stores(&mut self) {
-        self.l1_dcache_stores = None;
+        self.l1_dcache_stores = ::std::option::None;
     }
 
     pub fn has_l1_dcache_stores(&self) -> bool {
@@ -10456,7 +10993,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_l1_dcache_stores(&mut self, v: u64) {
-        self.l1_dcache_stores = Some(v);
+        self.l1_dcache_stores = ::std::option::Some(v);
     }
 
     pub fn get_l1_dcache_stores(&self) -> u64 {
@@ -10466,7 +11003,7 @@ impl<'a> PerfStatistics {
     // optional uint64 l1_dcache_store_misses = 25;
 
     pub fn clear_l1_dcache_store_misses(&mut self) {
-        self.l1_dcache_store_misses = None;
+        self.l1_dcache_store_misses = ::std::option::None;
     }
 
     pub fn has_l1_dcache_store_misses(&self) -> bool {
@@ -10475,7 +11012,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_l1_dcache_store_misses(&mut self, v: u64) {
-        self.l1_dcache_store_misses = Some(v);
+        self.l1_dcache_store_misses = ::std::option::Some(v);
     }
 
     pub fn get_l1_dcache_store_misses(&self) -> u64 {
@@ -10485,7 +11022,7 @@ impl<'a> PerfStatistics {
     // optional uint64 l1_dcache_prefetches = 26;
 
     pub fn clear_l1_dcache_prefetches(&mut self) {
-        self.l1_dcache_prefetches = None;
+        self.l1_dcache_prefetches = ::std::option::None;
     }
 
     pub fn has_l1_dcache_prefetches(&self) -> bool {
@@ -10494,7 +11031,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_l1_dcache_prefetches(&mut self, v: u64) {
-        self.l1_dcache_prefetches = Some(v);
+        self.l1_dcache_prefetches = ::std::option::Some(v);
     }
 
     pub fn get_l1_dcache_prefetches(&self) -> u64 {
@@ -10504,7 +11041,7 @@ impl<'a> PerfStatistics {
     // optional uint64 l1_dcache_prefetch_misses = 27;
 
     pub fn clear_l1_dcache_prefetch_misses(&mut self) {
-        self.l1_dcache_prefetch_misses = None;
+        self.l1_dcache_prefetch_misses = ::std::option::None;
     }
 
     pub fn has_l1_dcache_prefetch_misses(&self) -> bool {
@@ -10513,7 +11050,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_l1_dcache_prefetch_misses(&mut self, v: u64) {
-        self.l1_dcache_prefetch_misses = Some(v);
+        self.l1_dcache_prefetch_misses = ::std::option::Some(v);
     }
 
     pub fn get_l1_dcache_prefetch_misses(&self) -> u64 {
@@ -10523,7 +11060,7 @@ impl<'a> PerfStatistics {
     // optional uint64 l1_icache_loads = 28;
 
     pub fn clear_l1_icache_loads(&mut self) {
-        self.l1_icache_loads = None;
+        self.l1_icache_loads = ::std::option::None;
     }
 
     pub fn has_l1_icache_loads(&self) -> bool {
@@ -10532,7 +11069,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_l1_icache_loads(&mut self, v: u64) {
-        self.l1_icache_loads = Some(v);
+        self.l1_icache_loads = ::std::option::Some(v);
     }
 
     pub fn get_l1_icache_loads(&self) -> u64 {
@@ -10542,7 +11079,7 @@ impl<'a> PerfStatistics {
     // optional uint64 l1_icache_load_misses = 29;
 
     pub fn clear_l1_icache_load_misses(&mut self) {
-        self.l1_icache_load_misses = None;
+        self.l1_icache_load_misses = ::std::option::None;
     }
 
     pub fn has_l1_icache_load_misses(&self) -> bool {
@@ -10551,7 +11088,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_l1_icache_load_misses(&mut self, v: u64) {
-        self.l1_icache_load_misses = Some(v);
+        self.l1_icache_load_misses = ::std::option::Some(v);
     }
 
     pub fn get_l1_icache_load_misses(&self) -> u64 {
@@ -10561,7 +11098,7 @@ impl<'a> PerfStatistics {
     // optional uint64 l1_icache_prefetches = 30;
 
     pub fn clear_l1_icache_prefetches(&mut self) {
-        self.l1_icache_prefetches = None;
+        self.l1_icache_prefetches = ::std::option::None;
     }
 
     pub fn has_l1_icache_prefetches(&self) -> bool {
@@ -10570,7 +11107,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_l1_icache_prefetches(&mut self, v: u64) {
-        self.l1_icache_prefetches = Some(v);
+        self.l1_icache_prefetches = ::std::option::Some(v);
     }
 
     pub fn get_l1_icache_prefetches(&self) -> u64 {
@@ -10580,7 +11117,7 @@ impl<'a> PerfStatistics {
     // optional uint64 l1_icache_prefetch_misses = 31;
 
     pub fn clear_l1_icache_prefetch_misses(&mut self) {
-        self.l1_icache_prefetch_misses = None;
+        self.l1_icache_prefetch_misses = ::std::option::None;
     }
 
     pub fn has_l1_icache_prefetch_misses(&self) -> bool {
@@ -10589,7 +11126,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_l1_icache_prefetch_misses(&mut self, v: u64) {
-        self.l1_icache_prefetch_misses = Some(v);
+        self.l1_icache_prefetch_misses = ::std::option::Some(v);
     }
 
     pub fn get_l1_icache_prefetch_misses(&self) -> u64 {
@@ -10599,7 +11136,7 @@ impl<'a> PerfStatistics {
     // optional uint64 llc_loads = 32;
 
     pub fn clear_llc_loads(&mut self) {
-        self.llc_loads = None;
+        self.llc_loads = ::std::option::None;
     }
 
     pub fn has_llc_loads(&self) -> bool {
@@ -10608,7 +11145,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_llc_loads(&mut self, v: u64) {
-        self.llc_loads = Some(v);
+        self.llc_loads = ::std::option::Some(v);
     }
 
     pub fn get_llc_loads(&self) -> u64 {
@@ -10618,7 +11155,7 @@ impl<'a> PerfStatistics {
     // optional uint64 llc_load_misses = 33;
 
     pub fn clear_llc_load_misses(&mut self) {
-        self.llc_load_misses = None;
+        self.llc_load_misses = ::std::option::None;
     }
 
     pub fn has_llc_load_misses(&self) -> bool {
@@ -10627,7 +11164,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_llc_load_misses(&mut self, v: u64) {
-        self.llc_load_misses = Some(v);
+        self.llc_load_misses = ::std::option::Some(v);
     }
 
     pub fn get_llc_load_misses(&self) -> u64 {
@@ -10637,7 +11174,7 @@ impl<'a> PerfStatistics {
     // optional uint64 llc_stores = 34;
 
     pub fn clear_llc_stores(&mut self) {
-        self.llc_stores = None;
+        self.llc_stores = ::std::option::None;
     }
 
     pub fn has_llc_stores(&self) -> bool {
@@ -10646,7 +11183,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_llc_stores(&mut self, v: u64) {
-        self.llc_stores = Some(v);
+        self.llc_stores = ::std::option::Some(v);
     }
 
     pub fn get_llc_stores(&self) -> u64 {
@@ -10656,7 +11193,7 @@ impl<'a> PerfStatistics {
     // optional uint64 llc_store_misses = 35;
 
     pub fn clear_llc_store_misses(&mut self) {
-        self.llc_store_misses = None;
+        self.llc_store_misses = ::std::option::None;
     }
 
     pub fn has_llc_store_misses(&self) -> bool {
@@ -10665,7 +11202,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_llc_store_misses(&mut self, v: u64) {
-        self.llc_store_misses = Some(v);
+        self.llc_store_misses = ::std::option::Some(v);
     }
 
     pub fn get_llc_store_misses(&self) -> u64 {
@@ -10675,7 +11212,7 @@ impl<'a> PerfStatistics {
     // optional uint64 llc_prefetches = 36;
 
     pub fn clear_llc_prefetches(&mut self) {
-        self.llc_prefetches = None;
+        self.llc_prefetches = ::std::option::None;
     }
 
     pub fn has_llc_prefetches(&self) -> bool {
@@ -10684,7 +11221,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_llc_prefetches(&mut self, v: u64) {
-        self.llc_prefetches = Some(v);
+        self.llc_prefetches = ::std::option::Some(v);
     }
 
     pub fn get_llc_prefetches(&self) -> u64 {
@@ -10694,7 +11231,7 @@ impl<'a> PerfStatistics {
     // optional uint64 llc_prefetch_misses = 37;
 
     pub fn clear_llc_prefetch_misses(&mut self) {
-        self.llc_prefetch_misses = None;
+        self.llc_prefetch_misses = ::std::option::None;
     }
 
     pub fn has_llc_prefetch_misses(&self) -> bool {
@@ -10703,7 +11240,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_llc_prefetch_misses(&mut self, v: u64) {
-        self.llc_prefetch_misses = Some(v);
+        self.llc_prefetch_misses = ::std::option::Some(v);
     }
 
     pub fn get_llc_prefetch_misses(&self) -> u64 {
@@ -10713,7 +11250,7 @@ impl<'a> PerfStatistics {
     // optional uint64 dtlb_loads = 38;
 
     pub fn clear_dtlb_loads(&mut self) {
-        self.dtlb_loads = None;
+        self.dtlb_loads = ::std::option::None;
     }
 
     pub fn has_dtlb_loads(&self) -> bool {
@@ -10722,7 +11259,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_dtlb_loads(&mut self, v: u64) {
-        self.dtlb_loads = Some(v);
+        self.dtlb_loads = ::std::option::Some(v);
     }
 
     pub fn get_dtlb_loads(&self) -> u64 {
@@ -10732,7 +11269,7 @@ impl<'a> PerfStatistics {
     // optional uint64 dtlb_load_misses = 39;
 
     pub fn clear_dtlb_load_misses(&mut self) {
-        self.dtlb_load_misses = None;
+        self.dtlb_load_misses = ::std::option::None;
     }
 
     pub fn has_dtlb_load_misses(&self) -> bool {
@@ -10741,7 +11278,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_dtlb_load_misses(&mut self, v: u64) {
-        self.dtlb_load_misses = Some(v);
+        self.dtlb_load_misses = ::std::option::Some(v);
     }
 
     pub fn get_dtlb_load_misses(&self) -> u64 {
@@ -10751,7 +11288,7 @@ impl<'a> PerfStatistics {
     // optional uint64 dtlb_stores = 40;
 
     pub fn clear_dtlb_stores(&mut self) {
-        self.dtlb_stores = None;
+        self.dtlb_stores = ::std::option::None;
     }
 
     pub fn has_dtlb_stores(&self) -> bool {
@@ -10760,7 +11297,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_dtlb_stores(&mut self, v: u64) {
-        self.dtlb_stores = Some(v);
+        self.dtlb_stores = ::std::option::Some(v);
     }
 
     pub fn get_dtlb_stores(&self) -> u64 {
@@ -10770,7 +11307,7 @@ impl<'a> PerfStatistics {
     // optional uint64 dtlb_store_misses = 41;
 
     pub fn clear_dtlb_store_misses(&mut self) {
-        self.dtlb_store_misses = None;
+        self.dtlb_store_misses = ::std::option::None;
     }
 
     pub fn has_dtlb_store_misses(&self) -> bool {
@@ -10779,7 +11316,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_dtlb_store_misses(&mut self, v: u64) {
-        self.dtlb_store_misses = Some(v);
+        self.dtlb_store_misses = ::std::option::Some(v);
     }
 
     pub fn get_dtlb_store_misses(&self) -> u64 {
@@ -10789,7 +11326,7 @@ impl<'a> PerfStatistics {
     // optional uint64 dtlb_prefetches = 42;
 
     pub fn clear_dtlb_prefetches(&mut self) {
-        self.dtlb_prefetches = None;
+        self.dtlb_prefetches = ::std::option::None;
     }
 
     pub fn has_dtlb_prefetches(&self) -> bool {
@@ -10798,7 +11335,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_dtlb_prefetches(&mut self, v: u64) {
-        self.dtlb_prefetches = Some(v);
+        self.dtlb_prefetches = ::std::option::Some(v);
     }
 
     pub fn get_dtlb_prefetches(&self) -> u64 {
@@ -10808,7 +11345,7 @@ impl<'a> PerfStatistics {
     // optional uint64 dtlb_prefetch_misses = 43;
 
     pub fn clear_dtlb_prefetch_misses(&mut self) {
-        self.dtlb_prefetch_misses = None;
+        self.dtlb_prefetch_misses = ::std::option::None;
     }
 
     pub fn has_dtlb_prefetch_misses(&self) -> bool {
@@ -10817,7 +11354,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_dtlb_prefetch_misses(&mut self, v: u64) {
-        self.dtlb_prefetch_misses = Some(v);
+        self.dtlb_prefetch_misses = ::std::option::Some(v);
     }
 
     pub fn get_dtlb_prefetch_misses(&self) -> u64 {
@@ -10827,7 +11364,7 @@ impl<'a> PerfStatistics {
     // optional uint64 itlb_loads = 44;
 
     pub fn clear_itlb_loads(&mut self) {
-        self.itlb_loads = None;
+        self.itlb_loads = ::std::option::None;
     }
 
     pub fn has_itlb_loads(&self) -> bool {
@@ -10836,7 +11373,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_itlb_loads(&mut self, v: u64) {
-        self.itlb_loads = Some(v);
+        self.itlb_loads = ::std::option::Some(v);
     }
 
     pub fn get_itlb_loads(&self) -> u64 {
@@ -10846,7 +11383,7 @@ impl<'a> PerfStatistics {
     // optional uint64 itlb_load_misses = 45;
 
     pub fn clear_itlb_load_misses(&mut self) {
-        self.itlb_load_misses = None;
+        self.itlb_load_misses = ::std::option::None;
     }
 
     pub fn has_itlb_load_misses(&self) -> bool {
@@ -10855,7 +11392,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_itlb_load_misses(&mut self, v: u64) {
-        self.itlb_load_misses = Some(v);
+        self.itlb_load_misses = ::std::option::Some(v);
     }
 
     pub fn get_itlb_load_misses(&self) -> u64 {
@@ -10865,7 +11402,7 @@ impl<'a> PerfStatistics {
     // optional uint64 branch_loads = 46;
 
     pub fn clear_branch_loads(&mut self) {
-        self.branch_loads = None;
+        self.branch_loads = ::std::option::None;
     }
 
     pub fn has_branch_loads(&self) -> bool {
@@ -10874,7 +11411,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_branch_loads(&mut self, v: u64) {
-        self.branch_loads = Some(v);
+        self.branch_loads = ::std::option::Some(v);
     }
 
     pub fn get_branch_loads(&self) -> u64 {
@@ -10884,7 +11421,7 @@ impl<'a> PerfStatistics {
     // optional uint64 branch_load_misses = 47;
 
     pub fn clear_branch_load_misses(&mut self) {
-        self.branch_load_misses = None;
+        self.branch_load_misses = ::std::option::None;
     }
 
     pub fn has_branch_load_misses(&self) -> bool {
@@ -10893,7 +11430,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_branch_load_misses(&mut self, v: u64) {
-        self.branch_load_misses = Some(v);
+        self.branch_load_misses = ::std::option::Some(v);
     }
 
     pub fn get_branch_load_misses(&self) -> u64 {
@@ -10903,7 +11440,7 @@ impl<'a> PerfStatistics {
     // optional uint64 node_loads = 48;
 
     pub fn clear_node_loads(&mut self) {
-        self.node_loads = None;
+        self.node_loads = ::std::option::None;
     }
 
     pub fn has_node_loads(&self) -> bool {
@@ -10912,7 +11449,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_node_loads(&mut self, v: u64) {
-        self.node_loads = Some(v);
+        self.node_loads = ::std::option::Some(v);
     }
 
     pub fn get_node_loads(&self) -> u64 {
@@ -10922,7 +11459,7 @@ impl<'a> PerfStatistics {
     // optional uint64 node_load_misses = 49;
 
     pub fn clear_node_load_misses(&mut self) {
-        self.node_load_misses = None;
+        self.node_load_misses = ::std::option::None;
     }
 
     pub fn has_node_load_misses(&self) -> bool {
@@ -10931,7 +11468,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_node_load_misses(&mut self, v: u64) {
-        self.node_load_misses = Some(v);
+        self.node_load_misses = ::std::option::Some(v);
     }
 
     pub fn get_node_load_misses(&self) -> u64 {
@@ -10941,7 +11478,7 @@ impl<'a> PerfStatistics {
     // optional uint64 node_stores = 50;
 
     pub fn clear_node_stores(&mut self) {
-        self.node_stores = None;
+        self.node_stores = ::std::option::None;
     }
 
     pub fn has_node_stores(&self) -> bool {
@@ -10950,7 +11487,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_node_stores(&mut self, v: u64) {
-        self.node_stores = Some(v);
+        self.node_stores = ::std::option::Some(v);
     }
 
     pub fn get_node_stores(&self) -> u64 {
@@ -10960,7 +11497,7 @@ impl<'a> PerfStatistics {
     // optional uint64 node_store_misses = 51;
 
     pub fn clear_node_store_misses(&mut self) {
-        self.node_store_misses = None;
+        self.node_store_misses = ::std::option::None;
     }
 
     pub fn has_node_store_misses(&self) -> bool {
@@ -10969,7 +11506,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_node_store_misses(&mut self, v: u64) {
-        self.node_store_misses = Some(v);
+        self.node_store_misses = ::std::option::Some(v);
     }
 
     pub fn get_node_store_misses(&self) -> u64 {
@@ -10979,7 +11516,7 @@ impl<'a> PerfStatistics {
     // optional uint64 node_prefetches = 52;
 
     pub fn clear_node_prefetches(&mut self) {
-        self.node_prefetches = None;
+        self.node_prefetches = ::std::option::None;
     }
 
     pub fn has_node_prefetches(&self) -> bool {
@@ -10988,7 +11525,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_node_prefetches(&mut self, v: u64) {
-        self.node_prefetches = Some(v);
+        self.node_prefetches = ::std::option::Some(v);
     }
 
     pub fn get_node_prefetches(&self) -> u64 {
@@ -10998,7 +11535,7 @@ impl<'a> PerfStatistics {
     // optional uint64 node_prefetch_misses = 53;
 
     pub fn clear_node_prefetch_misses(&mut self) {
-        self.node_prefetch_misses = None;
+        self.node_prefetch_misses = ::std::option::None;
     }
 
     pub fn has_node_prefetch_misses(&self) -> bool {
@@ -11007,7 +11544,7 @@ impl<'a> PerfStatistics {
 
     // Param is passed by value, moved
     pub fn set_node_prefetch_misses(&mut self, v: u64) {
-        self.node_prefetch_misses = Some(v);
+        self.node_prefetch_misses = ::std::option::Some(v);
     }
 
     pub fn get_node_prefetch_misses(&self) -> u64 {
@@ -11039,371 +11576,371 @@ impl ::protobuf::Message for PerfStatistics {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.timestamp = Some(tmp);
+                    self.timestamp = ::std::option::Some(tmp);
                 },
                 2 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.duration = Some(tmp);
+                    self.duration = ::std::option::Some(tmp);
                 },
                 3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.cycles = Some(tmp);
+                    self.cycles = ::std::option::Some(tmp);
                 },
                 4 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.stalled_cycles_frontend = Some(tmp);
+                    self.stalled_cycles_frontend = ::std::option::Some(tmp);
                 },
                 5 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.stalled_cycles_backend = Some(tmp);
+                    self.stalled_cycles_backend = ::std::option::Some(tmp);
                 },
                 6 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.instructions = Some(tmp);
+                    self.instructions = ::std::option::Some(tmp);
                 },
                 7 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.cache_references = Some(tmp);
+                    self.cache_references = ::std::option::Some(tmp);
                 },
                 8 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.cache_misses = Some(tmp);
+                    self.cache_misses = ::std::option::Some(tmp);
                 },
                 9 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.branches = Some(tmp);
+                    self.branches = ::std::option::Some(tmp);
                 },
                 10 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.branch_misses = Some(tmp);
+                    self.branch_misses = ::std::option::Some(tmp);
                 },
                 11 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.bus_cycles = Some(tmp);
+                    self.bus_cycles = ::std::option::Some(tmp);
                 },
                 12 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.ref_cycles = Some(tmp);
+                    self.ref_cycles = ::std::option::Some(tmp);
                 },
                 13 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.cpu_clock = Some(tmp);
+                    self.cpu_clock = ::std::option::Some(tmp);
                 },
                 14 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.task_clock = Some(tmp);
+                    self.task_clock = ::std::option::Some(tmp);
                 },
                 15 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.page_faults = Some(tmp);
+                    self.page_faults = ::std::option::Some(tmp);
                 },
                 16 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.minor_faults = Some(tmp);
+                    self.minor_faults = ::std::option::Some(tmp);
                 },
                 17 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.major_faults = Some(tmp);
+                    self.major_faults = ::std::option::Some(tmp);
                 },
                 18 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.context_switches = Some(tmp);
+                    self.context_switches = ::std::option::Some(tmp);
                 },
                 19 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.cpu_migrations = Some(tmp);
+                    self.cpu_migrations = ::std::option::Some(tmp);
                 },
                 20 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.alignment_faults = Some(tmp);
+                    self.alignment_faults = ::std::option::Some(tmp);
                 },
                 21 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.emulation_faults = Some(tmp);
+                    self.emulation_faults = ::std::option::Some(tmp);
                 },
                 22 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.l1_dcache_loads = Some(tmp);
+                    self.l1_dcache_loads = ::std::option::Some(tmp);
                 },
                 23 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.l1_dcache_load_misses = Some(tmp);
+                    self.l1_dcache_load_misses = ::std::option::Some(tmp);
                 },
                 24 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.l1_dcache_stores = Some(tmp);
+                    self.l1_dcache_stores = ::std::option::Some(tmp);
                 },
                 25 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.l1_dcache_store_misses = Some(tmp);
+                    self.l1_dcache_store_misses = ::std::option::Some(tmp);
                 },
                 26 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.l1_dcache_prefetches = Some(tmp);
+                    self.l1_dcache_prefetches = ::std::option::Some(tmp);
                 },
                 27 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.l1_dcache_prefetch_misses = Some(tmp);
+                    self.l1_dcache_prefetch_misses = ::std::option::Some(tmp);
                 },
                 28 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.l1_icache_loads = Some(tmp);
+                    self.l1_icache_loads = ::std::option::Some(tmp);
                 },
                 29 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.l1_icache_load_misses = Some(tmp);
+                    self.l1_icache_load_misses = ::std::option::Some(tmp);
                 },
                 30 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.l1_icache_prefetches = Some(tmp);
+                    self.l1_icache_prefetches = ::std::option::Some(tmp);
                 },
                 31 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.l1_icache_prefetch_misses = Some(tmp);
+                    self.l1_icache_prefetch_misses = ::std::option::Some(tmp);
                 },
                 32 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.llc_loads = Some(tmp);
+                    self.llc_loads = ::std::option::Some(tmp);
                 },
                 33 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.llc_load_misses = Some(tmp);
+                    self.llc_load_misses = ::std::option::Some(tmp);
                 },
                 34 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.llc_stores = Some(tmp);
+                    self.llc_stores = ::std::option::Some(tmp);
                 },
                 35 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.llc_store_misses = Some(tmp);
+                    self.llc_store_misses = ::std::option::Some(tmp);
                 },
                 36 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.llc_prefetches = Some(tmp);
+                    self.llc_prefetches = ::std::option::Some(tmp);
                 },
                 37 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.llc_prefetch_misses = Some(tmp);
+                    self.llc_prefetch_misses = ::std::option::Some(tmp);
                 },
                 38 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.dtlb_loads = Some(tmp);
+                    self.dtlb_loads = ::std::option::Some(tmp);
                 },
                 39 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.dtlb_load_misses = Some(tmp);
+                    self.dtlb_load_misses = ::std::option::Some(tmp);
                 },
                 40 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.dtlb_stores = Some(tmp);
+                    self.dtlb_stores = ::std::option::Some(tmp);
                 },
                 41 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.dtlb_store_misses = Some(tmp);
+                    self.dtlb_store_misses = ::std::option::Some(tmp);
                 },
                 42 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.dtlb_prefetches = Some(tmp);
+                    self.dtlb_prefetches = ::std::option::Some(tmp);
                 },
                 43 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.dtlb_prefetch_misses = Some(tmp);
+                    self.dtlb_prefetch_misses = ::std::option::Some(tmp);
                 },
                 44 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.itlb_loads = Some(tmp);
+                    self.itlb_loads = ::std::option::Some(tmp);
                 },
                 45 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.itlb_load_misses = Some(tmp);
+                    self.itlb_load_misses = ::std::option::Some(tmp);
                 },
                 46 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.branch_loads = Some(tmp);
+                    self.branch_loads = ::std::option::Some(tmp);
                 },
                 47 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.branch_load_misses = Some(tmp);
+                    self.branch_load_misses = ::std::option::Some(tmp);
                 },
                 48 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.node_loads = Some(tmp);
+                    self.node_loads = ::std::option::Some(tmp);
                 },
                 49 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.node_load_misses = Some(tmp);
+                    self.node_load_misses = ::std::option::Some(tmp);
                 },
                 50 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.node_stores = Some(tmp);
+                    self.node_stores = ::std::option::Some(tmp);
                 },
                 51 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.node_store_misses = Some(tmp);
+                    self.node_store_misses = ::std::option::Some(tmp);
                 },
                 52 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.node_prefetches = Some(tmp);
+                    self.node_prefetches = ::std::option::Some(tmp);
                 },
                 53 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.node_prefetch_misses = Some(tmp);
+                    self.node_prefetch_misses = ::std::option::Some(tmp);
                 },
                 _ => {
                     let unknown = try!(is.read_unknown(wire_type));
@@ -11415,10 +11952,7 @@ impl ::protobuf::Message for PerfStatistics {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         if self.timestamp.is_some() {
             my_size += 9;
@@ -11580,14 +12114,11 @@ impl ::protobuf::Message for PerfStatistics {
             my_size += ::protobuf::rt::value_size(53, *value, ::protobuf::wire_format::WireTypeVarint);
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.timestamp {
             Some(v) => {
                 try!(os.write_double(1, v));
@@ -11910,6 +12441,10 @@ impl ::protobuf::Message for PerfStatistics {
         ::std::result::Ok(())
     }
 
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
         &self.unknown_fields
     }
@@ -12053,9 +12588,67 @@ impl ::protobuf::Clear for PerfStatistics {
     }
 }
 
+impl ::std::cmp::PartialEq for PerfStatistics {
+    fn eq(&self, other: &PerfStatistics) -> bool {
+        self.timestamp == other.timestamp &&
+        self.duration == other.duration &&
+        self.cycles == other.cycles &&
+        self.stalled_cycles_frontend == other.stalled_cycles_frontend &&
+        self.stalled_cycles_backend == other.stalled_cycles_backend &&
+        self.instructions == other.instructions &&
+        self.cache_references == other.cache_references &&
+        self.cache_misses == other.cache_misses &&
+        self.branches == other.branches &&
+        self.branch_misses == other.branch_misses &&
+        self.bus_cycles == other.bus_cycles &&
+        self.ref_cycles == other.ref_cycles &&
+        self.cpu_clock == other.cpu_clock &&
+        self.task_clock == other.task_clock &&
+        self.page_faults == other.page_faults &&
+        self.minor_faults == other.minor_faults &&
+        self.major_faults == other.major_faults &&
+        self.context_switches == other.context_switches &&
+        self.cpu_migrations == other.cpu_migrations &&
+        self.alignment_faults == other.alignment_faults &&
+        self.emulation_faults == other.emulation_faults &&
+        self.l1_dcache_loads == other.l1_dcache_loads &&
+        self.l1_dcache_load_misses == other.l1_dcache_load_misses &&
+        self.l1_dcache_stores == other.l1_dcache_stores &&
+        self.l1_dcache_store_misses == other.l1_dcache_store_misses &&
+        self.l1_dcache_prefetches == other.l1_dcache_prefetches &&
+        self.l1_dcache_prefetch_misses == other.l1_dcache_prefetch_misses &&
+        self.l1_icache_loads == other.l1_icache_loads &&
+        self.l1_icache_load_misses == other.l1_icache_load_misses &&
+        self.l1_icache_prefetches == other.l1_icache_prefetches &&
+        self.l1_icache_prefetch_misses == other.l1_icache_prefetch_misses &&
+        self.llc_loads == other.llc_loads &&
+        self.llc_load_misses == other.llc_load_misses &&
+        self.llc_stores == other.llc_stores &&
+        self.llc_store_misses == other.llc_store_misses &&
+        self.llc_prefetches == other.llc_prefetches &&
+        self.llc_prefetch_misses == other.llc_prefetch_misses &&
+        self.dtlb_loads == other.dtlb_loads &&
+        self.dtlb_load_misses == other.dtlb_load_misses &&
+        self.dtlb_stores == other.dtlb_stores &&
+        self.dtlb_store_misses == other.dtlb_store_misses &&
+        self.dtlb_prefetches == other.dtlb_prefetches &&
+        self.dtlb_prefetch_misses == other.dtlb_prefetch_misses &&
+        self.itlb_loads == other.itlb_loads &&
+        self.itlb_load_misses == other.itlb_load_misses &&
+        self.branch_loads == other.branch_loads &&
+        self.branch_load_misses == other.branch_load_misses &&
+        self.node_loads == other.node_loads &&
+        self.node_load_misses == other.node_load_misses &&
+        self.node_stores == other.node_stores &&
+        self.node_store_misses == other.node_store_misses &&
+        self.node_prefetches == other.node_prefetches &&
+        self.node_prefetch_misses == other.node_prefetch_misses &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for PerfStatistics {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -13015,11 +13608,12 @@ impl ::protobuf::reflect::FieldAccessor<PerfStatistics> for PerfStatistics_node_
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Request {
     slave_id: ::protobuf::SingularPtrField<SlaveID>,
     resources: ::protobuf::RepeatedField<Resource>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Request {
@@ -13038,6 +13632,7 @@ impl<'a> Request {
                     slave_id: ::protobuf::SingularPtrField::none(),
                     resources: ::protobuf::RepeatedField::new(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -13067,6 +13662,11 @@ impl<'a> Request {
         self.slave_id.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_slave_id(&mut self) -> SlaveID {
+        self.slave_id.take().unwrap_or_else(|| SlaveID::new())
+    }
+
     pub fn get_slave_id(&'a self) -> &'a SlaveID {
         self.slave_id.as_ref().unwrap_or_else(|| SlaveID::default_instance())
     }
@@ -13085,6 +13685,11 @@ impl<'a> Request {
     // Mutable pointer to the field.
     pub fn mut_resources(&'a mut self) -> &'a mut ::protobuf::RepeatedField<Resource> {
         &mut self.resources
+    }
+
+    // Take field
+    pub fn take_resources(&mut self) -> ::protobuf::RepeatedField<Resource> {
+        ::std::mem::replace(&mut self.resources, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_resources(&'a self) -> &'a [Resource] {
@@ -13129,44 +13734,41 @@ impl ::protobuf::Message for Request {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.slave_id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.resources.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.slave_id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         for v in self.resources.iter() {
             try!(os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -13210,9 +13812,16 @@ impl ::protobuf::Clear for Request {
     }
 }
 
+impl ::std::cmp::PartialEq for Request {
+    fn eq(&self, other: &Request) -> bool {
+        self.slave_id == other.slave_id &&
+        self.resources == other.resources &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Request {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -13254,7 +13863,7 @@ impl ::protobuf::reflect::FieldAccessor<Request> for Request_resources_acc_type 
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Offer {
     id: ::protobuf::SingularPtrField<OfferID>,
     framework_id: ::protobuf::SingularPtrField<FrameworkID>,
@@ -13264,6 +13873,7 @@ pub struct Offer {
     attributes: ::protobuf::RepeatedField<Attribute>,
     executor_ids: ::protobuf::RepeatedField<ExecutorID>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Offer {
@@ -13287,6 +13897,7 @@ impl<'a> Offer {
                     attributes: ::protobuf::RepeatedField::new(),
                     executor_ids: ::protobuf::RepeatedField::new(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -13314,6 +13925,11 @@ impl<'a> Offer {
             self.id.set_default();
         };
         self.id.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_id(&mut self) -> OfferID {
+        self.id.take().unwrap_or_else(|| OfferID::new())
     }
 
     pub fn get_id(&'a self) -> &'a OfferID {
@@ -13344,6 +13960,11 @@ impl<'a> Offer {
         self.framework_id.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_framework_id(&mut self) -> FrameworkID {
+        self.framework_id.take().unwrap_or_else(|| FrameworkID::new())
+    }
+
     pub fn get_framework_id(&'a self) -> &'a FrameworkID {
         self.framework_id.as_ref().unwrap_or_else(|| FrameworkID::default_instance())
     }
@@ -13370,6 +13991,11 @@ impl<'a> Offer {
             self.slave_id.set_default();
         };
         self.slave_id.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_slave_id(&mut self) -> SlaveID {
+        self.slave_id.take().unwrap_or_else(|| SlaveID::new())
     }
 
     pub fn get_slave_id(&'a self) -> &'a SlaveID {
@@ -13400,6 +14026,11 @@ impl<'a> Offer {
         self.hostname.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_hostname(&mut self) -> ::std::string::String {
+        self.hostname.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_hostname(&'a self) -> &'a str {
         match self.hostname.as_ref() {
             Some(v) => v.as_slice(),
@@ -13423,6 +14054,11 @@ impl<'a> Offer {
         &mut self.resources
     }
 
+    // Take field
+    pub fn take_resources(&mut self) -> ::protobuf::RepeatedField<Resource> {
+        ::std::mem::replace(&mut self.resources, ::protobuf::RepeatedField::new())
+    }
+
     pub fn get_resources(&'a self) -> &'a [Resource] {
         self.resources.as_slice()
     }
@@ -13443,6 +14079,11 @@ impl<'a> Offer {
         &mut self.attributes
     }
 
+    // Take field
+    pub fn take_attributes(&mut self) -> ::protobuf::RepeatedField<Attribute> {
+        ::std::mem::replace(&mut self.attributes, ::protobuf::RepeatedField::new())
+    }
+
     pub fn get_attributes(&'a self) -> &'a [Attribute] {
         self.attributes.as_slice()
     }
@@ -13461,6 +14102,11 @@ impl<'a> Offer {
     // Mutable pointer to the field.
     pub fn mut_executor_ids(&'a mut self) -> &'a mut ::protobuf::RepeatedField<ExecutorID> {
         &mut self.executor_ids
+    }
+
+    // Take field
+    pub fn take_executor_ids(&mut self) -> ::protobuf::RepeatedField<ExecutorID> {
+        ::std::mem::replace(&mut self.executor_ids, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_executor_ids(&'a self) -> &'a [ExecutorID] {
@@ -13552,70 +14198,62 @@ impl ::protobuf::Message for Offer {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.framework_id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.slave_id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.hostname.iter() {
             my_size += ::protobuf::rt::string_size(4, value.as_slice());
         };
         for value in self.resources.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.attributes.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.executor_ids.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.framework_id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.slave_id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(3, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
@@ -13627,24 +14265,25 @@ impl ::protobuf::Message for Offer {
         };
         for v in self.resources.iter() {
             try!(os.write_tag(5, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         for v in self.attributes.iter() {
             try!(os.write_tag(7, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         for v in self.executor_ids.iter() {
             try!(os.write_tag(6, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -13698,9 +14337,21 @@ impl ::protobuf::Clear for Offer {
     }
 }
 
+impl ::std::cmp::PartialEq for Offer {
+    fn eq(&self, other: &Offer) -> bool {
+        self.id == other.id &&
+        self.framework_id == other.framework_id &&
+        self.slave_id == other.slave_id &&
+        self.hostname == other.hostname &&
+        self.resources == other.resources &&
+        self.attributes == other.attributes &&
+        self.executor_ids == other.executor_ids &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Offer {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -13832,7 +14483,7 @@ impl ::protobuf::reflect::FieldAccessor<Offer> for Offer_executor_ids_acc_type {
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct TaskInfo {
     name: ::protobuf::SingularField<::std::string::String>,
     task_id: ::protobuf::SingularPtrField<TaskID>,
@@ -13844,6 +14495,7 @@ pub struct TaskInfo {
     data: ::protobuf::SingularField<::std::vec::Vec<u8>>,
     health_check: ::protobuf::SingularPtrField<HealthCheck>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> TaskInfo {
@@ -13869,6 +14521,7 @@ impl<'a> TaskInfo {
                     data: ::protobuf::SingularField::none(),
                     health_check: ::protobuf::SingularPtrField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -13896,6 +14549,11 @@ impl<'a> TaskInfo {
             self.name.set_default();
         };
         self.name.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_name(&mut self) -> ::std::string::String {
+        self.name.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_name(&'a self) -> &'a str {
@@ -13929,6 +14587,11 @@ impl<'a> TaskInfo {
         self.task_id.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_task_id(&mut self) -> TaskID {
+        self.task_id.take().unwrap_or_else(|| TaskID::new())
+    }
+
     pub fn get_task_id(&'a self) -> &'a TaskID {
         self.task_id.as_ref().unwrap_or_else(|| TaskID::default_instance())
     }
@@ -13957,6 +14620,11 @@ impl<'a> TaskInfo {
         self.slave_id.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_slave_id(&mut self) -> SlaveID {
+        self.slave_id.take().unwrap_or_else(|| SlaveID::new())
+    }
+
     pub fn get_slave_id(&'a self) -> &'a SlaveID {
         self.slave_id.as_ref().unwrap_or_else(|| SlaveID::default_instance())
     }
@@ -13975,6 +14643,11 @@ impl<'a> TaskInfo {
     // Mutable pointer to the field.
     pub fn mut_resources(&'a mut self) -> &'a mut ::protobuf::RepeatedField<Resource> {
         &mut self.resources
+    }
+
+    // Take field
+    pub fn take_resources(&mut self) -> ::protobuf::RepeatedField<Resource> {
+        ::std::mem::replace(&mut self.resources, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_resources(&'a self) -> &'a [Resource] {
@@ -14005,6 +14678,11 @@ impl<'a> TaskInfo {
         self.executor.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_executor(&mut self) -> ExecutorInfo {
+        self.executor.take().unwrap_or_else(|| ExecutorInfo::new())
+    }
+
     pub fn get_executor(&'a self) -> &'a ExecutorInfo {
         self.executor.as_ref().unwrap_or_else(|| ExecutorInfo::default_instance())
     }
@@ -14031,6 +14709,11 @@ impl<'a> TaskInfo {
             self.command.set_default();
         };
         self.command.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_command(&mut self) -> CommandInfo {
+        self.command.take().unwrap_or_else(|| CommandInfo::new())
     }
 
     pub fn get_command(&'a self) -> &'a CommandInfo {
@@ -14061,6 +14744,11 @@ impl<'a> TaskInfo {
         self.container.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_container(&mut self) -> ContainerInfo {
+        self.container.take().unwrap_or_else(|| ContainerInfo::new())
+    }
+
     pub fn get_container(&'a self) -> &'a ContainerInfo {
         self.container.as_ref().unwrap_or_else(|| ContainerInfo::default_instance())
     }
@@ -14087,6 +14775,11 @@ impl<'a> TaskInfo {
             self.data.set_default();
         };
         self.data.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_data(&mut self) -> ::std::vec::Vec<u8> {
+        self.data.take().unwrap_or_else(|| ::std::vec::Vec::new())
     }
 
     pub fn get_data(&'a self) -> &'a [u8] {
@@ -14118,6 +14811,11 @@ impl<'a> TaskInfo {
             self.health_check.set_default();
         };
         self.health_check.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_health_check(&mut self) -> HealthCheck {
+        self.health_check.take().unwrap_or_else(|| HealthCheck::new())
     }
 
     pub fn get_health_check(&'a self) -> &'a HealthCheck {
@@ -14220,53 +14918,48 @@ impl ::protobuf::Message for TaskInfo {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.name.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
         };
         for value in self.task_id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.slave_id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.resources.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.executor.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.command.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.container.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.data.iter() {
             my_size += ::protobuf::rt::bytes_size(6, value.as_slice());
         };
         for value in self.health_check.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.name.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -14276,51 +14969,45 @@ impl ::protobuf::Message for TaskInfo {
         match self.task_id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.slave_id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(3, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         for v in self.resources.iter() {
             try!(os.write_tag(4, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         match self.executor.as_ref() {
             Some(v) => {
                 try!(os.write_tag(5, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.command.as_ref() {
             Some(v) => {
                 try!(os.write_tag(7, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.container.as_ref() {
             Some(v) => {
                 try!(os.write_tag(9, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
@@ -14333,14 +15020,17 @@ impl ::protobuf::Message for TaskInfo {
         match self.health_check.as_ref() {
             Some(v) => {
                 try!(os.write_tag(8, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -14398,9 +15088,23 @@ impl ::protobuf::Clear for TaskInfo {
     }
 }
 
+impl ::std::cmp::PartialEq for TaskInfo {
+    fn eq(&self, other: &TaskInfo) -> bool {
+        self.name == other.name &&
+        self.task_id == other.task_id &&
+        self.slave_id == other.slave_id &&
+        self.resources == other.resources &&
+        self.executor == other.executor &&
+        self.command == other.command &&
+        self.container == other.container &&
+        self.data == other.data &&
+        self.health_check == other.health_check &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for TaskInfo {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -14568,7 +15272,7 @@ impl ::protobuf::reflect::FieldAccessor<TaskInfo> for TaskInfo_health_check_acc_
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct TaskStatus {
     task_id: ::protobuf::SingularPtrField<TaskID>,
     state: ::std::option::Option<TaskState>,
@@ -14581,6 +15285,7 @@ pub struct TaskStatus {
     timestamp: ::std::option::Option<f64>,
     healthy: ::std::option::Option<bool>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> TaskStatus {
@@ -14607,6 +15312,7 @@ impl<'a> TaskStatus {
                     timestamp: ::std::option::None,
                     healthy: ::std::option::None,
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -14636,6 +15342,11 @@ impl<'a> TaskStatus {
         self.task_id.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_task_id(&mut self) -> TaskID {
+        self.task_id.take().unwrap_or_else(|| TaskID::new())
+    }
+
     pub fn get_task_id(&'a self) -> &'a TaskID {
         self.task_id.as_ref().unwrap_or_else(|| TaskID::default_instance())
     }
@@ -14643,7 +15354,7 @@ impl<'a> TaskStatus {
     // required .mesos.TaskState state = 2;
 
     pub fn clear_state(&mut self) {
-        self.state = None;
+        self.state = ::std::option::None;
     }
 
     pub fn has_state(&self) -> bool {
@@ -14652,7 +15363,7 @@ impl<'a> TaskStatus {
 
     // Param is passed by value, moved
     pub fn set_state(&mut self, v: TaskState) {
-        self.state = Some(v);
+        self.state = ::std::option::Some(v);
     }
 
     pub fn get_state(&self) -> TaskState {
@@ -14683,6 +15394,11 @@ impl<'a> TaskStatus {
         self.message.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_message(&mut self) -> ::std::string::String {
+        self.message.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_message(&'a self) -> &'a str {
         match self.message.as_ref() {
             Some(v) => v.as_slice(),
@@ -14693,7 +15409,7 @@ impl<'a> TaskStatus {
     // optional .mesos.TaskStatus.Source source = 9;
 
     pub fn clear_source(&mut self) {
-        self.source = None;
+        self.source = ::std::option::None;
     }
 
     pub fn has_source(&self) -> bool {
@@ -14702,7 +15418,7 @@ impl<'a> TaskStatus {
 
     // Param is passed by value, moved
     pub fn set_source(&mut self, v: TaskStatus_Source) {
-        self.source = Some(v);
+        self.source = ::std::option::Some(v);
     }
 
     pub fn get_source(&self) -> TaskStatus_Source {
@@ -14712,7 +15428,7 @@ impl<'a> TaskStatus {
     // optional .mesos.TaskStatus.Reason reason = 10;
 
     pub fn clear_reason(&mut self) {
-        self.reason = None;
+        self.reason = ::std::option::None;
     }
 
     pub fn has_reason(&self) -> bool {
@@ -14721,7 +15437,7 @@ impl<'a> TaskStatus {
 
     // Param is passed by value, moved
     pub fn set_reason(&mut self, v: TaskStatus_Reason) {
-        self.reason = Some(v);
+        self.reason = ::std::option::Some(v);
     }
 
     pub fn get_reason(&self) -> TaskStatus_Reason {
@@ -14750,6 +15466,11 @@ impl<'a> TaskStatus {
             self.data.set_default();
         };
         self.data.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_data(&mut self) -> ::std::vec::Vec<u8> {
+        self.data.take().unwrap_or_else(|| ::std::vec::Vec::new())
     }
 
     pub fn get_data(&'a self) -> &'a [u8] {
@@ -14783,6 +15504,11 @@ impl<'a> TaskStatus {
         self.slave_id.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_slave_id(&mut self) -> SlaveID {
+        self.slave_id.take().unwrap_or_else(|| SlaveID::new())
+    }
+
     pub fn get_slave_id(&'a self) -> &'a SlaveID {
         self.slave_id.as_ref().unwrap_or_else(|| SlaveID::default_instance())
     }
@@ -14811,6 +15537,11 @@ impl<'a> TaskStatus {
         self.executor_id.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_executor_id(&mut self) -> ExecutorID {
+        self.executor_id.take().unwrap_or_else(|| ExecutorID::new())
+    }
+
     pub fn get_executor_id(&'a self) -> &'a ExecutorID {
         self.executor_id.as_ref().unwrap_or_else(|| ExecutorID::default_instance())
     }
@@ -14818,7 +15549,7 @@ impl<'a> TaskStatus {
     // optional double timestamp = 6;
 
     pub fn clear_timestamp(&mut self) {
-        self.timestamp = None;
+        self.timestamp = ::std::option::None;
     }
 
     pub fn has_timestamp(&self) -> bool {
@@ -14827,7 +15558,7 @@ impl<'a> TaskStatus {
 
     // Param is passed by value, moved
     pub fn set_timestamp(&mut self, v: f64) {
-        self.timestamp = Some(v);
+        self.timestamp = ::std::option::Some(v);
     }
 
     pub fn get_timestamp(&self) -> f64 {
@@ -14837,7 +15568,7 @@ impl<'a> TaskStatus {
     // optional bool healthy = 8;
 
     pub fn clear_healthy(&mut self) {
-        self.healthy = None;
+        self.healthy = ::std::option::None;
     }
 
     pub fn has_healthy(&self) -> bool {
@@ -14846,7 +15577,7 @@ impl<'a> TaskStatus {
 
     // Param is passed by value, moved
     pub fn set_healthy(&mut self, v: bool) {
-        self.healthy = Some(v);
+        self.healthy = ::std::option::Some(v);
     }
 
     pub fn get_healthy(&self) -> bool {
@@ -14884,8 +15615,8 @@ impl ::protobuf::Message for TaskStatus {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
-                    let tmp = TaskState::new(try!(is.read_int32()));
-                    self.state = Some(tmp);
+                    let tmp = try!(is.read_enum());
+                    self.state = ::std::option::Some(tmp);
                 },
                 4 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -14898,15 +15629,15 @@ impl ::protobuf::Message for TaskStatus {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
-                    let tmp = TaskStatus_Source::new(try!(is.read_int32()));
-                    self.source = Some(tmp);
+                    let tmp = try!(is.read_enum());
+                    self.source = ::std::option::Some(tmp);
                 },
                 10 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
-                    let tmp = TaskStatus_Reason::new(try!(is.read_int32()));
-                    self.reason = Some(tmp);
+                    let tmp = try!(is.read_enum());
+                    self.reason = ::std::option::Some(tmp);
                 },
                 3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -14934,14 +15665,14 @@ impl ::protobuf::Message for TaskStatus {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.timestamp = Some(tmp);
+                    self.timestamp = ::std::option::Some(tmp);
                 },
                 8 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_bool());
-                    self.healthy = Some(tmp);
+                    self.healthy = ::std::option::Some(tmp);
                 },
                 _ => {
                     let unknown = try!(is.read_unknown(wire_type));
@@ -14953,13 +15684,10 @@ impl ::protobuf::Message for TaskStatus {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.task_id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.state.iter() {
@@ -14978,11 +15706,11 @@ impl ::protobuf::Message for TaskStatus {
             my_size += ::protobuf::rt::bytes_size(3, value.as_slice());
         };
         for value in self.slave_id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.executor_id.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         if self.timestamp.is_some() {
@@ -14992,19 +15720,16 @@ impl ::protobuf::Message for TaskStatus {
             my_size += 2;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.task_id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
@@ -15041,18 +15766,16 @@ impl ::protobuf::Message for TaskStatus {
         match self.slave_id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(5, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.executor_id.as_ref() {
             Some(v) => {
                 try!(os.write_tag(7, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
@@ -15070,6 +15793,10 @@ impl ::protobuf::Message for TaskStatus {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -15129,9 +15856,24 @@ impl ::protobuf::Clear for TaskStatus {
     }
 }
 
+impl ::std::cmp::PartialEq for TaskStatus {
+    fn eq(&self, other: &TaskStatus) -> bool {
+        self.task_id == other.task_id &&
+        self.state == other.state &&
+        self.message == other.message &&
+        self.source == other.source &&
+        self.reason == other.reason &&
+        self.data == other.data &&
+        self.slave_id == other.slave_id &&
+        self.executor_id == other.executor_id &&
+        self.timestamp == other.timestamp &&
+        self.healthy == other.healthy &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for TaskStatus {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -15169,7 +15911,6 @@ impl ::protobuf::reflect::FieldAccessor<TaskStatus> for TaskStatus_state_acc_typ
     }
 
     fn get_enum<'a>(&self, m: &TaskStatus) -> &'static ::protobuf::reflect::EnumValueDescriptor {
-        use protobuf::{ProtobufEnum};
         m.get_state().descriptor()
     }
 }
@@ -15206,7 +15947,6 @@ impl ::protobuf::reflect::FieldAccessor<TaskStatus> for TaskStatus_source_acc_ty
     }
 
     fn get_enum<'a>(&self, m: &TaskStatus) -> &'static ::protobuf::reflect::EnumValueDescriptor {
-        use protobuf::{ProtobufEnum};
         m.get_source().descriptor()
     }
 }
@@ -15225,7 +15965,6 @@ impl ::protobuf::reflect::FieldAccessor<TaskStatus> for TaskStatus_reason_acc_ty
     }
 
     fn get_enum<'a>(&self, m: &TaskStatus) -> &'static ::protobuf::reflect::EnumValueDescriptor {
-        use protobuf::{ProtobufEnum};
         m.get_reason().descriptor()
     }
 }
@@ -15327,20 +16066,19 @@ pub enum TaskStatus_Source {
     SOURCE_EXECUTOR = 2,
 }
 
-impl TaskStatus_Source {
-    pub fn new(value: i32) -> TaskStatus_Source {
-        match value {
-            0 => TaskStatus_Source::SOURCE_MASTER,
-            1 => TaskStatus_Source::SOURCE_SLAVE,
-            2 => TaskStatus_Source::SOURCE_EXECUTOR,
-            _ => panic!()
-        }
-    }
-}
 
 impl ::protobuf::ProtobufEnum for TaskStatus_Source {
     fn value(&self) -> i32 {
         *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<TaskStatus_Source> {
+        match value {
+            0 => ::std::option::Some(TaskStatus_Source::SOURCE_MASTER),
+            1 => ::std::option::Some(TaskStatus_Source::SOURCE_SLAVE),
+            2 => ::std::option::Some(TaskStatus_Source::SOURCE_EXECUTOR),
+            _ => ::std::option::None
+        }
     }
 
     fn enum_descriptor_static(_: Option<TaskStatus_Source>) -> &'static ::protobuf::reflect::EnumDescriptor {
@@ -15377,34 +16115,33 @@ pub enum TaskStatus_Reason {
     REASON_TASK_UNKNOWN = 16,
 }
 
-impl TaskStatus_Reason {
-    pub fn new(value: i32) -> TaskStatus_Reason {
-        match value {
-            0 => TaskStatus_Reason::REASON_COMMAND_EXECUTOR_FAILED,
-            1 => TaskStatus_Reason::REASON_EXECUTOR_TERMINATED,
-            2 => TaskStatus_Reason::REASON_EXECUTOR_UNREGISTERED,
-            3 => TaskStatus_Reason::REASON_FRAMEWORK_REMOVED,
-            4 => TaskStatus_Reason::REASON_GC_ERROR,
-            5 => TaskStatus_Reason::REASON_INVALID_FRAMEWORKID,
-            6 => TaskStatus_Reason::REASON_INVALID_OFFERS,
-            7 => TaskStatus_Reason::REASON_MASTER_DISCONNECTED,
-            8 => TaskStatus_Reason::REASON_MEMORY_LIMIT,
-            9 => TaskStatus_Reason::REASON_RECONCILIATION,
-            10 => TaskStatus_Reason::REASON_SLAVE_DISCONNECTED,
-            11 => TaskStatus_Reason::REASON_SLAVE_REMOVED,
-            12 => TaskStatus_Reason::REASON_SLAVE_RESTARTED,
-            13 => TaskStatus_Reason::REASON_SLAVE_UNKNOWN,
-            14 => TaskStatus_Reason::REASON_TASK_INVALID,
-            15 => TaskStatus_Reason::REASON_TASK_UNAUTHORIZED,
-            16 => TaskStatus_Reason::REASON_TASK_UNKNOWN,
-            _ => panic!()
-        }
-    }
-}
 
 impl ::protobuf::ProtobufEnum for TaskStatus_Reason {
     fn value(&self) -> i32 {
         *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<TaskStatus_Reason> {
+        match value {
+            0 => ::std::option::Some(TaskStatus_Reason::REASON_COMMAND_EXECUTOR_FAILED),
+            1 => ::std::option::Some(TaskStatus_Reason::REASON_EXECUTOR_TERMINATED),
+            2 => ::std::option::Some(TaskStatus_Reason::REASON_EXECUTOR_UNREGISTERED),
+            3 => ::std::option::Some(TaskStatus_Reason::REASON_FRAMEWORK_REMOVED),
+            4 => ::std::option::Some(TaskStatus_Reason::REASON_GC_ERROR),
+            5 => ::std::option::Some(TaskStatus_Reason::REASON_INVALID_FRAMEWORKID),
+            6 => ::std::option::Some(TaskStatus_Reason::REASON_INVALID_OFFERS),
+            7 => ::std::option::Some(TaskStatus_Reason::REASON_MASTER_DISCONNECTED),
+            8 => ::std::option::Some(TaskStatus_Reason::REASON_MEMORY_LIMIT),
+            9 => ::std::option::Some(TaskStatus_Reason::REASON_RECONCILIATION),
+            10 => ::std::option::Some(TaskStatus_Reason::REASON_SLAVE_DISCONNECTED),
+            11 => ::std::option::Some(TaskStatus_Reason::REASON_SLAVE_REMOVED),
+            12 => ::std::option::Some(TaskStatus_Reason::REASON_SLAVE_RESTARTED),
+            13 => ::std::option::Some(TaskStatus_Reason::REASON_SLAVE_UNKNOWN),
+            14 => ::std::option::Some(TaskStatus_Reason::REASON_TASK_INVALID),
+            15 => ::std::option::Some(TaskStatus_Reason::REASON_TASK_UNAUTHORIZED),
+            16 => ::std::option::Some(TaskStatus_Reason::REASON_TASK_UNKNOWN),
+            _ => ::std::option::None
+        }
     }
 
     fn enum_descriptor_static(_: Option<TaskStatus_Reason>) -> &'static ::protobuf::reflect::EnumDescriptor {
@@ -15420,10 +16157,11 @@ impl ::protobuf::ProtobufEnum for TaskStatus_Reason {
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Filters {
     refuse_seconds: ::std::option::Option<f64>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Filters {
@@ -15441,6 +16179,7 @@ impl<'a> Filters {
                 Filters {
                     refuse_seconds: ::std::option::None,
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -15449,7 +16188,7 @@ impl<'a> Filters {
     // optional double refuse_seconds = 1;
 
     pub fn clear_refuse_seconds(&mut self) {
-        self.refuse_seconds = None;
+        self.refuse_seconds = ::std::option::None;
     }
 
     pub fn has_refuse_seconds(&self) -> bool {
@@ -15458,7 +16197,7 @@ impl<'a> Filters {
 
     // Param is passed by value, moved
     pub fn set_refuse_seconds(&mut self, v: f64) {
-        self.refuse_seconds = Some(v);
+        self.refuse_seconds = ::std::option::Some(v);
     }
 
     pub fn get_refuse_seconds(&self) -> f64 {
@@ -15484,7 +16223,7 @@ impl ::protobuf::Message for Filters {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.refuse_seconds = Some(tmp);
+                    self.refuse_seconds = ::std::option::Some(tmp);
                 },
                 _ => {
                     let unknown = try!(is.read_unknown(wire_type));
@@ -15496,23 +16235,17 @@ impl ::protobuf::Message for Filters {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         if self.refuse_seconds.is_some() {
             my_size += 9;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.refuse_seconds {
             Some(v) => {
                 try!(os.write_double(1, v));
@@ -15521,6 +16254,10 @@ impl ::protobuf::Message for Filters {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -15562,9 +16299,15 @@ impl ::protobuf::Clear for Filters {
     }
 }
 
+impl ::std::cmp::PartialEq for Filters {
+    fn eq(&self, other: &Filters) -> bool {
+        self.refuse_seconds == other.refuse_seconds &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Filters {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -15588,10 +16331,11 @@ impl ::protobuf::reflect::FieldAccessor<Filters> for Filters_refuse_seconds_acc_
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Environment {
     variables: ::protobuf::RepeatedField<Environment_Variable>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Environment {
@@ -15609,6 +16353,7 @@ impl<'a> Environment {
                 Environment {
                     variables: ::protobuf::RepeatedField::new(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -15628,6 +16373,11 @@ impl<'a> Environment {
     // Mutable pointer to the field.
     pub fn mut_variables(&'a mut self) -> &'a mut ::protobuf::RepeatedField<Environment_Variable> {
         &mut self.variables
+    }
+
+    // Take field
+    pub fn take_variables(&mut self) -> ::protobuf::RepeatedField<Environment_Variable> {
+        ::std::mem::replace(&mut self.variables, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_variables(&'a self) -> &'a [Environment_Variable] {
@@ -15665,31 +16415,29 @@ impl ::protobuf::Message for Environment {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.variables.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         for v in self.variables.iter() {
             try!(os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -15731,9 +16479,15 @@ impl ::protobuf::Clear for Environment {
     }
 }
 
+impl ::std::cmp::PartialEq for Environment {
+    fn eq(&self, other: &Environment) -> bool {
+        self.variables == other.variables &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Environment {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -15757,11 +16511,12 @@ impl ::protobuf::reflect::FieldAccessor<Environment> for Environment_variables_a
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Environment_Variable {
     name: ::protobuf::SingularField<::std::string::String>,
     value: ::protobuf::SingularField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Environment_Variable {
@@ -15780,6 +16535,7 @@ impl<'a> Environment_Variable {
                     name: ::protobuf::SingularField::none(),
                     value: ::protobuf::SingularField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -15807,6 +16563,11 @@ impl<'a> Environment_Variable {
             self.name.set_default();
         };
         self.name.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_name(&mut self) -> ::std::string::String {
+        self.name.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_name(&'a self) -> &'a str {
@@ -15838,6 +16599,11 @@ impl<'a> Environment_Variable {
             self.value.set_default();
         };
         self.value.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_value(&mut self) -> ::std::string::String {
+        self.value.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_value(&'a self) -> &'a str {
@@ -15891,10 +16657,7 @@ impl ::protobuf::Message for Environment_Variable {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.name.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
@@ -15903,14 +16666,11 @@ impl ::protobuf::Message for Environment_Variable {
             my_size += ::protobuf::rt::string_size(2, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.name.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -15925,6 +16685,10 @@ impl ::protobuf::Message for Environment_Variable {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -15968,9 +16732,16 @@ impl ::protobuf::Clear for Environment_Variable {
     }
 }
 
+impl ::std::cmp::PartialEq for Environment_Variable {
+    fn eq(&self, other: &Environment_Variable) -> bool {
+        self.name == other.name &&
+        self.value == other.value &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Environment_Variable {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -16012,11 +16783,12 @@ impl ::protobuf::reflect::FieldAccessor<Environment_Variable> for Environment_Va
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Parameter {
     key: ::protobuf::SingularField<::std::string::String>,
     value: ::protobuf::SingularField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Parameter {
@@ -16035,6 +16807,7 @@ impl<'a> Parameter {
                     key: ::protobuf::SingularField::none(),
                     value: ::protobuf::SingularField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -16062,6 +16835,11 @@ impl<'a> Parameter {
             self.key.set_default();
         };
         self.key.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_key(&mut self) -> ::std::string::String {
+        self.key.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_key(&'a self) -> &'a str {
@@ -16093,6 +16871,11 @@ impl<'a> Parameter {
             self.value.set_default();
         };
         self.value.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_value(&mut self) -> ::std::string::String {
+        self.value.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_value(&'a self) -> &'a str {
@@ -16146,10 +16929,7 @@ impl ::protobuf::Message for Parameter {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.key.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
@@ -16158,14 +16938,11 @@ impl ::protobuf::Message for Parameter {
             my_size += ::protobuf::rt::string_size(2, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.key.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -16180,6 +16957,10 @@ impl ::protobuf::Message for Parameter {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -16223,9 +17004,16 @@ impl ::protobuf::Clear for Parameter {
     }
 }
 
+impl ::std::cmp::PartialEq for Parameter {
+    fn eq(&self, other: &Parameter) -> bool {
+        self.key == other.key &&
+        self.value == other.value &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Parameter {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -16267,10 +17055,11 @@ impl ::protobuf::reflect::FieldAccessor<Parameter> for Parameter_value_acc_type 
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Parameters {
     parameter: ::protobuf::RepeatedField<Parameter>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Parameters {
@@ -16288,6 +17077,7 @@ impl<'a> Parameters {
                 Parameters {
                     parameter: ::protobuf::RepeatedField::new(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -16307,6 +17097,11 @@ impl<'a> Parameters {
     // Mutable pointer to the field.
     pub fn mut_parameter(&'a mut self) -> &'a mut ::protobuf::RepeatedField<Parameter> {
         &mut self.parameter
+    }
+
+    // Take field
+    pub fn take_parameter(&mut self) -> ::protobuf::RepeatedField<Parameter> {
+        ::std::mem::replace(&mut self.parameter, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_parameter(&'a self) -> &'a [Parameter] {
@@ -16344,31 +17139,29 @@ impl ::protobuf::Message for Parameters {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.parameter.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         for v in self.parameter.iter() {
             try!(os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -16410,9 +17203,15 @@ impl ::protobuf::Clear for Parameters {
     }
 }
 
+impl ::std::cmp::PartialEq for Parameters {
+    fn eq(&self, other: &Parameters) -> bool {
+        self.parameter == other.parameter &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Parameters {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -16436,11 +17235,12 @@ impl ::protobuf::reflect::FieldAccessor<Parameters> for Parameters_parameter_acc
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Credential {
     principal: ::protobuf::SingularField<::std::string::String>,
     secret: ::protobuf::SingularField<::std::vec::Vec<u8>>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Credential {
@@ -16459,6 +17259,7 @@ impl<'a> Credential {
                     principal: ::protobuf::SingularField::none(),
                     secret: ::protobuf::SingularField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -16486,6 +17287,11 @@ impl<'a> Credential {
             self.principal.set_default();
         };
         self.principal.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_principal(&mut self) -> ::std::string::String {
+        self.principal.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_principal(&'a self) -> &'a str {
@@ -16517,6 +17323,11 @@ impl<'a> Credential {
             self.secret.set_default();
         };
         self.secret.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_secret(&mut self) -> ::std::vec::Vec<u8> {
+        self.secret.take().unwrap_or_else(|| ::std::vec::Vec::new())
     }
 
     pub fn get_secret(&'a self) -> &'a [u8] {
@@ -16567,10 +17378,7 @@ impl ::protobuf::Message for Credential {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.principal.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
@@ -16579,14 +17387,11 @@ impl ::protobuf::Message for Credential {
             my_size += ::protobuf::rt::bytes_size(2, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.principal.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -16601,6 +17406,10 @@ impl ::protobuf::Message for Credential {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -16644,9 +17453,16 @@ impl ::protobuf::Clear for Credential {
     }
 }
 
+impl ::std::cmp::PartialEq for Credential {
+    fn eq(&self, other: &Credential) -> bool {
+        self.principal == other.principal &&
+        self.secret == other.secret &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Credential {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -16688,10 +17504,11 @@ impl ::protobuf::reflect::FieldAccessor<Credential> for Credential_secret_acc_ty
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Credentials {
     credentials: ::protobuf::RepeatedField<Credential>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Credentials {
@@ -16709,6 +17526,7 @@ impl<'a> Credentials {
                 Credentials {
                     credentials: ::protobuf::RepeatedField::new(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -16728,6 +17546,11 @@ impl<'a> Credentials {
     // Mutable pointer to the field.
     pub fn mut_credentials(&'a mut self) -> &'a mut ::protobuf::RepeatedField<Credential> {
         &mut self.credentials
+    }
+
+    // Take field
+    pub fn take_credentials(&mut self) -> ::protobuf::RepeatedField<Credential> {
+        ::std::mem::replace(&mut self.credentials, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_credentials(&'a self) -> &'a [Credential] {
@@ -16765,31 +17588,29 @@ impl ::protobuf::Message for Credentials {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.credentials.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         for v in self.credentials.iter() {
             try!(os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -16831,9 +17652,15 @@ impl ::protobuf::Clear for Credentials {
     }
 }
 
+impl ::std::cmp::PartialEq for Credentials {
+    fn eq(&self, other: &Credentials) -> bool {
+        self.credentials == other.credentials &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Credentials {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -16857,9 +17684,10 @@ impl ::protobuf::reflect::FieldAccessor<Credentials> for Credentials_credentials
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct ACL {
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> ACL {
@@ -16876,6 +17704,7 @@ impl<'a> ACL {
             instance.get(|| {
                 ACL {
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -16905,22 +17734,20 @@ impl ::protobuf::Message for ACL {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -16960,19 +17787,25 @@ impl ::protobuf::Clear for ACL {
     }
 }
 
+impl ::std::cmp::PartialEq for ACL {
+    fn eq(&self, other: &ACL) -> bool {
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for ACL {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
 
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct ACL_Entity {
     field_type: ::std::option::Option<ACL_Entity_Type>,
     values: ::protobuf::RepeatedField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> ACL_Entity {
@@ -16991,6 +17824,7 @@ impl<'a> ACL_Entity {
                     field_type: ::std::option::None,
                     values: ::protobuf::RepeatedField::new(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -16999,7 +17833,7 @@ impl<'a> ACL_Entity {
     // optional .mesos.ACL.Entity.Type type = 1;
 
     pub fn clear_field_type(&mut self) {
-        self.field_type = None;
+        self.field_type = ::std::option::None;
     }
 
     pub fn has_field_type(&self) -> bool {
@@ -17008,7 +17842,7 @@ impl<'a> ACL_Entity {
 
     // Param is passed by value, moved
     pub fn set_field_type(&mut self, v: ACL_Entity_Type) {
-        self.field_type = Some(v);
+        self.field_type = ::std::option::Some(v);
     }
 
     pub fn get_field_type(&self) -> ACL_Entity_Type {
@@ -17029,6 +17863,11 @@ impl<'a> ACL_Entity {
     // Mutable pointer to the field.
     pub fn mut_values(&'a mut self) -> &'a mut ::protobuf::RepeatedField<::std::string::String> {
         &mut self.values
+    }
+
+    // Take field
+    pub fn take_values(&mut self) -> ::protobuf::RepeatedField<::std::string::String> {
+        ::std::mem::replace(&mut self.values, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_values(&'a self) -> &'a [::std::string::String] {
@@ -17053,8 +17892,8 @@ impl ::protobuf::Message for ACL_Entity {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
-                    let tmp = ACL_Entity_Type::new(try!(is.read_int32()));
-                    self.field_type = Some(tmp);
+                    let tmp = try!(is.read_enum());
+                    self.field_type = ::std::option::Some(tmp);
                 },
                 2 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -17073,10 +17912,7 @@ impl ::protobuf::Message for ACL_Entity {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.field_type.iter() {
             my_size += ::protobuf::rt::enum_size(1, *value);
@@ -17085,14 +17921,11 @@ impl ::protobuf::Message for ACL_Entity {
             my_size += ::protobuf::rt::string_size(2, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.field_type {
             Some(v) => {
                 try!(os.write_enum(1, v as i32));
@@ -17104,6 +17937,10 @@ impl ::protobuf::Message for ACL_Entity {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -17147,9 +17984,16 @@ impl ::protobuf::Clear for ACL_Entity {
     }
 }
 
+impl ::std::cmp::PartialEq for ACL_Entity {
+    fn eq(&self, other: &ACL_Entity) -> bool {
+        self.field_type == other.field_type &&
+        self.values == other.values &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for ACL_Entity {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -17169,7 +18013,6 @@ impl ::protobuf::reflect::FieldAccessor<ACL_Entity> for ACL_Entity_field_type_ac
     }
 
     fn get_enum<'a>(&self, m: &ACL_Entity) -> &'static ::protobuf::reflect::EnumValueDescriptor {
-        use protobuf::{ProtobufEnum};
         m.get_field_type().descriptor()
     }
 }
@@ -17199,20 +18042,19 @@ pub enum ACL_Entity_Type {
     NONE = 2,
 }
 
-impl ACL_Entity_Type {
-    pub fn new(value: i32) -> ACL_Entity_Type {
-        match value {
-            0 => ACL_Entity_Type::SOME,
-            1 => ACL_Entity_Type::ANY,
-            2 => ACL_Entity_Type::NONE,
-            _ => panic!()
-        }
-    }
-}
 
 impl ::protobuf::ProtobufEnum for ACL_Entity_Type {
     fn value(&self) -> i32 {
         *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<ACL_Entity_Type> {
+        match value {
+            0 => ::std::option::Some(ACL_Entity_Type::SOME),
+            1 => ::std::option::Some(ACL_Entity_Type::ANY),
+            2 => ::std::option::Some(ACL_Entity_Type::NONE),
+            _ => ::std::option::None
+        }
     }
 
     fn enum_descriptor_static(_: Option<ACL_Entity_Type>) -> &'static ::protobuf::reflect::EnumDescriptor {
@@ -17228,11 +18070,12 @@ impl ::protobuf::ProtobufEnum for ACL_Entity_Type {
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct ACL_RegisterFramework {
     principals: ::protobuf::SingularPtrField<ACL_Entity>,
     roles: ::protobuf::SingularPtrField<ACL_Entity>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> ACL_RegisterFramework {
@@ -17251,6 +18094,7 @@ impl<'a> ACL_RegisterFramework {
                     principals: ::protobuf::SingularPtrField::none(),
                     roles: ::protobuf::SingularPtrField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -17280,6 +18124,11 @@ impl<'a> ACL_RegisterFramework {
         self.principals.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_principals(&mut self) -> ACL_Entity {
+        self.principals.take().unwrap_or_else(|| ACL_Entity::new())
+    }
+
     pub fn get_principals(&'a self) -> &'a ACL_Entity {
         self.principals.as_ref().unwrap_or_else(|| ACL_Entity::default_instance())
     }
@@ -17306,6 +18155,11 @@ impl<'a> ACL_RegisterFramework {
             self.roles.set_default();
         };
         self.roles.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_roles(&mut self) -> ACL_Entity {
+        self.roles.take().unwrap_or_else(|| ACL_Entity::new())
     }
 
     pub fn get_roles(&'a self) -> &'a ACL_Entity {
@@ -17356,47 +18210,44 @@ impl ::protobuf::Message for ACL_RegisterFramework {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.principals.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.roles.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.principals.as_ref() {
             Some(v) => {
                 try!(os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.roles.as_ref() {
             Some(v) => {
                 try!(os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -17440,9 +18291,16 @@ impl ::protobuf::Clear for ACL_RegisterFramework {
     }
 }
 
+impl ::std::cmp::PartialEq for ACL_RegisterFramework {
+    fn eq(&self, other: &ACL_RegisterFramework) -> bool {
+        self.principals == other.principals &&
+        self.roles == other.roles &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for ACL_RegisterFramework {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -17484,11 +18342,12 @@ impl ::protobuf::reflect::FieldAccessor<ACL_RegisterFramework> for ACL_RegisterF
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct ACL_RunTask {
     principals: ::protobuf::SingularPtrField<ACL_Entity>,
     users: ::protobuf::SingularPtrField<ACL_Entity>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> ACL_RunTask {
@@ -17507,6 +18366,7 @@ impl<'a> ACL_RunTask {
                     principals: ::protobuf::SingularPtrField::none(),
                     users: ::protobuf::SingularPtrField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -17536,6 +18396,11 @@ impl<'a> ACL_RunTask {
         self.principals.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_principals(&mut self) -> ACL_Entity {
+        self.principals.take().unwrap_or_else(|| ACL_Entity::new())
+    }
+
     pub fn get_principals(&'a self) -> &'a ACL_Entity {
         self.principals.as_ref().unwrap_or_else(|| ACL_Entity::default_instance())
     }
@@ -17562,6 +18427,11 @@ impl<'a> ACL_RunTask {
             self.users.set_default();
         };
         self.users.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_users(&mut self) -> ACL_Entity {
+        self.users.take().unwrap_or_else(|| ACL_Entity::new())
     }
 
     pub fn get_users(&'a self) -> &'a ACL_Entity {
@@ -17612,47 +18482,44 @@ impl ::protobuf::Message for ACL_RunTask {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.principals.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.users.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.principals.as_ref() {
             Some(v) => {
                 try!(os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.users.as_ref() {
             Some(v) => {
                 try!(os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -17696,9 +18563,16 @@ impl ::protobuf::Clear for ACL_RunTask {
     }
 }
 
+impl ::std::cmp::PartialEq for ACL_RunTask {
+    fn eq(&self, other: &ACL_RunTask) -> bool {
+        self.principals == other.principals &&
+        self.users == other.users &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for ACL_RunTask {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -17740,11 +18614,12 @@ impl ::protobuf::reflect::FieldAccessor<ACL_RunTask> for ACL_RunTask_users_acc_t
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct ACL_ShutdownFramework {
     principals: ::protobuf::SingularPtrField<ACL_Entity>,
     framework_principals: ::protobuf::SingularPtrField<ACL_Entity>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> ACL_ShutdownFramework {
@@ -17763,6 +18638,7 @@ impl<'a> ACL_ShutdownFramework {
                     principals: ::protobuf::SingularPtrField::none(),
                     framework_principals: ::protobuf::SingularPtrField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -17792,6 +18668,11 @@ impl<'a> ACL_ShutdownFramework {
         self.principals.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_principals(&mut self) -> ACL_Entity {
+        self.principals.take().unwrap_or_else(|| ACL_Entity::new())
+    }
+
     pub fn get_principals(&'a self) -> &'a ACL_Entity {
         self.principals.as_ref().unwrap_or_else(|| ACL_Entity::default_instance())
     }
@@ -17818,6 +18699,11 @@ impl<'a> ACL_ShutdownFramework {
             self.framework_principals.set_default();
         };
         self.framework_principals.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_framework_principals(&mut self) -> ACL_Entity {
+        self.framework_principals.take().unwrap_or_else(|| ACL_Entity::new())
     }
 
     pub fn get_framework_principals(&'a self) -> &'a ACL_Entity {
@@ -17868,47 +18754,44 @@ impl ::protobuf::Message for ACL_ShutdownFramework {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.principals.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.framework_principals.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.principals.as_ref() {
             Some(v) => {
                 try!(os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         match self.framework_principals.as_ref() {
             Some(v) => {
                 try!(os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -17952,9 +18835,16 @@ impl ::protobuf::Clear for ACL_ShutdownFramework {
     }
 }
 
+impl ::std::cmp::PartialEq for ACL_ShutdownFramework {
+    fn eq(&self, other: &ACL_ShutdownFramework) -> bool {
+        self.principals == other.principals &&
+        self.framework_principals == other.framework_principals &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for ACL_ShutdownFramework {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -17996,13 +18886,14 @@ impl ::protobuf::reflect::FieldAccessor<ACL_ShutdownFramework> for ACL_ShutdownF
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct ACLs {
     permissive: ::std::option::Option<bool>,
     register_frameworks: ::protobuf::RepeatedField<ACL_RegisterFramework>,
     run_tasks: ::protobuf::RepeatedField<ACL_RunTask>,
     shutdown_frameworks: ::protobuf::RepeatedField<ACL_ShutdownFramework>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> ACLs {
@@ -18023,6 +18914,7 @@ impl<'a> ACLs {
                     run_tasks: ::protobuf::RepeatedField::new(),
                     shutdown_frameworks: ::protobuf::RepeatedField::new(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -18031,7 +18923,7 @@ impl<'a> ACLs {
     // optional bool permissive = 1;
 
     pub fn clear_permissive(&mut self) {
-        self.permissive = None;
+        self.permissive = ::std::option::None;
     }
 
     pub fn has_permissive(&self) -> bool {
@@ -18040,7 +18932,7 @@ impl<'a> ACLs {
 
     // Param is passed by value, moved
     pub fn set_permissive(&mut self, v: bool) {
-        self.permissive = Some(v);
+        self.permissive = ::std::option::Some(v);
     }
 
     pub fn get_permissive(&self) -> bool {
@@ -18063,6 +18955,11 @@ impl<'a> ACLs {
         &mut self.register_frameworks
     }
 
+    // Take field
+    pub fn take_register_frameworks(&mut self) -> ::protobuf::RepeatedField<ACL_RegisterFramework> {
+        ::std::mem::replace(&mut self.register_frameworks, ::protobuf::RepeatedField::new())
+    }
+
     pub fn get_register_frameworks(&'a self) -> &'a [ACL_RegisterFramework] {
         self.register_frameworks.as_slice()
     }
@@ -18083,6 +18980,11 @@ impl<'a> ACLs {
         &mut self.run_tasks
     }
 
+    // Take field
+    pub fn take_run_tasks(&mut self) -> ::protobuf::RepeatedField<ACL_RunTask> {
+        ::std::mem::replace(&mut self.run_tasks, ::protobuf::RepeatedField::new())
+    }
+
     pub fn get_run_tasks(&'a self) -> &'a [ACL_RunTask] {
         self.run_tasks.as_slice()
     }
@@ -18101,6 +19003,11 @@ impl<'a> ACLs {
     // Mutable pointer to the field.
     pub fn mut_shutdown_frameworks(&'a mut self) -> &'a mut ::protobuf::RepeatedField<ACL_ShutdownFramework> {
         &mut self.shutdown_frameworks
+    }
+
+    // Take field
+    pub fn take_shutdown_frameworks(&mut self) -> ::protobuf::RepeatedField<ACL_ShutdownFramework> {
+        ::std::mem::replace(&mut self.shutdown_frameworks, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_shutdown_frameworks(&'a self) -> &'a [ACL_ShutdownFramework] {
@@ -18126,7 +19033,7 @@ impl ::protobuf::Message for ACLs {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_bool());
-                    self.permissive = Some(tmp);
+                    self.permissive = ::std::option::Some(tmp);
                 },
                 2 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -18159,34 +19066,29 @@ impl ::protobuf::Message for ACLs {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         if self.permissive.is_some() {
             my_size += 2;
         };
         for value in self.register_frameworks.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.run_tasks.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.shutdown_frameworks.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.permissive {
             Some(v) => {
                 try!(os.write_bool(1, v));
@@ -18195,24 +19097,25 @@ impl ::protobuf::Message for ACLs {
         };
         for v in self.register_frameworks.iter() {
             try!(os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         for v in self.run_tasks.iter() {
             try!(os.write_tag(3, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         for v in self.shutdown_frameworks.iter() {
             try!(os.write_tag(4, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -18260,9 +19163,18 @@ impl ::protobuf::Clear for ACLs {
     }
 }
 
+impl ::std::cmp::PartialEq for ACLs {
+    fn eq(&self, other: &ACLs) -> bool {
+        self.permissive == other.permissive &&
+        self.register_frameworks == other.register_frameworks &&
+        self.run_tasks == other.run_tasks &&
+        self.shutdown_frameworks == other.shutdown_frameworks &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for ACLs {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -18340,12 +19252,13 @@ impl ::protobuf::reflect::FieldAccessor<ACLs> for ACLs_shutdown_frameworks_acc_t
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct RateLimit {
     qps: ::std::option::Option<f64>,
     principal: ::protobuf::SingularField<::std::string::String>,
     capacity: ::std::option::Option<u64>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> RateLimit {
@@ -18365,6 +19278,7 @@ impl<'a> RateLimit {
                     principal: ::protobuf::SingularField::none(),
                     capacity: ::std::option::None,
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -18373,7 +19287,7 @@ impl<'a> RateLimit {
     // optional double qps = 1;
 
     pub fn clear_qps(&mut self) {
-        self.qps = None;
+        self.qps = ::std::option::None;
     }
 
     pub fn has_qps(&self) -> bool {
@@ -18382,7 +19296,7 @@ impl<'a> RateLimit {
 
     // Param is passed by value, moved
     pub fn set_qps(&mut self, v: f64) {
-        self.qps = Some(v);
+        self.qps = ::std::option::Some(v);
     }
 
     pub fn get_qps(&self) -> f64 {
@@ -18413,6 +19327,11 @@ impl<'a> RateLimit {
         self.principal.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_principal(&mut self) -> ::std::string::String {
+        self.principal.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_principal(&'a self) -> &'a str {
         match self.principal.as_ref() {
             Some(v) => v.as_slice(),
@@ -18423,7 +19342,7 @@ impl<'a> RateLimit {
     // optional uint64 capacity = 3;
 
     pub fn clear_capacity(&mut self) {
-        self.capacity = None;
+        self.capacity = ::std::option::None;
     }
 
     pub fn has_capacity(&self) -> bool {
@@ -18432,7 +19351,7 @@ impl<'a> RateLimit {
 
     // Param is passed by value, moved
     pub fn set_capacity(&mut self, v: u64) {
-        self.capacity = Some(v);
+        self.capacity = ::std::option::Some(v);
     }
 
     pub fn get_capacity(&self) -> u64 {
@@ -18461,7 +19380,7 @@ impl ::protobuf::Message for RateLimit {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.qps = Some(tmp);
+                    self.qps = ::std::option::Some(tmp);
                 },
                 2 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -18475,7 +19394,7 @@ impl ::protobuf::Message for RateLimit {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.capacity = Some(tmp);
+                    self.capacity = ::std::option::Some(tmp);
                 },
                 _ => {
                     let unknown = try!(is.read_unknown(wire_type));
@@ -18487,10 +19406,7 @@ impl ::protobuf::Message for RateLimit {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         if self.qps.is_some() {
             my_size += 9;
@@ -18502,14 +19418,11 @@ impl ::protobuf::Message for RateLimit {
             my_size += ::protobuf::rt::value_size(3, *value, ::protobuf::wire_format::WireTypeVarint);
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.qps {
             Some(v) => {
                 try!(os.write_double(1, v));
@@ -18530,6 +19443,10 @@ impl ::protobuf::Message for RateLimit {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -18575,9 +19492,17 @@ impl ::protobuf::Clear for RateLimit {
     }
 }
 
+impl ::std::cmp::PartialEq for RateLimit {
+    fn eq(&self, other: &RateLimit) -> bool {
+        self.qps == other.qps &&
+        self.principal == other.principal &&
+        self.capacity == other.capacity &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for RateLimit {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -18637,12 +19562,13 @@ impl ::protobuf::reflect::FieldAccessor<RateLimit> for RateLimit_capacity_acc_ty
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct RateLimits {
     limits: ::protobuf::RepeatedField<RateLimit>,
     aggregate_default_qps: ::std::option::Option<f64>,
     aggregate_default_capacity: ::std::option::Option<u64>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> RateLimits {
@@ -18662,6 +19588,7 @@ impl<'a> RateLimits {
                     aggregate_default_qps: ::std::option::None,
                     aggregate_default_capacity: ::std::option::None,
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -18683,6 +19610,11 @@ impl<'a> RateLimits {
         &mut self.limits
     }
 
+    // Take field
+    pub fn take_limits(&mut self) -> ::protobuf::RepeatedField<RateLimit> {
+        ::std::mem::replace(&mut self.limits, ::protobuf::RepeatedField::new())
+    }
+
     pub fn get_limits(&'a self) -> &'a [RateLimit] {
         self.limits.as_slice()
     }
@@ -18690,7 +19622,7 @@ impl<'a> RateLimits {
     // optional double aggregate_default_qps = 2;
 
     pub fn clear_aggregate_default_qps(&mut self) {
-        self.aggregate_default_qps = None;
+        self.aggregate_default_qps = ::std::option::None;
     }
 
     pub fn has_aggregate_default_qps(&self) -> bool {
@@ -18699,7 +19631,7 @@ impl<'a> RateLimits {
 
     // Param is passed by value, moved
     pub fn set_aggregate_default_qps(&mut self, v: f64) {
-        self.aggregate_default_qps = Some(v);
+        self.aggregate_default_qps = ::std::option::Some(v);
     }
 
     pub fn get_aggregate_default_qps(&self) -> f64 {
@@ -18709,7 +19641,7 @@ impl<'a> RateLimits {
     // optional uint64 aggregate_default_capacity = 3;
 
     pub fn clear_aggregate_default_capacity(&mut self) {
-        self.aggregate_default_capacity = None;
+        self.aggregate_default_capacity = ::std::option::None;
     }
 
     pub fn has_aggregate_default_capacity(&self) -> bool {
@@ -18718,7 +19650,7 @@ impl<'a> RateLimits {
 
     // Param is passed by value, moved
     pub fn set_aggregate_default_capacity(&mut self, v: u64) {
-        self.aggregate_default_capacity = Some(v);
+        self.aggregate_default_capacity = ::std::option::Some(v);
     }
 
     pub fn get_aggregate_default_capacity(&self) -> u64 {
@@ -18751,14 +19683,14 @@ impl ::protobuf::Message for RateLimits {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_double());
-                    self.aggregate_default_qps = Some(tmp);
+                    self.aggregate_default_qps = ::std::option::Some(tmp);
                 },
                 3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint64());
-                    self.aggregate_default_capacity = Some(tmp);
+                    self.aggregate_default_capacity = ::std::option::Some(tmp);
                 },
                 _ => {
                     let unknown = try!(is.read_unknown(wire_type));
@@ -18770,13 +19702,10 @@ impl ::protobuf::Message for RateLimits {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.limits.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         if self.aggregate_default_qps.is_some() {
@@ -18786,18 +19715,15 @@ impl ::protobuf::Message for RateLimits {
             my_size += ::protobuf::rt::value_size(3, *value, ::protobuf::wire_format::WireTypeVarint);
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         for v in self.limits.iter() {
             try!(os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         match self.aggregate_default_qps {
             Some(v) => {
@@ -18813,6 +19739,10 @@ impl ::protobuf::Message for RateLimits {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -18858,9 +19788,17 @@ impl ::protobuf::Clear for RateLimits {
     }
 }
 
+impl ::std::cmp::PartialEq for RateLimits {
+    fn eq(&self, other: &RateLimits) -> bool {
+        self.limits == other.limits &&
+        self.aggregate_default_qps == other.aggregate_default_qps &&
+        self.aggregate_default_capacity == other.aggregate_default_capacity &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for RateLimits {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -18920,12 +19858,13 @@ impl ::protobuf::reflect::FieldAccessor<RateLimits> for RateLimits_aggregate_def
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct Volume {
     container_path: ::protobuf::SingularField<::std::string::String>,
     host_path: ::protobuf::SingularField<::std::string::String>,
     mode: ::std::option::Option<Volume_Mode>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> Volume {
@@ -18945,6 +19884,7 @@ impl<'a> Volume {
                     host_path: ::protobuf::SingularField::none(),
                     mode: ::std::option::None,
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -18972,6 +19912,11 @@ impl<'a> Volume {
             self.container_path.set_default();
         };
         self.container_path.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_container_path(&mut self) -> ::std::string::String {
+        self.container_path.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_container_path(&'a self) -> &'a str {
@@ -19005,6 +19950,11 @@ impl<'a> Volume {
         self.host_path.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_host_path(&mut self) -> ::std::string::String {
+        self.host_path.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_host_path(&'a self) -> &'a str {
         match self.host_path.as_ref() {
             Some(v) => v.as_slice(),
@@ -19015,7 +19965,7 @@ impl<'a> Volume {
     // required .mesos.Volume.Mode mode = 3;
 
     pub fn clear_mode(&mut self) {
-        self.mode = None;
+        self.mode = ::std::option::None;
     }
 
     pub fn has_mode(&self) -> bool {
@@ -19024,7 +19974,7 @@ impl<'a> Volume {
 
     // Param is passed by value, moved
     pub fn set_mode(&mut self, v: Volume_Mode) {
-        self.mode = Some(v);
+        self.mode = ::std::option::Some(v);
     }
 
     pub fn get_mode(&self) -> Volume_Mode {
@@ -19069,8 +20019,8 @@ impl ::protobuf::Message for Volume {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
-                    let tmp = Volume_Mode::new(try!(is.read_int32()));
-                    self.mode = Some(tmp);
+                    let tmp = try!(is.read_enum());
+                    self.mode = ::std::option::Some(tmp);
                 },
                 _ => {
                     let unknown = try!(is.read_unknown(wire_type));
@@ -19082,10 +20032,7 @@ impl ::protobuf::Message for Volume {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.container_path.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
@@ -19097,14 +20044,11 @@ impl ::protobuf::Message for Volume {
             my_size += ::protobuf::rt::enum_size(3, *value);
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.container_path.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -19125,6 +20069,10 @@ impl ::protobuf::Message for Volume {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -19170,9 +20118,17 @@ impl ::protobuf::Clear for Volume {
     }
 }
 
+impl ::std::cmp::PartialEq for Volume {
+    fn eq(&self, other: &Volume) -> bool {
+        self.container_path == other.container_path &&
+        self.host_path == other.host_path &&
+        self.mode == other.mode &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for Volume {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -19228,7 +20184,6 @@ impl ::protobuf::reflect::FieldAccessor<Volume> for Volume_mode_acc_type {
     }
 
     fn get_enum<'a>(&self, m: &Volume) -> &'static ::protobuf::reflect::EnumValueDescriptor {
-        use protobuf::{ProtobufEnum};
         m.get_mode().descriptor()
     }
 }
@@ -19239,19 +20194,18 @@ pub enum Volume_Mode {
     RO = 2,
 }
 
-impl Volume_Mode {
-    pub fn new(value: i32) -> Volume_Mode {
-        match value {
-            1 => Volume_Mode::RW,
-            2 => Volume_Mode::RO,
-            _ => panic!()
-        }
-    }
-}
 
 impl ::protobuf::ProtobufEnum for Volume_Mode {
     fn value(&self) -> i32 {
         *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<Volume_Mode> {
+        match value {
+            1 => ::std::option::Some(Volume_Mode::RW),
+            2 => ::std::option::Some(Volume_Mode::RO),
+            _ => ::std::option::None
+        }
     }
 
     fn enum_descriptor_static(_: Option<Volume_Mode>) -> &'static ::protobuf::reflect::EnumDescriptor {
@@ -19267,13 +20221,14 @@ impl ::protobuf::ProtobufEnum for Volume_Mode {
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct ContainerInfo {
     field_type: ::std::option::Option<ContainerInfo_Type>,
     volumes: ::protobuf::RepeatedField<Volume>,
     hostname: ::protobuf::SingularField<::std::string::String>,
     docker: ::protobuf::SingularPtrField<ContainerInfo_DockerInfo>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> ContainerInfo {
@@ -19294,6 +20249,7 @@ impl<'a> ContainerInfo {
                     hostname: ::protobuf::SingularField::none(),
                     docker: ::protobuf::SingularPtrField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -19302,7 +20258,7 @@ impl<'a> ContainerInfo {
     // required .mesos.ContainerInfo.Type type = 1;
 
     pub fn clear_field_type(&mut self) {
-        self.field_type = None;
+        self.field_type = ::std::option::None;
     }
 
     pub fn has_field_type(&self) -> bool {
@@ -19311,7 +20267,7 @@ impl<'a> ContainerInfo {
 
     // Param is passed by value, moved
     pub fn set_field_type(&mut self, v: ContainerInfo_Type) {
-        self.field_type = Some(v);
+        self.field_type = ::std::option::Some(v);
     }
 
     pub fn get_field_type(&self) -> ContainerInfo_Type {
@@ -19332,6 +20288,11 @@ impl<'a> ContainerInfo {
     // Mutable pointer to the field.
     pub fn mut_volumes(&'a mut self) -> &'a mut ::protobuf::RepeatedField<Volume> {
         &mut self.volumes
+    }
+
+    // Take field
+    pub fn take_volumes(&mut self) -> ::protobuf::RepeatedField<Volume> {
+        ::std::mem::replace(&mut self.volumes, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_volumes(&'a self) -> &'a [Volume] {
@@ -19360,6 +20321,11 @@ impl<'a> ContainerInfo {
             self.hostname.set_default();
         };
         self.hostname.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_hostname(&mut self) -> ::std::string::String {
+        self.hostname.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_hostname(&'a self) -> &'a str {
@@ -19393,6 +20359,11 @@ impl<'a> ContainerInfo {
         self.docker.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_docker(&mut self) -> ContainerInfo_DockerInfo {
+        self.docker.take().unwrap_or_else(|| ContainerInfo_DockerInfo::new())
+    }
+
     pub fn get_docker(&'a self) -> &'a ContainerInfo_DockerInfo {
         self.docker.as_ref().unwrap_or_else(|| ContainerInfo_DockerInfo::default_instance())
     }
@@ -19418,8 +20389,8 @@ impl ::protobuf::Message for ContainerInfo {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
-                    let tmp = ContainerInfo_Type::new(try!(is.read_int32()));
-                    self.field_type = Some(tmp);
+                    let tmp = try!(is.read_enum());
+                    self.field_type = ::std::option::Some(tmp);
                 },
                 2 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -19452,33 +20423,28 @@ impl ::protobuf::Message for ContainerInfo {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.field_type.iter() {
             my_size += ::protobuf::rt::enum_size(1, *value);
         };
         for value in self.volumes.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         for value in self.hostname.iter() {
             my_size += ::protobuf::rt::string_size(4, value.as_slice());
         };
         for value in self.docker.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.field_type {
             Some(v) => {
                 try!(os.write_enum(1, v as i32));
@@ -19487,9 +20453,8 @@ impl ::protobuf::Message for ContainerInfo {
         };
         for v in self.volumes.iter() {
             try!(os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         match self.hostname.as_ref() {
             Some(v) => {
@@ -19500,14 +20465,17 @@ impl ::protobuf::Message for ContainerInfo {
         match self.docker.as_ref() {
             Some(v) => {
                 try!(os.write_tag(3, ::protobuf::wire_format::WireTypeLengthDelimited));
-                try!(os.write_raw_varint32(sizes[*sizes_pos]));
-                *sizes_pos += 1;
-                try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+                try!(os.write_raw_varint32(v.get_cached_size()));
+                try!(v.write_to_with_cached_sizes(os));
             },
             None => {},
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -19555,9 +20523,18 @@ impl ::protobuf::Clear for ContainerInfo {
     }
 }
 
+impl ::std::cmp::PartialEq for ContainerInfo {
+    fn eq(&self, other: &ContainerInfo) -> bool {
+        self.field_type == other.field_type &&
+        self.volumes == other.volumes &&
+        self.hostname == other.hostname &&
+        self.docker == other.docker &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for ContainerInfo {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -19577,7 +20554,6 @@ impl ::protobuf::reflect::FieldAccessor<ContainerInfo> for ContainerInfo_field_t
     }
 
     fn get_enum<'a>(&self, m: &ContainerInfo) -> &'static ::protobuf::reflect::EnumValueDescriptor {
-        use protobuf::{ProtobufEnum};
         m.get_field_type().descriptor()
     }
 }
@@ -19636,7 +20612,7 @@ impl ::protobuf::reflect::FieldAccessor<ContainerInfo> for ContainerInfo_docker_
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct ContainerInfo_DockerInfo {
     image: ::protobuf::SingularField<::std::string::String>,
     network: ::std::option::Option<ContainerInfo_DockerInfo_Network>,
@@ -19644,6 +20620,7 @@ pub struct ContainerInfo_DockerInfo {
     privileged: ::std::option::Option<bool>,
     parameters: ::protobuf::RepeatedField<Parameter>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> ContainerInfo_DockerInfo {
@@ -19665,6 +20642,7 @@ impl<'a> ContainerInfo_DockerInfo {
                     privileged: ::std::option::None,
                     parameters: ::protobuf::RepeatedField::new(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -19694,6 +20672,11 @@ impl<'a> ContainerInfo_DockerInfo {
         self.image.as_mut().unwrap()
     }
 
+    // Take field
+    pub fn take_image(&mut self) -> ::std::string::String {
+        self.image.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
     pub fn get_image(&'a self) -> &'a str {
         match self.image.as_ref() {
             Some(v) => v.as_slice(),
@@ -19704,7 +20687,7 @@ impl<'a> ContainerInfo_DockerInfo {
     // optional .mesos.ContainerInfo.DockerInfo.Network network = 2;
 
     pub fn clear_network(&mut self) {
-        self.network = None;
+        self.network = ::std::option::None;
     }
 
     pub fn has_network(&self) -> bool {
@@ -19713,7 +20696,7 @@ impl<'a> ContainerInfo_DockerInfo {
 
     // Param is passed by value, moved
     pub fn set_network(&mut self, v: ContainerInfo_DockerInfo_Network) {
-        self.network = Some(v);
+        self.network = ::std::option::Some(v);
     }
 
     pub fn get_network(&self) -> ContainerInfo_DockerInfo_Network {
@@ -19736,6 +20719,11 @@ impl<'a> ContainerInfo_DockerInfo {
         &mut self.port_mappings
     }
 
+    // Take field
+    pub fn take_port_mappings(&mut self) -> ::protobuf::RepeatedField<ContainerInfo_DockerInfo_PortMapping> {
+        ::std::mem::replace(&mut self.port_mappings, ::protobuf::RepeatedField::new())
+    }
+
     pub fn get_port_mappings(&'a self) -> &'a [ContainerInfo_DockerInfo_PortMapping] {
         self.port_mappings.as_slice()
     }
@@ -19743,7 +20731,7 @@ impl<'a> ContainerInfo_DockerInfo {
     // optional bool privileged = 4;
 
     pub fn clear_privileged(&mut self) {
-        self.privileged = None;
+        self.privileged = ::std::option::None;
     }
 
     pub fn has_privileged(&self) -> bool {
@@ -19752,7 +20740,7 @@ impl<'a> ContainerInfo_DockerInfo {
 
     // Param is passed by value, moved
     pub fn set_privileged(&mut self, v: bool) {
-        self.privileged = Some(v);
+        self.privileged = ::std::option::Some(v);
     }
 
     pub fn get_privileged(&self) -> bool {
@@ -19773,6 +20761,11 @@ impl<'a> ContainerInfo_DockerInfo {
     // Mutable pointer to the field.
     pub fn mut_parameters(&'a mut self) -> &'a mut ::protobuf::RepeatedField<Parameter> {
         &mut self.parameters
+    }
+
+    // Take field
+    pub fn take_parameters(&mut self) -> ::protobuf::RepeatedField<Parameter> {
+        ::std::mem::replace(&mut self.parameters, ::protobuf::RepeatedField::new())
     }
 
     pub fn get_parameters(&'a self) -> &'a [Parameter] {
@@ -19807,8 +20800,8 @@ impl ::protobuf::Message for ContainerInfo_DockerInfo {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
-                    let tmp = ContainerInfo_DockerInfo_Network::new(try!(is.read_int32()));
-                    self.network = Some(tmp);
+                    let tmp = try!(is.read_enum());
+                    self.network = ::std::option::Some(tmp);
                 },
                 3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -19822,7 +20815,7 @@ impl ::protobuf::Message for ContainerInfo_DockerInfo {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_bool());
-                    self.privileged = Some(tmp);
+                    self.privileged = ::std::option::Some(tmp);
                 },
                 5 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -19841,10 +20834,7 @@ impl ::protobuf::Message for ContainerInfo_DockerInfo {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.image.iter() {
             my_size += ::protobuf::rt::string_size(1, value.as_slice());
@@ -19853,24 +20843,22 @@ impl ::protobuf::Message for ContainerInfo_DockerInfo {
             my_size += ::protobuf::rt::enum_size(2, *value);
         };
         for value in self.port_mappings.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         if self.privileged.is_some() {
             my_size += 2;
         };
         for value in self.parameters.iter() {
-            let len = value.compute_sizes(sizes);
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.image.as_ref() {
             Some(v) => {
                 try!(os.write_string(1, v.as_slice()));
@@ -19885,9 +20873,8 @@ impl ::protobuf::Message for ContainerInfo_DockerInfo {
         };
         for v in self.port_mappings.iter() {
             try!(os.write_tag(3, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         match self.privileged {
             Some(v) => {
@@ -19897,12 +20884,15 @@ impl ::protobuf::Message for ContainerInfo_DockerInfo {
         };
         for v in self.parameters.iter() {
             try!(os.write_tag(5, ::protobuf::wire_format::WireTypeLengthDelimited));
-            try!(os.write_raw_varint32(sizes[*sizes_pos]));
-            *sizes_pos += 1;
-            try!(v.write_to_with_computed_sizes(os, sizes.as_slice(), sizes_pos));
+            try!(os.write_raw_varint32(v.get_cached_size()));
+            try!(v.write_to_with_cached_sizes(os));
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -19952,9 +20942,19 @@ impl ::protobuf::Clear for ContainerInfo_DockerInfo {
     }
 }
 
+impl ::std::cmp::PartialEq for ContainerInfo_DockerInfo {
+    fn eq(&self, other: &ContainerInfo_DockerInfo) -> bool {
+        self.image == other.image &&
+        self.network == other.network &&
+        self.port_mappings == other.port_mappings &&
+        self.privileged == other.privileged &&
+        self.parameters == other.parameters &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for ContainerInfo_DockerInfo {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -19992,7 +20992,6 @@ impl ::protobuf::reflect::FieldAccessor<ContainerInfo_DockerInfo> for ContainerI
     }
 
     fn get_enum<'a>(&self, m: &ContainerInfo_DockerInfo) -> &'static ::protobuf::reflect::EnumValueDescriptor {
-        use protobuf::{ProtobufEnum};
         m.get_network().descriptor()
     }
 }
@@ -20051,12 +21050,13 @@ impl ::protobuf::reflect::FieldAccessor<ContainerInfo_DockerInfo> for ContainerI
     }
 }
 
-#[deriving(Clone,PartialEq,Default)]
+#[deriving(Clone,Default)]
 pub struct ContainerInfo_DockerInfo_PortMapping {
     host_port: ::std::option::Option<u32>,
     container_port: ::std::option::Option<u32>,
     protocol: ::protobuf::SingularField<::std::string::String>,
     unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::std::cell::Cell<u32>,
 }
 
 impl<'a> ContainerInfo_DockerInfo_PortMapping {
@@ -20076,6 +21076,7 @@ impl<'a> ContainerInfo_DockerInfo_PortMapping {
                     container_port: ::std::option::None,
                     protocol: ::protobuf::SingularField::none(),
                     unknown_fields: ::protobuf::UnknownFields::new(),
+                    cached_size: ::std::cell::Cell::new(0),
                 }
             })
         }
@@ -20084,7 +21085,7 @@ impl<'a> ContainerInfo_DockerInfo_PortMapping {
     // required uint32 host_port = 1;
 
     pub fn clear_host_port(&mut self) {
-        self.host_port = None;
+        self.host_port = ::std::option::None;
     }
 
     pub fn has_host_port(&self) -> bool {
@@ -20093,7 +21094,7 @@ impl<'a> ContainerInfo_DockerInfo_PortMapping {
 
     // Param is passed by value, moved
     pub fn set_host_port(&mut self, v: u32) {
-        self.host_port = Some(v);
+        self.host_port = ::std::option::Some(v);
     }
 
     pub fn get_host_port(&self) -> u32 {
@@ -20103,7 +21104,7 @@ impl<'a> ContainerInfo_DockerInfo_PortMapping {
     // required uint32 container_port = 2;
 
     pub fn clear_container_port(&mut self) {
-        self.container_port = None;
+        self.container_port = ::std::option::None;
     }
 
     pub fn has_container_port(&self) -> bool {
@@ -20112,7 +21113,7 @@ impl<'a> ContainerInfo_DockerInfo_PortMapping {
 
     // Param is passed by value, moved
     pub fn set_container_port(&mut self, v: u32) {
-        self.container_port = Some(v);
+        self.container_port = ::std::option::Some(v);
     }
 
     pub fn get_container_port(&self) -> u32 {
@@ -20141,6 +21142,11 @@ impl<'a> ContainerInfo_DockerInfo_PortMapping {
             self.protocol.set_default();
         };
         self.protocol.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_protocol(&mut self) -> ::std::string::String {
+        self.protocol.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     pub fn get_protocol(&'a self) -> &'a str {
@@ -20175,14 +21181,14 @@ impl ::protobuf::Message for ContainerInfo_DockerInfo_PortMapping {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint32());
-                    self.host_port = Some(tmp);
+                    self.host_port = ::std::option::Some(tmp);
                 },
                 2 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Err(::protobuf::ProtobufError::WireError("unexpected wire type".to_string()));
                     };
                     let tmp = try!(is.read_uint32());
-                    self.container_port = Some(tmp);
+                    self.container_port = ::std::option::Some(tmp);
                 },
                 3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
@@ -20201,10 +21207,7 @@ impl ::protobuf::Message for ContainerInfo_DockerInfo_PortMapping {
     }
 
     // Compute sizes of nested messages
-    fn compute_sizes(&self, sizes: &mut ::std::vec::Vec<u32>) -> u32 {
-        use protobuf::{Message};
-        let pos = sizes.len();
-        sizes.push(0);
+    fn compute_size(&self) -> u32 {
         let mut my_size = 0;
         for value in self.host_port.iter() {
             my_size += ::protobuf::rt::value_size(1, *value, ::protobuf::wire_format::WireTypeVarint);
@@ -20216,14 +21219,11 @@ impl ::protobuf::Message for ContainerInfo_DockerInfo_PortMapping {
             my_size += ::protobuf::rt::string_size(3, value.as_slice());
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        sizes[pos] = my_size;
-        // value is returned for convenience
+        self.cached_size.set(my_size);
         my_size
     }
 
-    #[allow(unused_variables)]
-    fn write_to_with_computed_sizes(&self, os: &mut ::protobuf::CodedOutputStream, sizes: &[u32], sizes_pos: &mut uint) -> ::protobuf::ProtobufResult<()> {
-        use protobuf::{Message};
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         match self.host_port {
             Some(v) => {
                 try!(os.write_uint32(1, v));
@@ -20244,6 +21244,10 @@ impl ::protobuf::Message for ContainerInfo_DockerInfo_PortMapping {
         };
         try!(os.write_unknown_fields(self.get_unknown_fields()));
         ::std::result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
     }
 
     fn get_unknown_fields<'s>(&'s self) -> &'s ::protobuf::UnknownFields {
@@ -20289,9 +21293,17 @@ impl ::protobuf::Clear for ContainerInfo_DockerInfo_PortMapping {
     }
 }
 
+impl ::std::cmp::PartialEq for ContainerInfo_DockerInfo_PortMapping {
+    fn eq(&self, other: &ContainerInfo_DockerInfo_PortMapping) -> bool {
+        self.host_port == other.host_port &&
+        self.container_port == other.container_port &&
+        self.protocol == other.protocol &&
+        self.unknown_fields == other.unknown_fields
+    }
+}
+
 impl ::std::fmt::Show for ContainerInfo_DockerInfo_PortMapping {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        use protobuf::{Message};
         self.fmt_impl(f)
     }
 }
@@ -20358,20 +21370,19 @@ pub enum ContainerInfo_DockerInfo_Network {
     NONE = 3,
 }
 
-impl ContainerInfo_DockerInfo_Network {
-    pub fn new(value: i32) -> ContainerInfo_DockerInfo_Network {
-        match value {
-            1 => ContainerInfo_DockerInfo_Network::HOST,
-            2 => ContainerInfo_DockerInfo_Network::BRIDGE,
-            3 => ContainerInfo_DockerInfo_Network::NONE,
-            _ => panic!()
-        }
-    }
-}
 
 impl ::protobuf::ProtobufEnum for ContainerInfo_DockerInfo_Network {
     fn value(&self) -> i32 {
         *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<ContainerInfo_DockerInfo_Network> {
+        match value {
+            1 => ::std::option::Some(ContainerInfo_DockerInfo_Network::HOST),
+            2 => ::std::option::Some(ContainerInfo_DockerInfo_Network::BRIDGE),
+            3 => ::std::option::Some(ContainerInfo_DockerInfo_Network::NONE),
+            _ => ::std::option::None
+        }
     }
 
     fn enum_descriptor_static(_: Option<ContainerInfo_DockerInfo_Network>) -> &'static ::protobuf::reflect::EnumDescriptor {
@@ -20393,19 +21404,18 @@ pub enum ContainerInfo_Type {
     MESOS = 2,
 }
 
-impl ContainerInfo_Type {
-    pub fn new(value: i32) -> ContainerInfo_Type {
-        match value {
-            1 => ContainerInfo_Type::DOCKER,
-            2 => ContainerInfo_Type::MESOS,
-            _ => panic!()
-        }
-    }
-}
 
 impl ::protobuf::ProtobufEnum for ContainerInfo_Type {
     fn value(&self) -> i32 {
         *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<ContainerInfo_Type> {
+        match value {
+            1 => ::std::option::Some(ContainerInfo_Type::DOCKER),
+            2 => ::std::option::Some(ContainerInfo_Type::MESOS),
+            _ => ::std::option::None
+        }
     }
 
     fn enum_descriptor_static(_: Option<ContainerInfo_Type>) -> &'static ::protobuf::reflect::EnumDescriptor {
@@ -20429,21 +21439,20 @@ pub enum Status {
     DRIVER_STOPPED = 4,
 }
 
-impl Status {
-    pub fn new(value: i32) -> Status {
-        match value {
-            1 => Status::DRIVER_NOT_STARTED,
-            2 => Status::DRIVER_RUNNING,
-            3 => Status::DRIVER_ABORTED,
-            4 => Status::DRIVER_STOPPED,
-            _ => panic!()
-        }
-    }
-}
 
 impl ::protobuf::ProtobufEnum for Status {
     fn value(&self) -> i32 {
         *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<Status> {
+        match value {
+            1 => ::std::option::Some(Status::DRIVER_NOT_STARTED),
+            2 => ::std::option::Some(Status::DRIVER_RUNNING),
+            3 => ::std::option::Some(Status::DRIVER_ABORTED),
+            4 => ::std::option::Some(Status::DRIVER_STOPPED),
+            _ => ::std::option::None
+        }
     }
 
     fn enum_descriptor_static(_: Option<Status>) -> &'static ::protobuf::reflect::EnumDescriptor {
@@ -20471,25 +21480,24 @@ pub enum TaskState {
     TASK_ERROR = 7,
 }
 
-impl TaskState {
-    pub fn new(value: i32) -> TaskState {
-        match value {
-            6 => TaskState::TASK_STAGING,
-            0 => TaskState::TASK_STARTING,
-            1 => TaskState::TASK_RUNNING,
-            2 => TaskState::TASK_FINISHED,
-            3 => TaskState::TASK_FAILED,
-            4 => TaskState::TASK_KILLED,
-            5 => TaskState::TASK_LOST,
-            7 => TaskState::TASK_ERROR,
-            _ => panic!()
-        }
-    }
-}
 
 impl ::protobuf::ProtobufEnum for TaskState {
     fn value(&self) -> i32 {
         *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<TaskState> {
+        match value {
+            6 => ::std::option::Some(TaskState::TASK_STAGING),
+            0 => ::std::option::Some(TaskState::TASK_STARTING),
+            1 => ::std::option::Some(TaskState::TASK_RUNNING),
+            2 => ::std::option::Some(TaskState::TASK_FINISHED),
+            3 => ::std::option::Some(TaskState::TASK_FAILED),
+            4 => ::std::option::Some(TaskState::TASK_KILLED),
+            5 => ::std::option::Some(TaskState::TASK_LOST),
+            7 => ::std::option::Some(TaskState::TASK_ERROR),
+            _ => ::std::option::None
+        }
     }
 
     fn enum_descriptor_static(_: Option<TaskState>) -> &'static ::protobuf::reflect::EnumDescriptor {
