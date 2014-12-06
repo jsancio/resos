@@ -9,6 +9,23 @@ use protobuf::Message;
 use std::raw::{Repr, Slice};
 use std::vec::Vec;
 
+/// Returns the result of serializing the supplied protobuf message
+pub fn serialize(proto: &Message) -> Result<ProtobufObj, ProtobufError> {
+    proto.write_to_bytes().map(|buffer: Vec<u8>| {
+        slice_to_pb(buffer.as_slice())
+    })
+}
+
+/// Returns the result of deserializing the supplied protobuf data
+/// into the supplied message.
+pub fn deserialize<'a, T: Message>(
+    obj: &ProtobufObj,
+    proto: &'a mut T) -> Result<&'a mut T, ProtobufError> {
+    let slice = pb_to_slice(obj);
+    try!(proto.merge_from_bytes(slice));
+    Ok(proto)
+}
+
 /// Returns a wrapped represtation of the supplied vector as protobuf
 /// data.
 fn slice_to_pb(buffer: &[u8]) -> ProtobufObj {
@@ -32,22 +49,5 @@ fn pb_to_slice(pb: &ProtobufObj) -> &[u8] {
             }
         )
     }
-}
-
-/// Returns the result of serializing the supplied protobuf message
-pub fn serialize(proto: &Message) -> Result<ProtobufObj, ProtobufError> {
-    proto.write_to_bytes().map(|buffer: Vec<u8>| {
-        slice_to_pb(buffer.as_slice())
-    })
-}
-
-/// Returns the result of deserializing the supplied protobuf data
-/// into the supplied message.
-pub fn deserialize<'a, T: Message>(
-    obj: &ProtobufObj,
-    proto: &'a mut T) -> Result<&'a mut T, ProtobufError> {
-    let slice = pb_to_slice(obj);
-    try!(proto.merge_from_bytes(slice));
-    Ok(proto)
 }
 
