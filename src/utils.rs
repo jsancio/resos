@@ -1,13 +1,11 @@
+#![allow(dead_code)]
+
 extern crate libc;
 
-use mesos;
 use native::ProtobufObj;
 use protobuf::error::ProtobufError;
 use protobuf::Message;
-use protobuf::stream::CodedInputStream;
 
-use std::ops::Deref;
-use std::path::BytesContainer;
 use std::raw::{Repr, Slice};
 use std::vec::Vec;
 
@@ -36,11 +34,6 @@ fn pb_to_slice(pb: &ProtobufObj) -> &[u8] {
     }
 }
 
-/// Returns an input stream wrapping the supplied vector.
-fn slice_to_stream(buffer: &[u8]) -> CodedInputStream {
-    CodedInputStream::from_bytes(buffer)
-}
-
 /// Returns the result of serializing the supplied protobuf message
 pub fn serialize(proto: &Message) -> Result<ProtobufObj, ProtobufError> {
     proto.write_to_bytes().map(|buffer: Vec<u8>| {
@@ -48,13 +41,13 @@ pub fn serialize(proto: &Message) -> Result<ProtobufObj, ProtobufError> {
     })
 }
 
-/*
-/// Returns...
-pub fn deserialize<T: Message>(
+/// Returns the result of deserializing the supplied protobuf data
+/// into the supplied message.
+pub fn deserialize<'a, T: Message>(
     obj: &ProtobufObj,
-    proto: &T) -> Result<T, ProtobufError> {
+    proto: &'a mut T) -> Result<&'a mut T, ProtobufError> {
     let slice = pb_to_slice(obj);
-    let stream = slice_to_stream(slice);
-    proto.merge_from(stream).map(|_| proto)
+    try!(proto.merge_from_bytes(slice));
+    Ok(proto)
 }
-*/
+
