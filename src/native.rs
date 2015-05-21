@@ -3,7 +3,7 @@
 
 extern crate libc;
 
-#[link(name="libmesos")]
+#[link(name="mesos")]
 extern "C" {
 
     //////////////////////////////////////////////////////////////////
