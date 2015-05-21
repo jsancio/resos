@@ -1,7 +1,6 @@
 language: rust
 rust: nightly
 os: osx
-sudo: false
 before_install:
   - brew update
   - brew install protobuf mesos
