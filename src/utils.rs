@@ -12,7 +12,7 @@ use std::vec::Vec;
 /// Returns the result of serializing the supplied protobuf message
 pub fn serialize(proto: &Message) -> Result<ProtobufObj, ProtobufError> {
     proto.write_to_bytes().map(|buffer: Vec<u8>| {
-        slice_to_pb(buffer.as_slice())
+        slice_to_pb(&buffer[..])
     })
 }
 
@@ -45,7 +45,7 @@ fn pb_to_slice(pb: &ProtobufObj) -> &[u8] {
         ::std::mem::transmute(
             Slice {
                 data: pb.data as *const u8,
-                len: pb.size as uint
+                len: pb.size as usize
             }
         )
     }

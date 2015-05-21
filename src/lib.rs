@@ -1,5 +1,4 @@
-#![experimental]
-
+#![feature(core,libc)]
 extern crate protobuf; // depend on rust-protobuf runtime
 
 mod mesos;     // protobuf messages
