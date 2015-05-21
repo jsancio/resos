@@ -1,6 +1,5 @@
-os: osx
 language: rust
 rust: nightly
 before_install:
-  - brew update
-  - brew install protobuf mesos
+  - sudo apt-get update
+  - sudo apt-get install protobuf-compiler
