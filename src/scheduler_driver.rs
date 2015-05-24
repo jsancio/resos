@@ -1,30 +1,30 @@
 extern crate libc;
 
-use mesos;
-use native;
+use proto::{ExecutorID, Filters, FrameworkID, FrameworkInfo, MasterInfo, Offer, OfferID, Request, SlaveID, Status, TaskID, TaskInfo, TaskStatus};
 use scheduler;
+use utils;
 
 /// Abstract interface for connecting a scheduler to Mesos. This
 /// interface is used both to manage the scheduler's lifecycle (start
 /// it, stop it, or wait for it to finish) and to interact with Mesos
 /// (e.g., launch tasks, kill tasks, etc.).
-trait SchedulerDriver {
+pub trait SchedulerDriver {
 
     /// @param offerId The offer ID.
     /// @param tasks   The collection of tasks to be launched.
     /// @param filters The filters to set for any remaining resources.
     ///
     /// @return            The state of the driver after the call.
-    fn launch_tasks(
-        offerId: &mesos::OfferID,
-        tasks: &Vec<mesos::TaskInfo>,
-        filters: &mesos::Filters) -> mesos::Status;
+    fn launch_tasks(&self,
+        offerId: &OfferID,
+        tasks: &Vec<TaskInfo>,
+        filters: &Filters) -> Status;
 
     /// Starts the scheduler driver. This needs to be called before any
     /// other driver calls are made.
     ///
     /// @return            The state of the driver after the call.
-    fn start() -> mesos::Status;
+    fn start(&self) -> Status;
 
     /// Stops the scheduler driver. If the 'failover' flag is set to
     /// false then it is expected that this framework will never
@@ -38,7 +38,7 @@ trait SchedulerDriver {
     /// @param failover    Whether framework failover is expected.
     ///
     /// @return            The state of the driver after the call.
-    fn stop(failover: bool) -> mesos::Status;
+    fn stop(&self, failover: bool) -> Status;
 
     /// Aborts the driver so that no more callbacks can be made to the
     /// scheduler. The semantics of abort and stop have deliberately been
@@ -48,7 +48,7 @@ trait SchedulerDriver {
     /// process).
     ///
     /// @return The state of the driver after the call.
-    fn abort() -> mesos::Status;
+    fn abort(&self) -> Status;
 
     /// Waits for the driver to be stopped or aborted, possibly
     /// _blocking_ the current thread indefinitely. The return status of
@@ -56,12 +56,12 @@ trait SchedulerDriver {
     /// (see mesos.proto for a description of Status).
     ///
     /// @return The state of the driver after the call.
-    fn join() -> mesos::Status;
+    fn join(&self) -> Status;
 
     /// Starts and immediately joins (i.e., blocks on) the driver.
     ///
     /// @return The state of the driver after the call.
-    fn run() -> mesos::Status;
+    fn run(&self) -> Status;
 
     /// Requests resources from Mesos (see mesos.proto for a description
     /// of Request and how, for example, to request resources
@@ -72,8 +72,8 @@ trait SchedulerDriver {
     /// @param requests    The resource requests.
     ///
     /// @return            The state of the driver after the call.
-    fn request_resources(
-        requestsData: &mesos::Request) -> mesos::Status;
+    fn request_resources(&self,
+        requestsData: &Request) -> Status;
 
     /// Declines an offer in its entirety and applies the specified
     /// filters on the resources (see mesos.proto for a description of
@@ -85,9 +85,9 @@ trait SchedulerDriver {
     /// @param filters The filters to set for any remaining resources.
     ///
     /// @return        The state of the driver after the call.
-    fn decline_offer(
-        offerId: &mesos::OfferID,
-        filters: &mesos::Filters) -> mesos::Status;
+    fn decline_offer(&self,
+        offerId: &OfferID,
+        filters: &Filters) -> Status;
 
     /// Kills the specified task. Note that attempting to kill a task is
     /// currently not reliable. If, for example, a scheduler fails over
@@ -98,14 +98,14 @@ trait SchedulerDriver {
     /// @param taskId  The ID of the task to be killed.
     ///
     /// @return        The state of the driver after the call.
-    fn kill_task(taskId: &mesos::TaskID) -> mesos::Status;
+    fn kill_task(&self, taskId: &TaskID) -> Status;
 
     /// Removes all filters, previously set by the framework (via {@link
     /// #launchTasks}). This enables the framework to receive offers
     /// from those filtered slaves.
     ///
     /// @return    The state of the driver after the call.
-    fn revive_offers() -> mesos::Status;
+    fn revive_offers(&self) -> Status;
 
     /// Sends a message from the framework to one of its executors. These
     /// messages are best effort; do not expect a framework message to be
@@ -116,10 +116,10 @@ trait SchedulerDriver {
     /// @param data        The message.
     ///
     /// @return            The state of the driver after the call.
-    fn send_framework_message(
-        executorId: &mesos::ExecutorID,
-        slaveId: &mesos::SlaveID,
-        data: &Vec<u8>) -> mesos::Status;
+    fn send_framework_message(&self,
+        executorId: &ExecutorID,
+        slaveId: &SlaveID,
+        data: &Vec<u8>) -> Status;
 
     // fn destroy(driver: *mut libc::c_void, scheduler: *mut libc::c_void);
 }
@@ -147,13 +147,76 @@ trait SchedulerDriver {
 /// <mesos>/src/logging/flags.hpp. Mesos flags can also be set via environment
 /// variables, prefixing the flag name with "MESOS_", e.g.,
 /// "MESOS_QUIET=1".
-struct MesosSchedulerDriver; // {
-    // scheduler: scheduler::Scheduler
-// }
+pub struct MesosSchedulerDriver; // {
+//    scheduler: scheduler::Scheduler
+//}
 
-// impl SchedulerDriver for MesosSchedulerDriver {
-//      // TODO(CD): Call native::scheduler_init upon construction
-//      // TODO(CD): Implement the trait by marshalling the protobuf objects
-//      //           and calling the native implementations.
-// }
+impl MesosSchedulerDriver {
+     // TODO(CD): Call native::scheduler_init upon construction
+     // TODO(CD): Implement the trait by marshalling the protobuf objects
+     //           and calling the native implementations.
 
+    pub fn new(scheduler: &scheduler::Scheduler,
+               framework: &FrameworkInfo,
+               master: &str) -> MesosSchedulerDriver {
+        let driver = MesosSchedulerDriver;
+        let _framework_protobuf = utils::serialize(framework);
+        driver
+    }
+}
+
+impl SchedulerDriver for MesosSchedulerDriver {
+    fn launch_tasks(&self,
+        offerId: &OfferID,
+        tasks: &Vec<TaskInfo>,
+        filters: &Filters) -> Status {
+        Status::DRIVER_RUNNING
+    }
+
+    fn start(&self) -> Status {
+        //native::scheduler_start(self)
+        Status::DRIVER_RUNNING
+    }
+
+    fn stop(&self, failover: bool) -> Status {
+        Status::DRIVER_STOPPED
+    }
+
+    fn abort(&self) -> Status {
+        Status::DRIVER_ABORTED
+    }
+
+    fn join(&self) -> Status {
+        Status::DRIVER_RUNNING
+    }
+
+    fn run(&self) -> Status {
+        Status::DRIVER_RUNNING
+    }
+
+    fn request_resources(&self,
+        requestsData: &Request) -> Status {
+        Status::DRIVER_RUNNING
+    }
+
+    fn decline_offer(&self,
+        offerId: &OfferID,
+        filters: &Filters) -> Status {
+        Status::DRIVER_RUNNING
+    }
+
+    fn kill_task(&self, taskId: &TaskID) -> Status {
+        Status::DRIVER_RUNNING
+    }
+
+    fn revive_offers(&self) -> Status {
+        Status::DRIVER_RUNNING
+    }
+
+    fn send_framework_message(&self,
+        executorId: &ExecutorID,
+        slaveId: &SlaveID,
+        data: &Vec<u8>) -> Status {
+        Status::DRIVER_RUNNING        
+    }
+}
