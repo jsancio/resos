@@ -1,8 +1,19 @@
+extern crate hyper;
 extern crate mesos;
+extern crate protobuf;
 
+use hyper::Client;
+use hyper::client::Response;
+use hyper::error::Result;
+use hyper::header::{ContentType, Headers};
+use hyper::mime::Mime;
+use hyper::server;
+use hyper::server::Server;
+use protobuf::Message;
 use mesos::proto::{ExecutorID, FrameworkID, FrameworkInfo, MasterInfo, Offer, OfferID, SlaveID, TaskStatus};
 use mesos::scheduler::Scheduler;
 use mesos::scheduler_driver::{SchedulerDriver, MesosSchedulerDriver};
+use mesos::utils;
 
 struct MyScheduler;
 impl Scheduler for MyScheduler {
@@ -36,15 +47,46 @@ impl Scheduler for MyScheduler {
     fn status_update(&self, driver: &SchedulerDriver, status: &TaskStatus) {}
 }
 
+// header! {
+//     (LibprocessFrom, "Libprocess-From") => [&str]
+// }
+
+pub fn request<M: Message>(master_uri: &str, message: &M) -> Result<Response> {
+    let mut uri = master_uri.to_string();
+    uri.push_str("/mesos.");
+    uri.push_str(message.descriptor().name());
+    let mut client = Client::new();
+    let mut headers = Headers::new();
+    let proto_mime: Mime = "application/x-protobuf".parse().unwrap();
+    headers.set(ContentType(proto_mime));
+    headers.set_raw("Libprocess-From", vec![b"testapp".to_vec()]);
+    let data = utils::serialize(message).unwrap();
+    let res = client.post(uri.trim())
+          .headers(headers)
+          .body(&data[..])
+          .send();
+    res
+}
+
+fn server(host: &str) -> server::Listening {
+    Server::http(|req: server::Request, mut res: server::Response| {
+        
+    }).listen(host).unwrap()
+}
+
 fn main() {
 
     let scheduler = MyScheduler;
 
     let mut framework = FrameworkInfo::new();
+
     framework.set_name("rust-example".to_string());
     framework.set_user("bonifaido".to_string());
 
-    let master = "localhost:5050";
+    let master = "http://localhost:5050/master";
+
+    let resp = request(master, &framework);
+    println!("{:?}", resp);
 
     let driver = MesosSchedulerDriver::new(&scheduler, &framework, master);
 

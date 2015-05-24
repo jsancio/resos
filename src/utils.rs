@@ -1,7 +1,4 @@
 #![allow(dead_code)]
-
-extern crate libc;
-
 use protobuf::error::ProtobufError;
 use protobuf::Message;
 

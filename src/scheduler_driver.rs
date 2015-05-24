@@ -1,5 +1,4 @@
-extern crate libc;
-
+use http;
 use proto::{ExecutorID, Filters, FrameworkID, FrameworkInfo, MasterInfo, Offer, OfferID, Request, SlaveID, Status, TaskID, TaskInfo, TaskStatus};
 use scheduler;
 use utils;
@@ -160,7 +159,7 @@ impl MesosSchedulerDriver {
                framework: &FrameworkInfo,
                master: &str) -> MesosSchedulerDriver {
         let driver = MesosSchedulerDriver;
-        let _framework_protobuf = utils::serialize(framework);
+        http::request(master, &framework);
         driver
     }
 }
