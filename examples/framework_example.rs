@@ -1,4 +1,6 @@
+#[macro_use]
 extern crate hyper;
+extern crate env_logger;
 extern crate mesos;
 extern crate protobuf;
 
@@ -6,15 +8,17 @@ use hyper::Client;
 use hyper::client::Response;
 use hyper::error::Result;
 use hyper::header::{ContentType, Headers};
-use hyper::mime::Mime;
 use hyper::server;
 use hyper::server::Server;
+use hyper::status::StatusCode;
+use hyper::uri::RequestUri::AbsolutePath;
 use protobuf::{Message, parse_from_reader};
 use mesos::proto::{ExecutorID, FrameworkID, FrameworkInfo, MasterInfo, Offer, OfferID, SlaveID, TaskStatus};
 use mesos::proto_internal::{RegisterFrameworkMessage, FrameworkRegisteredMessage};
 use mesos::scheduler::Scheduler;
 use mesos::scheduler_driver::{SchedulerDriver, MesosSchedulerDriver};
 use mesos::utils;
+use std::net::SocketAddr;
 
 struct MyScheduler;
 impl Scheduler for MyScheduler {
@@ -48,19 +52,20 @@ impl Scheduler for MyScheduler {
     fn status_update(&self, driver: &SchedulerDriver, status: &TaskStatus) {}
 }
 
-// header! {
-//     (LibprocessFrom, "Libprocess-From") => [&str]
-// }
+// HTTP CLIENT/SERVER WORK
 
-pub fn request<M: Message>(master_uri: &str, message: &M) -> Result<Response> {
+header! {
+    (LibprocessFrom, "Libprocess-From") => [String]
+}
+
+pub fn request<M: Message>(sender: &UPID, master_uri: &str, message: &M) -> Result<Response> {
     let mut uri = master_uri.to_string();
     uri.push_str("/mesos.internal.");
     uri.push_str(message.descriptor().name());
     let mut client = Client::new();
     let mut headers = Headers::new();
-    let proto_mime: Mime = "application/x-protobuf".parse().unwrap();
-    headers.set(ContentType(proto_mime));
-    headers.set_raw("Libprocess-From", vec![b"rustclient@0.0.0.0:4567".to_vec()]);
+    headers.set(ContentType("application/x-protobuf".parse().unwrap()));
+    headers.set(LibprocessFrom(sender.to_string()));
     let data = utils::serialize(message).unwrap();
     let res = client.post(uri.trim())
           .headers(headers)
@@ -69,21 +74,51 @@ pub fn request<M: Message>(master_uri: &str, message: &M) -> Result<Response> {
     res
 }
 
-fn register_framework(master_uri: &str, framework: FrameworkInfo) -> Result<Response> {
+fn register_framework(me: &UPID, master_uri: &str, framework: FrameworkInfo) -> Result<Response> {
     let mut register_framework = RegisterFrameworkMessage::new();
     register_framework.set_framework(framework);
-    request(master_uri, &register_framework)
+    request(me, master_uri, &register_framework)
 }
 
-fn server(address: &str) -> server::Listening {
-    Server::http(|mut req: server::Request, res: server::Response| {
-        println!("{:?} - {:?}\n{:?}", req.method, req.uri, req.headers);
-        let framework_registered: FrameworkRegisteredMessage = parse_from_reader(&mut req).unwrap();
-        println!("FrameworkRegisteredMessage {:?}", framework_registered);
-    }).listen(address).unwrap()
+fn server(me: &UPID) -> server::Listening {
+    let id_end = me.id.len() + 1;
+    Server::http(move |mut req: server::Request, mut resp: server::Response| {
+        match req.uri.clone() { // TODO I hate borrowing rules
+            // slice the id from the path
+            AbsolutePath(ref path) => match &path[id_end..] {
+                "/mesos.internal.FrameworkRegisteredMessage" => {
+                   let message: FrameworkRegisteredMessage = parse_from_reader(&mut req).unwrap();
+                    println!("FrameworkRegisteredMessage {:?}", message);
+                    *resp.status_mut() = StatusCode::Accepted;
+                },
+                message => {
+                    println!("Unhandled {:?}", message);
+                }
+            },
+            _ => {}
+        }
+    }).listen(me.address).unwrap()
+}
+
+pub struct UPID {
+    id: String,
+    address: SocketAddr
+}
+
+impl ToString for UPID {
+    fn to_string(&self) -> String {
+        format!("{}@{}", self.id, self.address)
+    }
+}
+
+impl UPID {
+    fn new(id: &str, address: SocketAddr) -> UPID {
+        UPID{id: id.to_string(), address: address}
+    }
 }
 
 fn main() {
+    env_logger::init().unwrap();
 
     let scheduler = MyScheduler;
 
@@ -91,12 +126,14 @@ fn main() {
 
     framework.set_name("rust-example".to_string());
     framework.set_user("bonifaido".to_string());
+    framework.set_failover_timeout(60.0);
 
+    let me = UPID::new("rustclient", "127.0.0.1:4567".parse().unwrap());
     let master = "http://localhost:5050/master";
 
-    let server = server("0.0.0.0:4567");
+    let server = server(&me);
+    let resp = register_framework(&me, master, framework);
 
-    let resp = register_framework(master, framework);
     println!("{:?}", resp);
 
     //let driver = MesosSchedulerDriver::new(&scheduler, &framework, master);
