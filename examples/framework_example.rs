@@ -9,8 +9,9 @@ use hyper::header::{ContentType, Headers};
 use hyper::mime::Mime;
 use hyper::server;
 use hyper::server::Server;
-use protobuf::Message;
+use protobuf::{Message, parse_from_reader};
 use mesos::proto::{ExecutorID, FrameworkID, FrameworkInfo, MasterInfo, Offer, OfferID, SlaveID, TaskStatus};
+use mesos::proto_internal::{RegisterFrameworkMessage, FrameworkRegisteredMessage};
 use mesos::scheduler::Scheduler;
 use mesos::scheduler_driver::{SchedulerDriver, MesosSchedulerDriver};
 use mesos::utils;
@@ -53,13 +54,13 @@ impl Scheduler for MyScheduler {
 
 pub fn request<M: Message>(master_uri: &str, message: &M) -> Result<Response> {
     let mut uri = master_uri.to_string();
-    uri.push_str("/mesos.");
+    uri.push_str("/mesos.internal.");
     uri.push_str(message.descriptor().name());
     let mut client = Client::new();
     let mut headers = Headers::new();
     let proto_mime: Mime = "application/x-protobuf".parse().unwrap();
     headers.set(ContentType(proto_mime));
-    headers.set_raw("Libprocess-From", vec![b"testapp".to_vec()]);
+    headers.set_raw("Libprocess-From", vec![b"rustclient@0.0.0.0:4567".to_vec()]);
     let data = utils::serialize(message).unwrap();
     let res = client.post(uri.trim())
           .headers(headers)
@@ -68,10 +69,18 @@ pub fn request<M: Message>(master_uri: &str, message: &M) -> Result<Response> {
     res
 }
 
-fn server(host: &str) -> server::Listening {
-    Server::http(|req: server::Request, mut res: server::Response| {
-        
-    }).listen(host).unwrap()
+fn register_framework(master_uri: &str, framework: FrameworkInfo) -> Result<Response> {
+    let mut register_framework = RegisterFrameworkMessage::new();
+    register_framework.set_framework(framework);
+    request(master_uri, &register_framework)
+}
+
+fn server(address: &str) -> server::Listening {
+    Server::http(|mut req: server::Request, res: server::Response| {
+        println!("{:?} - {:?}\n{:?}", req.method, req.uri, req.headers);
+        let framework_registered: FrameworkRegisteredMessage = parse_from_reader(&mut req).unwrap();
+        println!("FrameworkRegisteredMessage {:?}", framework_registered);
+    }).listen(address).unwrap()
 }
 
 fn main() {
@@ -85,10 +94,11 @@ fn main() {
 
     let master = "http://localhost:5050/master";
 
-    let resp = request(master, &framework);
+    let server = server("0.0.0.0:4567");
+
+    let resp = register_framework(master, framework);
     println!("{:?}", resp);
 
-    let driver = MesosSchedulerDriver::new(&scheduler, &framework, master);
-
-    driver.start();
+    //let driver = MesosSchedulerDriver::new(&scheduler, &framework, master);
+    //driver.start();
 }

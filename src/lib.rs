@@ -4,6 +4,7 @@ extern crate hyper;
 
 mod http;
 pub mod proto;     // protobuf messages
+pub mod proto_internal;     // protobuf messages
 pub mod scheduler;
 pub mod scheduler_driver;
 mod executor;
