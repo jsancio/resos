@@ -146,19 +146,19 @@ pub trait SchedulerDriver {
 /// <mesos>/src/logging/flags.hpp. Mesos flags can also be set via environment
 /// variables, prefixing the flag name with "MESOS_", e.g.,
 /// "MESOS_QUIET=1".
-pub struct MesosSchedulerDriver; // {
-//    scheduler: scheduler::Scheduler
-//}
+pub struct MesosSchedulerDriver {
+    scheduler: Box<scheduler::Scheduler>
+}
 
 impl MesosSchedulerDriver {
      // TODO(CD): Call native::scheduler_init upon construction
      // TODO(CD): Implement the trait by marshalling the protobuf objects
      //           and calling the native implementations.
 
-    pub fn new(scheduler: &scheduler::Scheduler,
-               framework: &FrameworkInfo,
-               master: &str) -> MesosSchedulerDriver {
-        let driver = MesosSchedulerDriver;
+    pub fn new<S: scheduler::Scheduler + 'static>(scheduler: S,
+                                        framework: &FrameworkInfo,
+                                        master: &str) -> MesosSchedulerDriver {
+        let driver = MesosSchedulerDriver{scheduler: Box::new(scheduler)};
         http::request(master, &framework);
         driver
     }

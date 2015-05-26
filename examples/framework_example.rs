@@ -128,14 +128,14 @@ fn main() {
     framework.set_user("bonifaido".to_string());
     framework.set_failover_timeout(60.0);
 
-    let me = UPID::new("rustclient", "127.0.0.1:4567".parse().unwrap());
     let master = "http://localhost:5050/master";
 
+    let driver = MesosSchedulerDriver::new(scheduler, &framework, master);
+    driver.start();
+
+    let me = UPID::new("rustclient", "127.0.0.1:4567".parse().unwrap());
     let server = server(&me);
     let resp = register_framework(&me, master, framework);
 
     println!("{:?}", resp);
-
-    //let driver = MesosSchedulerDriver::new(&scheduler, &framework, master);
-    //driver.start();
 }
