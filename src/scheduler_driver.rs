@@ -1,7 +1,16 @@
-use http;
-use proto::{ExecutorID, Filters, FrameworkID, FrameworkInfo, MasterInfo, Offer, OfferID, Request, SlaveID, Status, TaskID, TaskInfo, TaskStatus};
+use hyper;
+use hyper::client::Response;
+use hyper::error::Result;
+use hyper::header::{ContentType, Headers};
+use hyper::status::StatusCode;
+use hyper::uri::RequestUri::AbsolutePath;
+use proto::{ExecutorID, Filters, FrameworkID, FrameworkInfo, MasterInfo, OfferID, Request, SlaveID, Status, TaskID, TaskInfo};
+use proto_internal::{RegisterFrameworkMessage, FrameworkRegisteredMessage};
+use protobuf::{Message, parse_from_reader};
 use scheduler;
 use utils;
+use std::cell::RefCell;
+use std::net::SocketAddr;
 
 /// Abstract interface for connecting a scheduler to Mesos. This
 /// interface is used both to manage the scheduler's lifecycle (start
@@ -15,7 +24,7 @@ pub trait SchedulerDriver {
     ///
     /// @return            The state of the driver after the call.
     fn launch_tasks(&self,
-        offerId: &OfferID,
+        offer_id: &OfferID,
         tasks: &Vec<TaskInfo>,
         filters: &Filters) -> Status;
 
@@ -72,7 +81,7 @@ pub trait SchedulerDriver {
     ///
     /// @return            The state of the driver after the call.
     fn request_resources(&self,
-        requestsData: &Request) -> Status;
+        requests_data: &Request) -> Status;
 
     /// Declines an offer in its entirety and applies the specified
     /// filters on the resources (see mesos.proto for a description of
@@ -85,7 +94,7 @@ pub trait SchedulerDriver {
     ///
     /// @return        The state of the driver after the call.
     fn decline_offer(&self,
-        offerId: &OfferID,
+        offer_id: &OfferID,
         filters: &Filters) -> Status;
 
     /// Kills the specified task. Note that attempting to kill a task is
@@ -97,7 +106,7 @@ pub trait SchedulerDriver {
     /// @param taskId  The ID of the task to be killed.
     ///
     /// @return        The state of the driver after the call.
-    fn kill_task(&self, taskId: &TaskID) -> Status;
+    fn kill_task(&self, task_id: &TaskID) -> Status;
 
     /// Removes all filters, previously set by the framework (via {@link
     /// #launchTasks}). This enables the framework to receive offers
@@ -116,11 +125,82 @@ pub trait SchedulerDriver {
     ///
     /// @return            The state of the driver after the call.
     fn send_framework_message(&self,
-        executorId: &ExecutorID,
-        slaveId: &SlaveID,
+        executor_id: &ExecutorID,
+        slave_id: &SlaveID,
         data: &Vec<u8>) -> Status;
 
     // fn destroy(driver: *mut libc::c_void, scheduler: *mut libc::c_void);
+}
+
+// HTTP CLIENT/SERVER WORK
+header! {
+    (LibprocessFrom, "Libprocess-From") => [String]
+}
+
+pub struct UPID {
+    id: String,
+    address: SocketAddr
+}
+
+impl ToString for UPID {
+    fn to_string(&self) -> String {
+        format!("{}@{}", self.id, self.address)
+    }
+}
+
+impl UPID {
+    fn new(id: &str, address: &SocketAddr) -> UPID {
+        UPID{id: id.to_string(), address: address.clone()}
+    }
+}
+
+fn server<S: scheduler::Scheduler + Send + Sync + 'static>(myid: &str, scheduler: S) -> hyper::server::Listening {
+    let id_end = myid.len() + 1;
+    hyper::Server::http(move |mut req: hyper::server::Request,
+                              mut resp: hyper::server::Response| {
+        match req.uri.clone() { // TODO I hate borrowing rules
+            // slice the id from the path
+            AbsolutePath(ref path) => match &path[id_end..] {
+                "/mesos.internal.FrameworkRegisteredMessage" => {
+                   let message: FrameworkRegisteredMessage = parse_from_reader(&mut req).unwrap();
+                    println!("FrameworkRegisteredMessage {:?}", message);
+                    *resp.status_mut() = StatusCode::Accepted;
+                    //scheduler.registered(None, message.get_framework_id(), message.get_master_info());
+                },
+                message => {
+                    println!("Unhandled {:?}", message);
+                }
+            },
+            _ => {}
+        }
+    }).listen_threads("0.0.0.0:0", 1).unwrap()
+}
+
+pub fn request<M: Message>(client: &mut hyper::Client,
+                           sender: &UPID,
+                           master_uri: &str,
+                           message: &M) -> Result<hyper::client::Response> {
+    let mut uri = master_uri.to_string();
+    uri.push_str("/mesos.internal.");
+    uri.push_str(message.descriptor().name());
+    let mut headers = Headers::new();
+    headers.set(ContentType("application/x-protobuf".parse().unwrap()));
+    headers.set(LibprocessFrom(sender.to_string()));
+    let data = utils::serialize(message).unwrap();
+    let res = client.post(uri.trim())
+          .headers(headers)
+          .body(&data[..])
+          .send();
+    res
+}
+
+fn register_framework(client: &mut hyper::Client,
+                      me: &UPID,
+                      master_uri: &str,
+                      framework: &FrameworkInfo) -> Result<Response> {
+    let mut register_framework = RegisterFrameworkMessage::new();
+    register_framework.set_framework(framework.clone());
+    request(client, me, master_uri, &register_framework)
 }
 
 /// Concrete implementation of a SchedulerDriver that connects a
@@ -147,37 +227,43 @@ pub trait SchedulerDriver {
 /// variables, prefixing the flag name with "MESOS_", e.g.,
 /// "MESOS_QUIET=1".
 pub struct MesosSchedulerDriver {
-    scheduler: Box<scheduler::Scheduler>
+    //scheduler: Box<scheduler::Scheduler>,
+    http_client: RefCell<hyper::Client>,
+    http_server: RefCell<hyper::server::Listening>,
+    framework: FrameworkInfo,
+    master: String,
+    pid: UPID
 }
 
 impl MesosSchedulerDriver {
-     // TODO(CD): Call native::scheduler_init upon construction
-     // TODO(CD): Implement the trait by marshalling the protobuf objects
-     //           and calling the native implementations.
-
-    pub fn new<S: scheduler::Scheduler + 'static>(scheduler: S,
-                                        framework: &FrameworkInfo,
-                                        master: &str) -> MesosSchedulerDriver {
-        let driver = MesosSchedulerDriver{scheduler: Box::new(scheduler)};
-        http::request(master, &framework);
+    pub fn new<S: scheduler::Scheduler + Send + Sync + 'static>(scheduler: S,
+                                                  framework: FrameworkInfo,
+                                                  master: &str) -> MesosSchedulerDriver {
+        let http_server = server(framework.get_name(), scheduler);
+        let pid = UPID::new(framework.get_name(), &http_server.socket);
+        let driver = MesosSchedulerDriver{
+            //scheduler: Box::new(scheduler),
+            http_client: RefCell::new(hyper::Client::new()),
+            http_server: RefCell::new(http_server),
+            framework: framework,
+            master: master.to_string(),
+            pid: pid
+        };
         driver
     }
 }
 
 impl SchedulerDriver for MesosSchedulerDriver {
-    fn launch_tasks(&self,
-        offerId: &OfferID,
-        tasks: &Vec<TaskInfo>,
-        filters: &Filters) -> Status {
-        Status::DRIVER_RUNNING
-    }
 
     fn start(&self) -> Status {
-        //native::scheduler_start(self)
+        let mut client = self.http_client.borrow_mut();
+        let resp = register_framework(&mut *client, &self.pid, &self.master, &self.framework);
+        println!("{:?}", resp);
         Status::DRIVER_RUNNING
     }
 
     fn stop(&self, failover: bool) -> Status {
+        self.http_server.borrow_mut().close();
         Status::DRIVER_STOPPED
     }
 
@@ -194,17 +280,24 @@ impl SchedulerDriver for MesosSchedulerDriver {
     }
 
     fn request_resources(&self,
-        requestsData: &Request) -> Status {
+        request_data: &Request) -> Status {
         Status::DRIVER_RUNNING
     }
 
     fn decline_offer(&self,
-        offerId: &OfferID,
+        offer_id: &OfferID,
         filters: &Filters) -> Status {
         Status::DRIVER_RUNNING
     }
 
-    fn kill_task(&self, taskId: &TaskID) -> Status {
+    fn launch_tasks(&self,
+        offer_id: &OfferID,
+        tasks: &Vec<TaskInfo>,
+        filters: &Filters) -> Status {
+        Status::DRIVER_RUNNING
+    }
+
+    fn kill_task(&self, task_id: &TaskID) -> Status {
         Status::DRIVER_RUNNING
     }
 
@@ -213,8 +306,8 @@ impl SchedulerDriver for MesosSchedulerDriver {
     }
 
     fn send_framework_message(&self,
-        executorId: &ExecutorID,
-        slaveId: &SlaveID,
+        executor_id: &ExecutorID,
+        slave_id: &SlaveID,
         data: &Vec<u8>) -> Status {
         Status::DRIVER_RUNNING        
     }
