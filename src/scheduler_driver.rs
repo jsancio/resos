@@ -6,11 +6,15 @@ use hyper::status::StatusCode;
 use hyper::uri::RequestUri::AbsolutePath;
 use proto::{ExecutorID, Filters, FrameworkID, FrameworkInfo, MasterInfo, OfferID, Request, SlaveID, Status, TaskID, TaskInfo};
 use proto_internal::{RegisterFrameworkMessage, FrameworkRegisteredMessage};
-use protobuf::{Message, parse_from_reader};
+use protobuf::{Message, parse_from_bytes};
 use scheduler;
 use utils;
 use std::cell::RefCell;
+use std::io::Read;
 use std::net::SocketAddr;
+use std::sync::Mutex;
+use std::sync::mpsc::{channel, Sender};
+use std::thread;
 
 /// Abstract interface for connecting a scheduler to Mesos. This
 /// interface is used both to manage the scheduler's lifecycle (start
@@ -154,26 +158,21 @@ impl UPID {
     }
 }
 
-fn server<S: scheduler::Scheduler + Send + Sync + 'static>(myid: &str, scheduler: S) -> hyper::server::Listening {
-    let id_end = myid.len() + 1;
-    hyper::Server::http(move |mut req: hyper::server::Request,
+fn server(tx: Sender<(String, Vec<u8>)>) -> hyper::server::Listening {
+    let gtx = Mutex::new(tx); // TODO lock needed because of Sync contstraint on Handler
+    hyper::Server::http(move |req: hyper::server::Request,
                               mut resp: hyper::server::Response| {
-        match req.uri.clone() { // TODO I hate borrowing rules
-            // slice the id from the path
-            AbsolutePath(ref path) => match &path[id_end..] {
-                "/mesos.internal.FrameworkRegisteredMessage" => {
-                   let message: FrameworkRegisteredMessage = parse_from_reader(&mut req).unwrap();
-                    println!("FrameworkRegisteredMessage {:?}", message);
-                    *resp.status_mut() = StatusCode::Accepted;
-                    //scheduler.registered(None, message.get_framework_id(), message.get_master_info());
-                },
-                message => {
-                    println!("Unhandled {:?}", message);
-                }
+        let (_, _, _, uri, _, mut body) = req.deconstruct();
+        match uri {
+            AbsolutePath(path) => {
+                let mut data = Vec::new();
+                body.read_to_end(&mut data).unwrap();
+                gtx.lock().unwrap().send((path, data)).unwrap();
+                *resp.status_mut() = StatusCode::Accepted;
             },
             _ => {}
         }
-    }).listen_threads("0.0.0.0:0", 1).unwrap()
+    }).listen("0.0.0.0:0").unwrap()
 }
 
 pub fn request<M: Message>(client: &mut hyper::Client,
@@ -232,23 +231,46 @@ pub struct MesosSchedulerDriver {
     http_server: RefCell<hyper::server::Listening>,
     framework: FrameworkInfo,
     master: String,
-    pid: UPID
+    pid: UPID,
+//    join: Option<thread::JoinHandle<()>>
 }
 
 impl MesosSchedulerDriver {
     pub fn new<S: scheduler::Scheduler + Send + Sync + 'static>(scheduler: S,
                                                   framework: FrameworkInfo,
                                                   master: &str) -> MesosSchedulerDriver {
-        let http_server = server(framework.get_name(), scheduler);
+        let (tx, rx) = channel();
+        let http_server = server(tx);
         let pid = UPID::new(framework.get_name(), &http_server.socket);
+        let id_end = pid.id.len() + 1;
+
         let driver = MesosSchedulerDriver{
             //scheduler: Box::new(scheduler),
             http_client: RefCell::new(hyper::Client::new()),
             http_server: RefCell::new(http_server),
             framework: framework,
             master: master.to_string(),
-            pid: pid
+            pid: pid,
+//            join: join
         };
+
+        let _join = thread::spawn(move || {
+            loop {
+                let (path, data) = rx.recv().unwrap();
+                // slice the id from the path
+                match &path[id_end..] {
+                    "/mesos.internal.FrameworkRegisteredMessage" => {
+                       let message: FrameworkRegisteredMessage = parse_from_bytes(&data).unwrap();
+                        println!("FrameworkRegisteredMessage {:?}", message);
+                        //scheduler.registered(&driver, message.get_framework_id(), message.get_master_info());
+                    },
+                    message => {
+                        println!("Unhandled {:?}", message);
+                    }
+                }
+            }
+        });
+
         driver
     }
 }

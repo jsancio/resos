@@ -52,7 +52,7 @@ fn main() {
     let driver = MesosSchedulerDriver::new(scheduler, framework, master);
     driver.start();
 
-    driver.stop(false);
+    //driver.stop(false);
 
 //    let me = UPID::new("rustclient", "127.0.0.1:4567".parse().unwrap());
 }
