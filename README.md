@@ -1,11 +1,12 @@
-# Resos 
+# rust-mesos
 
 [![Build Status](https://travis-ci.org/bonifaido/rust-mesos.png?branch=master)](https://travis-ci.org/bonifaido/rust-mesos)
 
-Rust language bindings for [Apache Mesos](http://mesos.apache.org).
+Rust library for [Apache Mesos](http://mesos.apache.org).
 
 ## Prerequisites
 
+- [Apache Mesos](http://mesos.apache.org)
 - [Rust](http://rust-lang.org)
 
 ## Building
