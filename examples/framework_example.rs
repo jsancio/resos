@@ -1,8 +1,9 @@
 #[macro_use]
 extern crate env_logger;
 extern crate mesos;
+extern crate proto;
 
-use mesos::proto::{ExecutorID, FrameworkID, FrameworkInfo, MasterInfo, Offer, OfferID, SlaveID, TaskStatus};
+use proto::{ExecutorID, FrameworkID, FrameworkInfo, MasterInfo, Offer, OfferID, SlaveID, TaskStatus};
 use mesos::scheduler::Scheduler;
 use mesos::scheduler_driver::{SchedulerDriver, MesosSchedulerDriver};
 
@@ -52,7 +53,5 @@ fn main() {
     let driver = MesosSchedulerDriver::new(scheduler, framework, master);
     driver.start();
 
-    //driver.stop(false);
-
-//    let me = UPID::new("rustclient", "127.0.0.1:4567".parse().unwrap());
+    driver.stop(false);
 }

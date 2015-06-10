@@ -5,7 +5,7 @@ use hyper::header::{ContentType, Headers};
 use hyper::status::StatusCode;
 use hyper::uri::RequestUri::AbsolutePath;
 use proto::{ExecutorID, Filters, FrameworkID, FrameworkInfo, MasterInfo, OfferID, Request, SlaveID, Status, TaskID, TaskInfo};
-use proto_internal::{RegisterFrameworkMessage, FrameworkRegisteredMessage};
+use proto::internal::{RegisterFrameworkMessage, FrameworkRegisteredMessage};
 use protobuf::{Message, parse_from_bytes};
 use scheduler;
 use utils;

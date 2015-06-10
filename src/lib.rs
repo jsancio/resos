@@ -1,10 +1,8 @@
-extern crate protobuf; // depend on rust-protobuf runtime
+extern crate protobuf;
+extern crate proto; // mesos protobuf messages, bad name?
 #[macro_use]
 extern crate hyper;
 
-mod http;
-pub mod proto;     // protobuf messages
-pub mod proto_internal;     // protobuf messages
 pub mod scheduler;
 pub mod scheduler_driver;
 mod executor;

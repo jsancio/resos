@@ -1,5 +1,4 @@
 [package]
-
 name = "mesos"
 version = "0.0.1"
 authors = ["Connor Doyle <connor@mesosphere.io>", "Nandor Kracser <bonifaido@gmail.com>"]
@@ -8,3 +7,6 @@ authors = ["Connor Doyle <connor@mesosphere.io>", "Nandor Kracser <bonifaido@gma
 hyper = "0.5.0"
 env_logger = "0.3.1"
 protobuf = "1.0.0"
+
+[dependencies.proto]
+path = "proto"
