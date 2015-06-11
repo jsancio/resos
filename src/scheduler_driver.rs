@@ -232,6 +232,7 @@ pub struct MesosSchedulerDriver {
     framework: Mutex<FrameworkInfo>,
     master: String,
     pid: UPID,
+    status: Mutex<Status>,
 //    join: Option<thread::JoinHandle<()>>
 }
 
@@ -251,6 +252,7 @@ impl MesosSchedulerDriver {
             framework: Mutex::new(framework),
             master: master.to_string(),
             pid: pid,
+            status: Mutex::new(Status::DRIVER_NOT_STARTED)
 //            join: join
         };
 
@@ -281,11 +283,15 @@ impl MesosSchedulerDriver {
 impl SchedulerDriver for MesosSchedulerDriver {
 
     fn start(&self) -> Status {
-        let mut client = self.http_client.lock().unwrap();
-        let framework = self.framework.lock().unwrap();
-        let resp = register_framework(&mut *client.borrow_mut(), &self.pid, &self.master, &framework);
-        println!("{:?}", resp);
-        Status::DRIVER_RUNNING
+        let mut status = self.status.lock().unwrap();
+        if *status == Status::DRIVER_NOT_STARTED {
+            let mut client = self.http_client.lock().unwrap();
+            let framework = self.framework.lock().unwrap();
+            let resp = register_framework(&mut *client.borrow_mut(), &self.pid, &self.master, &framework);
+            println!("{:?}", resp);
+            *status = Status::DRIVER_RUNNING
+        }
+        *status
     }
 
     fn stop(&self, failover: bool) -> Status {
