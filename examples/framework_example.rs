@@ -53,5 +53,6 @@ fn main() {
     let driver = MesosSchedulerDriver::new(scheduler, framework, master);
     driver.start();
 
-    driver.stop(false);
+    std::thread::sleep_ms(2000);
+//    driver.stop(false);
 }

@@ -12,7 +12,7 @@ use utils;
 use std::cell::RefCell;
 use std::io::Read;
 use std::net::SocketAddr;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use std::sync::mpsc::{channel, Sender};
 use std::thread;
 
@@ -227,9 +227,9 @@ fn register_framework(client: &mut hyper::Client,
 /// "MESOS_QUIET=1".
 pub struct MesosSchedulerDriver {
     //scheduler: Box<scheduler::Scheduler>,
-    http_client: RefCell<hyper::Client>,
-    http_server: RefCell<hyper::server::Listening>,
-    framework: FrameworkInfo,
+    http_client: Mutex<RefCell<hyper::Client>>,
+    http_server: Mutex<RefCell<hyper::server::Listening>>,
+    framework: Mutex<FrameworkInfo>,
     master: String,
     pid: UPID,
 //    join: Option<thread::JoinHandle<()>>
@@ -237,8 +237,8 @@ pub struct MesosSchedulerDriver {
 
 impl MesosSchedulerDriver {
     pub fn new<S: scheduler::Scheduler + Send + Sync + 'static>(scheduler: S,
-                                                  framework: FrameworkInfo,
-                                                  master: &str) -> MesosSchedulerDriver {
+                                                                framework: FrameworkInfo,
+                                                                master: &str) -> Arc<MesosSchedulerDriver> {
         let (tx, rx) = channel();
         let http_server = server(tx);
         let pid = UPID::new(framework.get_name(), &http_server.socket);
@@ -246,13 +246,16 @@ impl MesosSchedulerDriver {
 
         let driver = MesosSchedulerDriver{
             //scheduler: Box::new(scheduler),
-            http_client: RefCell::new(hyper::Client::new()),
-            http_server: RefCell::new(http_server),
-            framework: framework,
+            http_client: Mutex::new(RefCell::new(hyper::Client::new())),
+            http_server: Mutex::new(RefCell::new(http_server)),
+            framework: Mutex::new(framework),
             master: master.to_string(),
             pid: pid,
 //            join: join
         };
+
+        let driver_arc = Arc::new(driver);
+        let driver_arc2 = driver_arc.clone();
 
         let _join = thread::spawn(move || {
             loop {
@@ -262,7 +265,7 @@ impl MesosSchedulerDriver {
                     "/mesos.internal.FrameworkRegisteredMessage" => {
                        let message: FrameworkRegisteredMessage = parse_from_bytes(&data).unwrap();
                         println!("FrameworkRegisteredMessage {:?}", message);
-                        //scheduler.registered(&driver, message.get_framework_id(), message.get_master_info());
+                        scheduler.registered(&*driver_arc, message.get_framework_id(), message.get_master_info());
                     },
                     message => {
                         println!("Unhandled {:?}", message);
@@ -271,21 +274,23 @@ impl MesosSchedulerDriver {
             }
         });
 
-        driver
+        driver_arc2
     }
 }
 
 impl SchedulerDriver for MesosSchedulerDriver {
 
     fn start(&self) -> Status {
-        let mut client = self.http_client.borrow_mut();
-        let resp = register_framework(&mut *client, &self.pid, &self.master, &self.framework);
+        let mut client = self.http_client.lock().unwrap();
+        let framework = self.framework.lock().unwrap();
+        let resp = register_framework(&mut *client.borrow_mut(), &self.pid, &self.master, &framework);
         println!("{:?}", resp);
         Status::DRIVER_RUNNING
     }
 
     fn stop(&self, failover: bool) -> Status {
-        self.http_server.borrow_mut().close();
+        let server = self.http_server.lock().unwrap();
+        server.borrow_mut().close();
         Status::DRIVER_STOPPED
     }
 
@@ -301,21 +306,20 @@ impl SchedulerDriver for MesosSchedulerDriver {
         Status::DRIVER_RUNNING
     }
 
-    fn request_resources(&self,
-        request_data: &Request) -> Status {
+    fn request_resources(&self, request_data: &Request) -> Status {
         Status::DRIVER_RUNNING
     }
 
     fn decline_offer(&self,
-        offer_id: &OfferID,
-        filters: &Filters) -> Status {
+                     offer_id: &OfferID,
+                     filters: &Filters) -> Status {
         Status::DRIVER_RUNNING
     }
 
     fn launch_tasks(&self,
-        offer_id: &OfferID,
-        tasks: &Vec<TaskInfo>,
-        filters: &Filters) -> Status {
+                    offer_id: &OfferID,
+                    tasks: &Vec<TaskInfo>,
+                    filters: &Filters) -> Status {
         Status::DRIVER_RUNNING
     }
 
@@ -328,9 +332,9 @@ impl SchedulerDriver for MesosSchedulerDriver {
     }
 
     fn send_framework_message(&self,
-        executor_id: &ExecutorID,
-        slave_id: &SlaveID,
-        data: &Vec<u8>) -> Status {
+                              executor_id: &ExecutorID,
+                              slave_id: &SlaveID,
+                              data: &Vec<u8>) -> Status {
         Status::DRIVER_RUNNING        
     }
 }
