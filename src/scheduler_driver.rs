@@ -1,20 +1,10 @@
-use hyper;
-use hyper::client::Response;
-use hyper::error::Result;
-use hyper::header::{ContentType, Headers};
-use hyper::status::StatusCode;
-use hyper::uri::RequestUri::AbsolutePath;
+use libprocess::LibProcess;
 use proto::{ExecutorID, Filters, FrameworkID, FrameworkInfo, MasterInfo, OfferID, Request, SlaveID, Status, TaskID, TaskInfo};
 use proto::internal::{RegisterFrameworkMessage, FrameworkRegisteredMessage};
 use protobuf::{Message, parse_from_bytes};
 use scheduler;
-use utils;
 use std::cell::RefCell;
-use std::io::Read;
-use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
-use std::sync::mpsc::{channel, Sender};
-use std::thread;
 
 /// Abstract interface for connecting a scheduler to Mesos. This
 /// interface is used both to manage the scheduler's lifecycle (start
@@ -136,72 +126,6 @@ pub trait SchedulerDriver {
     // fn destroy(driver: *mut libc::c_void, scheduler: *mut libc::c_void);
 }
 
-// HTTP CLIENT/SERVER WORK
-header! {
-    (LibprocessFrom, "Libprocess-From") => [String]
-}
-
-pub struct UPID {
-    id: String,
-    address: SocketAddr
-}
-
-impl ToString for UPID {
-    fn to_string(&self) -> String {
-        format!("{}@{}", self.id, self.address)
-    }
-}
-
-impl UPID {
-    fn new(id: &str, address: &SocketAddr) -> UPID {
-        UPID{id: id.to_string(), address: address.clone()}
-    }
-}
-
-fn server(tx: Sender<(String, Vec<u8>)>) -> hyper::server::Listening {
-    let gtx = Mutex::new(tx); // TODO lock needed because of Sync contstraint on Handler
-    hyper::Server::http(move |req: hyper::server::Request,
-                              mut resp: hyper::server::Response| {
-        let (_, _, _, uri, _, mut body) = req.deconstruct();
-        match uri {
-            AbsolutePath(path) => {
-                let mut data = Vec::new();
-                body.read_to_end(&mut data).unwrap();
-                gtx.lock().unwrap().send((path, data)).unwrap();
-                *resp.status_mut() = StatusCode::Accepted;
-            },
-            _ => {}
-        }
-    }).listen("0.0.0.0:0").unwrap()
-}
-
-pub fn request<M: Message>(client: &mut hyper::Client,
-                           sender: &UPID,
-                           master_uri: &str,
-                           message: &M) -> Result<hyper::client::Response> {
-    let mut uri = master_uri.to_string();
-    uri.push_str("/mesos.internal.");
-    uri.push_str(message.descriptor().name());
-    let mut headers = Headers::new();
-    headers.set(ContentType("application/x-protobuf".parse().unwrap()));
-    headers.set(LibprocessFrom(sender.to_string()));
-    let data = utils::serialize(message).unwrap();
-    let res = client.post(uri.trim())
-          .headers(headers)
-          .body(&data[..])
-          .send();
-    res
-}
-
-fn register_framework(client: &mut hyper::Client,
-                      me: &UPID,
-                      master_uri: &str,
-                      framework: &FrameworkInfo) -> Result<Response> {
-    let mut register_framework = RegisterFrameworkMessage::new();
-    register_framework.set_framework(framework.clone());
-    request(client, me, master_uri, &register_framework)
-}
-
 /// Concrete implementation of a SchedulerDriver that connects a
 /// Scheduler with a Mesos master. The MesosSchedulerDriver is
 /// thread-safe.
@@ -227,11 +151,8 @@ fn register_framework(client: &mut hyper::Client,
 /// "MESOS_QUIET=1".
 pub struct MesosSchedulerDriver {
     //scheduler: Box<scheduler::Scheduler>,
-    http_client: Mutex<RefCell<hyper::Client>>,
-    http_server: Mutex<RefCell<hyper::server::Listening>>,
-    framework: Mutex<FrameworkInfo>,
-    master: String,
-    pid: UPID,
+    libprocess: Mutex<LibProcess>,
+    framework: FrameworkInfo,
     status: Mutex<Status>,
 //    join: Option<thread::JoinHandle<()>>
 }
@@ -239,44 +160,16 @@ pub struct MesosSchedulerDriver {
 impl MesosSchedulerDriver {
     pub fn new<S: scheduler::Scheduler + Send + Sync + 'static>(scheduler: S,
                                                                 framework: FrameworkInfo,
-                                                                master: &str) -> Arc<MesosSchedulerDriver> {
-        let (tx, rx) = channel();
-        let http_server = server(tx);
-        let pid = UPID::new(framework.get_name(), &http_server.socket);
-        let id_end = pid.id.len() + 1;
+                                                                master: &str) -> MesosSchedulerDriver {
+        let mut libprocess = LibProcess::new(master, framework.get_name());
 
         let driver = MesosSchedulerDriver{
-            //scheduler: Box::new(scheduler),
-            http_client: Mutex::new(RefCell::new(hyper::Client::new())),
-            http_server: Mutex::new(RefCell::new(http_server)),
-            framework: Mutex::new(framework),
-            master: master.to_string(),
-            pid: pid,
+            libprocess: Mutex::new(libprocess),
+            framework: framework,
             status: Mutex::new(Status::DRIVER_NOT_STARTED)
-//            join: join
         };
 
-        let driver_arc = Arc::new(driver);
-        let driver_arc2 = driver_arc.clone();
-
-        let _join = thread::spawn(move || {
-            loop {
-                let (path, data) = rx.recv().unwrap();
-                // slice the id from the path
-                match &path[id_end..] {
-                    "/mesos.internal.FrameworkRegisteredMessage" => {
-                       let message: FrameworkRegisteredMessage = parse_from_bytes(&data).unwrap();
-                        println!("FrameworkRegisteredMessage {:?}", message);
-                        scheduler.registered(&*driver_arc, message.get_framework_id(), message.get_master_info());
-                    },
-                    message => {
-                        println!("Unhandled {:?}", message);
-                    }
-                }
-            }
-        });
-
-        driver_arc2
+        driver
     }
 }
 
@@ -285,9 +178,10 @@ impl SchedulerDriver for MesosSchedulerDriver {
     fn start(&self) -> Status {
         let mut status = self.status.lock().unwrap();
         if *status == Status::DRIVER_NOT_STARTED {
-            let mut client = self.http_client.lock().unwrap();
-            let framework = self.framework.lock().unwrap();
-            let resp = register_framework(&mut *client.borrow_mut(), &self.pid, &self.master, &framework);
+            let mut libprocess = self.libprocess.lock().unwrap();
+            let mut register_framework = RegisterFrameworkMessage::new();
+            register_framework.set_framework(self.framework.clone());
+            let resp = libprocess.request(&register_framework);
             println!("{:?}", resp);
             *status = Status::DRIVER_RUNNING
         }
@@ -295,8 +189,8 @@ impl SchedulerDriver for MesosSchedulerDriver {
     }
 
     fn stop(&self, failover: bool) -> Status {
-        let server = self.http_server.lock().unwrap();
-        server.borrow_mut().close();
+        let mut libprocess = self.libprocess.lock().unwrap();
+        libprocess.close();
         Status::DRIVER_STOPPED
     }
 
