@@ -4,6 +4,7 @@ use proto::internal::{RegisterFrameworkMessage, FrameworkRegisteredMessage};
 use protobuf::{Message, parse_from_bytes};
 use scheduler;
 use std::sync::{Arc, Mutex};
+use std::thread;
 
 /// Abstract interface for connecting a scheduler to Mesos. This
 /// interface is used both to manage the scheduler's lifecycle (start
@@ -151,9 +152,8 @@ pub trait SchedulerDriver {
 pub struct MesosSchedulerDriver {
     //scheduler: Box<scheduler::Scheduler>,
     libprocess: Mutex<LibProcess>,
-    framework: FrameworkInfo,
+    framework: Mutex<FrameworkInfo>,
     status: Mutex<Status>,
-
 //    join: Option<thread::JoinHandle<()>>
 }
 
@@ -166,7 +166,7 @@ impl MesosSchedulerDriver {
 
         let driver = MesosSchedulerDriver{
             libprocess: Mutex::new(libprocess),
-            framework: framework,
+            framework: Mutex::new(framework),
             status: Mutex::new(Status::DRIVER_NOT_STARTED)
         };
 
@@ -181,7 +181,7 @@ impl SchedulerDriver for MesosSchedulerDriver {
         if *status == Status::DRIVER_NOT_STARTED {
             let mut libprocess = self.libprocess.lock().unwrap();
             let mut register_framework = RegisterFrameworkMessage::new();
-            register_framework.set_framework(self.framework.clone());
+            register_framework.set_framework(self.framework.lock().unwrap().clone());
             let resp = libprocess.send(&register_framework);
             println!("{:?}", resp);
             *status = Status::DRIVER_RUNNING
