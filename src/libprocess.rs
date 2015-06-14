@@ -3,11 +3,11 @@ use hyper::client::Response;
 use hyper::header::{ContentType, Headers};
 use hyper::status::StatusCode;
 use hyper::uri::RequestUri::AbsolutePath;
+use protobuf;
 use protobuf::error::ProtobufError;
-use protobuf::Message;
 use std::io::Read;
 use std::net::SocketAddr;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use std::sync::mpsc::{channel, Sender};
 use std::vec::Vec;
 use std::thread;
@@ -34,38 +34,39 @@ impl UPID {
 }
 
 /// Returns the result of serializing the supplied protobuf message
-pub fn serialize(proto: &Message) -> Result<Vec<u8>, ProtobufError> {
+pub fn serialize(proto: &protobuf::Message) -> Result<Vec<u8>, ProtobufError> {
     proto.write_to_bytes()
 }
 
 /// Returns the result of deserializing the supplied protobuf data
 /// into the supplied message.
-pub fn deserialize<'a, T: Message>(
-    obj: &Vec<u8>,
-    proto: &'a mut T) -> Result<&'a mut T, ProtobufError> {
-    try!(proto.merge_from_bytes(obj));
-    Ok(proto)
-}
+// pub fn deserialize<'a, T: protobuf::Message>(obj: &Vec<u8>,
+//                                              proto: &'a mut T) -> Result<&'a mut T, ProtobufError> {
+//     try!(proto.merge_from_bytes(obj));
+//     Ok(proto)
+// }
 
 pub struct LibProcess {
     http_server: hyper::server::Listening,
     http_client: hyper::Client,
     master: String,
-    pid: UPID,
+    pid: UPID
 }
 
 impl LibProcess {
-    pub fn new(master: &str, name: &str) -> LibProcess {
+    pub fn new<H: Handler + Send + Sync + 'static>(master: &str, name: &str, handler: Arc<Box<H>>) -> LibProcess {
         let (tx, rx) = channel();
         let http_server = LibProcess::new_server(tx);
         let http_client = hyper::Client::new();
         let pid = UPID::new(name, &http_server.socket);
-        let id_end = pid.id.len() + 1;
+        let id_end = pid.id.len() + 2;
 
         let _join = thread::spawn(move || {
             loop {
                 let (path, data) = rx.recv().unwrap();
-                println!("received {:?} {:?}", path, data);
+
+                handler.handle(&path[id_end..], data);
+
                 // slice the id from the path
                 //match &path[id_end..] {
                     // "/mesos.internal.FrameworkRegisteredMessage" => {
@@ -95,13 +96,15 @@ impl LibProcess {
                     gtx.lock().unwrap().send((path, data)).unwrap();
                     *resp.status_mut() = StatusCode::Accepted;
                 },
-                _ => {}
+                _ => {
+                    println!("Unhandled {:?}", uri);
+                }
             }
         }).listen("0.0.0.0:0").unwrap()
     }
 
-    pub fn request<M: Message>(&mut self,
-                               message: &M) -> hyper::error::Result<hyper::client::Response> {
+    pub fn send(&mut self,
+                message: &protobuf::Message) -> hyper::error::Result<hyper::client::Response> {
         let mut uri = self.master.to_string();
         uri.push_str("/mesos.internal.");
         uri.push_str(message.descriptor().name());
@@ -121,6 +124,6 @@ impl LibProcess {
     }
 }
 
-trait Handler {
-    fn handle(message: &str, data: Vec<u8>);
+pub trait Handler {
+    fn handle(&self, name: &str, data: Vec<u8>);
 }

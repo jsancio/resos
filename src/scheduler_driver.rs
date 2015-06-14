@@ -1,9 +1,8 @@
-use libprocess::LibProcess;
+use libprocess::{Handler, LibProcess};
 use proto::{ExecutorID, Filters, FrameworkID, FrameworkInfo, MasterInfo, OfferID, Request, SlaveID, Status, TaskID, TaskInfo};
 use proto::internal::{RegisterFrameworkMessage, FrameworkRegisteredMessage};
 use protobuf::{Message, parse_from_bytes};
 use scheduler;
-use std::cell::RefCell;
 use std::sync::{Arc, Mutex};
 
 /// Abstract interface for connecting a scheduler to Mesos. This
@@ -154,6 +153,7 @@ pub struct MesosSchedulerDriver {
     libprocess: Mutex<LibProcess>,
     framework: FrameworkInfo,
     status: Mutex<Status>,
+
 //    join: Option<thread::JoinHandle<()>>
 }
 
@@ -161,7 +161,8 @@ impl MesosSchedulerDriver {
     pub fn new<S: scheduler::Scheduler + Send + Sync + 'static>(scheduler: S,
                                                                 framework: FrameworkInfo,
                                                                 master: &str) -> MesosSchedulerDriver {
-        let mut libprocess = LibProcess::new(master, framework.get_name());
+        let handler = Arc::new(Box::new(DriverHandler));
+        let libprocess = LibProcess::new(master, framework.get_name(), handler);
 
         let driver = MesosSchedulerDriver{
             libprocess: Mutex::new(libprocess),
@@ -181,7 +182,7 @@ impl SchedulerDriver for MesosSchedulerDriver {
             let mut libprocess = self.libprocess.lock().unwrap();
             let mut register_framework = RegisterFrameworkMessage::new();
             register_framework.set_framework(self.framework.clone());
-            let resp = libprocess.request(&register_framework);
+            let resp = libprocess.send(&register_framework);
             println!("{:?}", resp);
             *status = Status::DRIVER_RUNNING
         }
@@ -236,5 +237,13 @@ impl SchedulerDriver for MesosSchedulerDriver {
                               slave_id: &SlaveID,
                               data: &Vec<u8>) -> Status {
         Status::DRIVER_RUNNING        
+    }
+}
+
+struct DriverHandler;
+
+impl Handler for DriverHandler {
+    fn handle(&self, name: &str, data: Vec<u8>) {
+        println!("{} -> {:?}", name, data);
     }
 }
