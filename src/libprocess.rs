@@ -59,7 +59,6 @@ impl LibProcess {
         let pid = UPID::new(id, &http_server.socket);
         let id_end = pid.id.len() + 2;
 
-
         //         // slice the id from the path
         //         //match &path[id_end..] {
         //             // "/mesos.internal.FrameworkRegisteredMessage" => {

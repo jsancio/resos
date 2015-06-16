@@ -5,7 +5,6 @@ use protobuf::{Message, parse_from_bytes};
 use scheduler::Scheduler;
 use std::sync::{Arc, Barrier, Mutex};
 use std::thread;
-use std::clone::Clone;
 
 /// Abstract interface for connecting a scheduler to Mesos. This
 /// interface is used both to manage the scheduler's lifecycle (start
@@ -75,8 +74,7 @@ pub trait SchedulerDriver {
     /// @param requests    The resource requests.
     ///
     /// @return            The state of the driver after the call.
-    fn request_resources(&self,
-        requests_data: &Request) -> Status;
+    fn request_resources(&self, requests_data: &Request) -> Status;
 
     /// Declines an offer in its entirety and applies the specified
     /// filters on the resources (see mesos.proto for a description of
@@ -150,15 +148,17 @@ pub trait SchedulerDriver {
 /// <mesos>/src/logging/flags.hpp. Mesos flags can also be set via environment
 /// variables, prefixing the flag name with "MESOS_", e.g.,
 /// "MESOS_QUIET=1".
-pub struct MesosSchedulerDriver<S: Scheduler + Send + Sync + 'static> {
+//#[derive(Clone)]
+pub struct MesosSchedulerDriver<S> {
     scheduler: Arc<S>,
     libprocess: Arc<Mutex<LibProcess>>,
     framework: Arc<Mutex<FrameworkInfo>>,
     status: Arc<Mutex<Status>>,
-    join: Arc<Barrier>
+    join: Arc<Barrier> // TODO we need a CountDownLatch maybe
 }
 
-impl <S: Scheduler + Send + Sync + 'static> Clone for MesosSchedulerDriver<S> {
+// TODO why do I need to do this??
+impl <S> Clone for MesosSchedulerDriver<S> {
     fn clone(&self) -> MesosSchedulerDriver<S> {
         MesosSchedulerDriver{
             scheduler: self.scheduler.clone(),
@@ -170,7 +170,7 @@ impl <S: Scheduler + Send + Sync + 'static> Clone for MesosSchedulerDriver<S> {
     }
 }
 
-impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver <S> {
+impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
     pub fn new(scheduler: S,
                framework: FrameworkInfo,
                master: &str) -> MesosSchedulerDriver<S> {
@@ -185,22 +185,22 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver <S> {
             join: Arc::new(Barrier::new(2))
         };
 
-        let self_clone = driver.clone();
+        let driver_clone = driver.clone();
 
-        let join = thread::spawn(move || {
+        thread::spawn(move || {
             loop {
                 match rx.recv() {
-                    Ok((name, data)) => self_clone.handle(&name, &data),
-                    Err(_) => { self_clone.join.wait(); }
+                    Ok((name, data)) => driver.handle(&name, &data),
+                    Err(_) => { driver.join.wait(); }
                 };
             }
         });
 
-        driver
+        driver_clone
     }
 }
 
-impl <S: Scheduler + Send + Sync + 'static> SchedulerDriver for MesosSchedulerDriver <S> {
+impl <S> SchedulerDriver for MesosSchedulerDriver<S> {
 
     fn start(&self) -> Status {
         let mut status = self.status.lock().unwrap();
@@ -226,7 +226,7 @@ impl <S: Scheduler + Send + Sync + 'static> SchedulerDriver for MesosSchedulerDr
     }
 
     fn join(&self) -> Status {
-        let join = self.join.wait();
+        self.join.wait();
         Status::DRIVER_RUNNING
     }
 
@@ -270,7 +270,7 @@ impl <S: Scheduler + Send + Sync + 'static> SchedulerDriver for MesosSchedulerDr
     }
 }
 
-impl <S: Scheduler + Send + Sync + 'static> Handler for MesosSchedulerDriver<S> {
+impl <S: Scheduler + Send + Sync> Handler for MesosSchedulerDriver<S> {
     fn handle(&self, name: &str, data: &Vec<u8>) {
         println!("{} -> {:?}", name, data);
         self.scheduler.disconnected(self); // TEST that it works

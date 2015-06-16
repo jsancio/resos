@@ -52,6 +52,4 @@ fn main() {
 
     let driver = MesosSchedulerDriver::new(scheduler, framework, master);
     driver.run();
-
-//    driver.stop(false);
 }
