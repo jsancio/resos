@@ -6,7 +6,6 @@ extern crate proto;
 use proto::{ExecutorID, FrameworkID, FrameworkInfo, MasterInfo, Offer, OfferID, SlaveID, TaskStatus};
 use mesos::scheduler::Scheduler;
 use mesos::scheduler_driver::{SchedulerDriver, MesosSchedulerDriver};
-use std::sync::Arc;
 
 struct MyScheduler;
 impl Scheduler for MyScheduler {
@@ -51,9 +50,8 @@ fn main() {
     framework.set_user("bonifaido".to_string());
     framework.set_failover_timeout(60.0);
 
-    let driver = Arc::new(MesosSchedulerDriver::new(scheduler, framework, master));
-    driver.start();
+    let driver = MesosSchedulerDriver::new(scheduler, framework, master);
+    driver.run();
 
-    std::thread::sleep_ms(2000);
 //    driver.stop(false);
 }

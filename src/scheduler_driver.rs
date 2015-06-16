@@ -2,7 +2,7 @@ use libprocess::{Handler, LibProcess};
 use proto::{ExecutorID, Filters, FrameworkID, FrameworkInfo, MasterInfo, OfferID, Request, SlaveID, Status, TaskID, TaskInfo};
 use proto::internal::{RegisterFrameworkMessage, FrameworkRegisteredMessage};
 use protobuf::{Message, parse_from_bytes};
-use scheduler;
+use scheduler::Scheduler;
 use std::sync::{Arc, Mutex};
 use std::thread;
 
@@ -149,32 +149,43 @@ pub trait SchedulerDriver {
 /// <mesos>/src/logging/flags.hpp. Mesos flags can also be set via environment
 /// variables, prefixing the flag name with "MESOS_", e.g.,
 /// "MESOS_QUIET=1".
-pub struct MesosSchedulerDriver {
-    //scheduler: Box<scheduler::Scheduler>,
+pub struct MesosSchedulerDriver<S: Scheduler + Send + Sync + 'static> {
+    scheduler: S,
     libprocess: Mutex<LibProcess>,
     framework: Mutex<FrameworkInfo>,
     status: Mutex<Status>,
-//    join: Option<thread::JoinHandle<()>>
+    join: Option<thread::JoinHandle<()>>
 }
 
-impl MesosSchedulerDriver {
-    pub fn new<S: scheduler::Scheduler + Send + Sync + 'static>(scheduler: S,
-                                                                framework: FrameworkInfo,
-                                                                master: &str) -> MesosSchedulerDriver {
-        let handler = Arc::new(Box::new(DriverHandler));
-        let libprocess = LibProcess::new(master, framework.get_name(), handler);
+impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver <S> {
+    pub fn new(scheduler: S,
+               framework: FrameworkInfo,
+               master: &str) -> Arc<MesosSchedulerDriver<S>> {
 
-        let driver = MesosSchedulerDriver{
+        let (libprocess, rx) = LibProcess::new(master, framework.get_name());
+
+        let driver = Arc::new(MesosSchedulerDriver{
+            scheduler: scheduler,
             libprocess: Mutex::new(libprocess),
             framework: Mutex::new(framework),
-            status: Mutex::new(Status::DRIVER_NOT_STARTED)
-        };
+            status: Mutex::new(Status::DRIVER_NOT_STARTED),
+            join: None
+        });
+
+        let self_driver = driver.clone();
+
+        thread::spawn(move || {
+            loop {
+                let (name, data) = rx.recv().unwrap();
+                self_driver.handle(&name, &data);
+            }
+        });
 
         driver
     }
 }
 
-impl SchedulerDriver for MesosSchedulerDriver {
+impl <S: Scheduler + Send + Sync + 'static> SchedulerDriver for MesosSchedulerDriver <S> {
 
     fn start(&self) -> Status {
         let mut status = self.status.lock().unwrap();
@@ -204,7 +215,10 @@ impl SchedulerDriver for MesosSchedulerDriver {
     }
 
     fn run(&self) -> Status {
-        Status::DRIVER_RUNNING
+        match self.start() {
+            Status::DRIVER_RUNNING => self.join(),
+            status => status
+        }
     }
 
     fn request_resources(&self, request_data: &Request) -> Status {
@@ -240,10 +254,9 @@ impl SchedulerDriver for MesosSchedulerDriver {
     }
 }
 
-struct DriverHandler;
-
-impl Handler for DriverHandler {
-    fn handle(&self, name: &str, data: Vec<u8>) {
+impl <S: Scheduler + Send + Sync + 'static> Handler for MesosSchedulerDriver<S> {
+    fn handle(&self, name: &str, data: &Vec<u8>) {
         println!("{} -> {:?}", name, data);
+        self.scheduler.disconnected(self); // TEST
     }
 }

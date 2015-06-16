@@ -7,10 +7,8 @@ use protobuf;
 use protobuf::error::ProtobufError;
 use std::io::Read;
 use std::net::SocketAddr;
-use std::sync::{Arc, Mutex};
-use std::sync::mpsc::{channel, Sender};
-use std::vec::Vec;
-use std::thread;
+use std::sync::mpsc;
+use std::sync::Mutex;
 
 header! {
     (LibprocessFrom, "Libprocess-From") => [String]
@@ -54,37 +52,30 @@ pub struct LibProcess {
 }
 
 impl LibProcess {
-    pub fn new<H: Handler + Send + Sync + 'static>(master: &str, name: &str, handler: Arc<Box<H>>) -> LibProcess {
-        let (tx, rx) = channel();
+    pub fn new(master: &str, id: &str) -> (LibProcess, mpsc::Receiver<(String, Vec<u8>)>) {
+        let (tx, rx) = mpsc::channel();
         let http_server = LibProcess::new_server(tx);
         let http_client = hyper::Client::new();
-        let pid = UPID::new(name, &http_server.socket);
+        let pid = UPID::new(id, &http_server.socket);
         let id_end = pid.id.len() + 2;
 
-        let _join = thread::spawn(move || {
-            loop {
-                let (path, data) = rx.recv().unwrap();
 
-                handler.handle(&path[id_end..], data);
+        //         // slice the id from the path
+        //         //match &path[id_end..] {
+        //             // "/mesos.internal.FrameworkRegisteredMessage" => {
+        //             //    let message: FrameworkRegisteredMessage = parse_from_bytes(&data).unwrap();
+        //             //     println!("FrameworkRegisteredMessage {:?}", message);
+        //             //     scheduler.registered(&*driver_arc, message.get_framework_id(), message.get_master_info());
+        //             // },
+        //             // message => {
+        //             //     println!("Unhandled {:?}", message);
+        //             // }
+        //         //}
 
-                // slice the id from the path
-                //match &path[id_end..] {
-                    // "/mesos.internal.FrameworkRegisteredMessage" => {
-                    //    let message: FrameworkRegisteredMessage = parse_from_bytes(&data).unwrap();
-                    //     println!("FrameworkRegisteredMessage {:?}", message);
-                    //     scheduler.registered(&*driver_arc, message.get_framework_id(), message.get_master_info());
-                    // },
-                    // message => {
-                    //     println!("Unhandled {:?}", message);
-                    // }
-                //}
-            }
-        });
-
-        LibProcess{http_server: http_server, http_client: http_client, master: master.to_string(), pid: pid}
+        (LibProcess{http_server: http_server, http_client: http_client, master: master.to_string(), pid: pid}, rx)
     }
 
-    fn new_server(tx: Sender<(String, Vec<u8>)>) -> hyper::server::Listening {
+    fn new_server(tx: mpsc::Sender<(String, Vec<u8>)>) -> hyper::server::Listening {
         let gtx = Mutex::new(tx); // TODO lock needed because of Sync contstraint on Handler
         hyper::Server::http(move |req: hyper::server::Request,
                                   mut resp: hyper::server::Response| {
@@ -93,7 +84,8 @@ impl LibProcess {
                 AbsolutePath(path) => {
                     let mut data = Vec::new();
                     body.read_to_end(&mut data).unwrap();
-                    gtx.lock().unwrap().send((path, data)).unwrap();
+                    let res = gtx.lock().unwrap().send((path, data));
+                    println!("HTTP Server got {:?}", res);
                     *resp.status_mut() = StatusCode::Accepted;
                 },
                 _ => {
@@ -124,6 +116,6 @@ impl LibProcess {
     }
 }
 
-pub trait Handler {
-    fn handle(&self, name: &str, data: Vec<u8>);
+pub trait Handler : Send + Sync {
+    fn handle(&self, name: &str, data: &Vec<u8>);
 }

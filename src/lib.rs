@@ -1,3 +1,4 @@
+#![feature(scoped)]
 #![deny(unused_mut)]
 extern crate protobuf;
 extern crate proto; // mesos protobuf messages, bad name?
