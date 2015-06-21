@@ -5,12 +5,16 @@ authors = ["Connor Doyle <connor@mesosphere.io>", "Nandor Kracser <bonifaido@gma
 
 [dependencies]
 hyper = "0.5"
-env_logger = "0.3"
 log = "0.3"
-protobuf = "1.0"
+
+[dependencies.protobuf]
+git = "https://github.com/stepancheg/rust-protobuf.git"
 
 [dependencies.proto]
 path = "proto"
 
 [dependencies.zookeeper]
 path = "../rust-zookeeper"
+
+[dev-dependencies]
+env_logger = "0.3"

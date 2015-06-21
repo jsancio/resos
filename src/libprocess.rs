@@ -1,10 +1,9 @@
 use hyper;
 use hyper::client::Response;
-use hyper::header::{ContentType, Headers};
+use hyper::header::{Connection, ContentType, Headers};
 use hyper::status::StatusCode;
 use hyper::uri::RequestUri::AbsolutePath;
 use protobuf;
-use protobuf::error::ProtobufError;
 use std::fmt::{Display, Error, Formatter};
 use std::io::Read;
 use std::net::SocketAddr;
@@ -28,7 +27,7 @@ impl UPID {
     }
 
     fn to_url(&self) -> String {
-        format!("http://{}/{}", self.address, self.id)
+        format!("http://{}/{}/", self.address, self.id)
     }
 }
 
@@ -56,19 +55,6 @@ impl FromStr for UPID {
 
 #[derive(Debug)]
 pub struct UPIDError;
-
-/// Returns the result of serializing the supplied protobuf message
-pub fn serialize(proto: &protobuf::Message) -> Result<Vec<u8>, ProtobufError> {
-    proto.write_to_bytes()
-}
-
-/// Returns the result of deserializing the supplied protobuf data
-/// into the supplied message.
-// pub fn deserialize<'a, T: protobuf::Message>(obj: &Vec<u8>,
-//                                              proto: &'a mut T) -> Result<&'a mut T, ProtobufError> {
-//     try!(proto.merge_from_bytes(obj));
-//     Ok(proto)
-// }
 
 pub struct LibProcess {
     http_server: hyper::server::Listening,
@@ -120,18 +106,22 @@ impl LibProcess {
     pub fn send(&mut self,
                 pid: &UPID,
                 message: &protobuf::Message) -> Result<(), ()> {
+
         let mut url = pid.to_url();
-        url.push_str("/mesos.internal.");
-        url.push_str(message.descriptor().name());
+        url.push_str(message.descriptor().full_name());
+
         let mut headers = Headers::new();
+        headers.set(Connection::keep_alive());
         headers.set(ContentType("application/x-protobuf".parse().unwrap()));
         headers.set(LibprocessFrom(self.pid.clone()));
-        let data = serialize(message).unwrap();
+
+        let data = message.write_to_bytes().unwrap();
 
         let resp = self.http_client.post(&url)
               .headers(headers)
               .body(&data[..])
               .send();
+
         match resp {
             Ok(resp) => match resp.status {
                 StatusCode::Accepted => Ok(()),
@@ -146,7 +136,7 @@ impl LibProcess {
     }
 }
 
-// TODO I think it's not needed here
+// TODO I don't think it's needed here
 pub trait Handler : Send + Sync {
     fn handle(&self, name: &str, data: &Vec<u8>);
 }

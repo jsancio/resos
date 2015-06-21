@@ -3,5 +3,5 @@ name = "proto"
 version = "0.1.0"
 authors = ["Nandor Kracser <bonifaido@gmail.com>"]
 
-[dependencies]
-protobuf = "1.0.0"
+[dependencies.protobuf]
+git = "https://github.com/stepancheg/rust-protobuf.git"
