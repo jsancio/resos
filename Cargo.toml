@@ -4,9 +4,13 @@ version = "0.0.1"
 authors = ["Connor Doyle <connor@mesosphere.io>", "Nandor Kracser <bonifaido@gmail.com>"]
 
 [dependencies]
-hyper = "0.5.2"
-env_logger = "0.3.1"
-protobuf = "1.0.0"
+hyper = "0.5"
+env_logger = "0.3"
+log = "0.3"
+protobuf = "1.0"
 
 [dependencies.proto]
 path = "proto"
+
+[dependencies.zookeeper]
+path = "../rust-zookeeper"

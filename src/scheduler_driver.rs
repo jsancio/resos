@@ -1,4 +1,5 @@
 use libprocess::{Handler, LibProcess};
+use master_detector::MasterDetector;
 use proto::{ExecutorID, Filters, FrameworkID, FrameworkInfo, MasterInfo, OfferID, Request, SlaveID, Status, TaskID, TaskInfo};
 use proto::internal::{RegisterFrameworkMessage, FrameworkRegisteredMessage};
 use protobuf::{Message, parse_from_bytes};
@@ -152,6 +153,7 @@ pub trait SchedulerDriver {
 pub struct MesosSchedulerDriver<S> {
     scheduler: Arc<S>,
     libprocess: Arc<Mutex<LibProcess>>,
+    master_detector: Arc<Mutex<MasterDetector>>,
     framework: Arc<Mutex<FrameworkInfo>>,
     status: Arc<Mutex<Status>>,
     join: Arc<Barrier> // TODO we need a CountDownLatch maybe
@@ -163,6 +165,7 @@ impl <S> Clone for MesosSchedulerDriver<S> {
         MesosSchedulerDriver{
             scheduler: self.scheduler.clone(),
             libprocess: self.libprocess.clone(),
+            master_detector: self.master_detector.clone(),
             framework: self.framework.clone(),
             status: self.status.clone(),
             join: self.join.clone()
@@ -171,15 +174,19 @@ impl <S> Clone for MesosSchedulerDriver<S> {
 }
 
 impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
+
     pub fn new(scheduler: S,
                framework: FrameworkInfo,
                master: &str) -> MesosSchedulerDriver<S> {
 
-        let (libprocess, rx) = LibProcess::new(master, framework.get_name());
+        let (libprocess, rx) = LibProcess::new(framework.get_name());
+
+        let master_detector = MasterDetector::new("localhost:2181/mesos").unwrap();
 
         let driver = MesosSchedulerDriver{
             scheduler: Arc::new(scheduler),
             libprocess: Arc::new(Mutex::new(libprocess)),
+            master_detector: Arc::new(Mutex::new(master_detector)),
             framework: Arc::new(Mutex::new(framework)),
             status: Arc::new(Mutex::new(Status::DRIVER_NOT_STARTED)),
             join: Arc::new(Barrier::new(2))
@@ -208,9 +215,15 @@ impl <S> SchedulerDriver for MesosSchedulerDriver<S> {
             let mut libprocess = self.libprocess.lock().unwrap();
             let mut register_framework = RegisterFrameworkMessage::new();
             register_framework.set_framework(self.framework.lock().unwrap().clone());
-            let resp = libprocess.send(&register_framework);
-            println!("{:?}", resp);
-            *status = Status::DRIVER_RUNNING
+            let mut master_detector = self.master_detector.lock().unwrap();
+            master_detector.start();
+            let master = master_detector.master().unwrap();
+            debug!("Registering with master {}", master);
+            let resp = libprocess.send(&master, &register_framework);
+            match resp {
+                Ok(_) => *status = Status::DRIVER_RUNNING,
+                Err(_) => error!("Failed to start")
+            }
         }
         *status
     }
@@ -272,7 +285,16 @@ impl <S> SchedulerDriver for MesosSchedulerDriver<S> {
 
 impl <S: Scheduler + Send + Sync> Handler for MesosSchedulerDriver<S> {
     fn handle(&self, name: &str, data: &Vec<u8>) {
-        println!("{} -> {:?}", name, data);
-        self.scheduler.disconnected(self); // TEST that it works
+        // slice the id from the path
+        match name {
+            "mesos.internal.FrameworkRegisteredMessage" => {
+               let message: FrameworkRegisteredMessage = parse_from_bytes(data).unwrap();
+                debug!("FrameworkRegisteredMessage {:?}", message);
+                self.scheduler.registered(self, message.get_framework_id(), message.get_master_info());
+            },
+            message => {
+                warn!("Unhandled {:?}", message);
+            }
+        }
     }
 }
