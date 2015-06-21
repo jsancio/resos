@@ -1,5 +1,5 @@
-use hyper;
-use hyper::client::Response;
+use hyper::server;
+use hyper::client;
 use hyper::header::{Connection, ContentType, Headers};
 use hyper::status::StatusCode;
 use hyper::uri::RequestUri::AbsolutePath;
@@ -14,6 +14,8 @@ use std::sync::Mutex;
 header! {
     (LibprocessFrom, "Libprocess-From") => [UPID]
 }
+
+static PROTOBUF: &'static str = "application/x-protobuf";
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct UPID {
@@ -39,13 +41,13 @@ impl Display for UPID {
 
 impl FromStr for UPID {
     type Err = UPIDError;
-    fn from_str(s: &str) -> Result<UPID, Self::Err> {
-        let mut split = s.split("@");
+    fn from_str(pid: &str) -> Result<UPID, Self::Err> {
+        let mut split = pid.split("@");
         match (split.nth(0), split.nth(0)) {
             (Some(id), Some(address)) => {
                 match FromStr::from_str(address) {
                     Ok(address) => Ok(UPID::new(id, address)),
-                    Err(e) => Err(UPIDError)
+                    Err(_) => Err(UPIDError)
                 }
             },
             _ => Err(UPIDError)
@@ -57,8 +59,8 @@ impl FromStr for UPID {
 pub struct UPIDError;
 
 pub struct LibProcess {
-    http_server: hyper::server::Listening,
-    http_client: hyper::Client,
+    http_server: server::Listening,
+    http_client: client::Client,
     pid: UPID
 }
 
@@ -66,7 +68,7 @@ impl LibProcess {
     pub fn new(id: &str) -> (LibProcess, mpsc::Receiver<(String, Vec<u8>)>) {
         let (tx, rx) = mpsc::channel();
         let http_server = LibProcess::new_server(id, tx);
-        let http_client = hyper::Client::new();
+        let http_client = client::Client::new();
         let pid = UPID::new(id, http_server.socket.clone());
 
         (LibProcess{http_server: http_server,
@@ -76,14 +78,14 @@ impl LibProcess {
     }
 
     fn new_server(myid: &str,
-                  tx: mpsc::Sender<(String, Vec<u8>)>) -> hyper::server::Listening {
+                  tx: mpsc::Sender<(String, Vec<u8>)>) -> server::Listening {
         let myid_len = myid.len() + 2;
 
         // Mutex needed because of Sync contstraint on Handler
-        let gtx = Mutex::new(tx);
+        let sender = Mutex::new(tx);
 
-        hyper::Server::http(move |req: hyper::server::Request,
-                                  mut resp: hyper::server::Response| {
+        server::Server::http(move |req: server::Request,
+                              mut resp: server::Response| {
             let (_, _, _, uri, _, mut body) = req.deconstruct();
             // TODO
             // - match for POST
@@ -91,9 +93,17 @@ impl LibProcess {
             match uri {
                 AbsolutePath(path) => {
                     let mut data = Vec::new();
-                    body.read_to_end(&mut data).unwrap();
-                    let res = gtx.lock().unwrap().send((path[myid_len..].to_string(), data));
-                    debug!("HTTP Server got {:?}", res);
+                    let id = &path[..myid_len];
+                    if let Err(e) = body.read_to_end(&mut data) {
+                        warn!("Failed to read message for {}: {}", id, e);
+                        *resp.status_mut() = StatusCode::BadRequest;
+                        return
+                    }
+                    let sender = sender.lock().unwrap();
+                    let name = path[myid_len..].to_string();
+                    if let Err(e) = sender.send((name, data)) {
+                        warn!("Failed to send message to {}: {}", id, e);
+                    }
                     *resp.status_mut() = StatusCode::Accepted;
                 },
                 _ => {
@@ -112,7 +122,7 @@ impl LibProcess {
 
         let mut headers = Headers::new();
         headers.set(Connection::keep_alive());
-        headers.set(ContentType("application/x-protobuf".parse().unwrap()));
+        headers.set(ContentType(PROTOBUF.parse().unwrap()));
         headers.set(LibprocessFrom(self.pid.clone()));
 
         let data = message.write_to_bytes().unwrap();
@@ -123,11 +133,8 @@ impl LibProcess {
               .send();
 
         match resp {
-            Ok(resp) => match resp.status {
-                StatusCode::Accepted => Ok(()),
-                status => Err(())
-            },
-            Err(err) => Err(())
+            Ok(client::Response{status: StatusCode::Accepted, ..}) => Ok(()),
+            _ => Err(())
         }
     }
 

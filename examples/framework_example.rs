@@ -1,4 +1,3 @@
-#[macro_use]
 extern crate env_logger;
 extern crate mesos;
 extern crate proto;
@@ -8,6 +7,7 @@ use mesos::scheduler::Scheduler;
 use mesos::scheduler_driver::{SchedulerDriver, MesosSchedulerDriver};
 
 struct MyScheduler;
+#[allow(unused_variables)]
 impl Scheduler for MyScheduler {
     fn disconnected(&self, driver: &SchedulerDriver) {}
 
@@ -43,7 +43,7 @@ fn main() {
     env_logger::init().unwrap();
 
     let scheduler = MyScheduler;
-    let master = "http://localhost:5050/master";
+    let master = "localhost:2181/mesos"; // TODO should start with zk://
     let mut framework = FrameworkInfo::new();
 
     framework.set_name("rustframework".to_string());
