@@ -232,7 +232,24 @@ message CommandInfo {
   message URI {
     required string value = 1;
     optional bool executable = 2;
+
+    // In case the fetched file is recognized as an archive, extract
+    // its contents into the sandbox. Note that a cached archive is
+    // not copied from the cache to the sandbox in case extraction
+    // originates from an archive in the cache.
     optional bool extract = 3 [default = true];
+
+    // If this field is "true", the fetcher cache will be used. If not,
+    // fetching bypasses the cache and downloads directly into the
+    // sandbox directory, no matter whether a suitable cache file is
+    // available or not. The former directs the fetcher to download to
+    // the file cache, then copy from there to the sandbox. Subsequent
+    // fetch attempts with the same URI will omit downloading and copy
+    // from the cache as long as the file is resident there. Cache files
+    // may get evicted at any time, which then leads to renewed
+    // downloading. See also "docs/fetcher.md" and
+    // "docs/fetcher-cache-internals.md".
+    optional bool cache = 4;
   }
 
   // Describes a container.
@@ -489,6 +506,42 @@ message Resource {
   optional RevocableInfo revocable = 9;
 }
 
+// When the network bandwidth caps are enabled and the container
+// is over its limit, outbound packets may be either delayed or
+// dropped completely either because it exceeds the maximum bandwidth
+// allocation for a single container (the cap) or because the combined
+// network traffic of multiple containers on the host exceeds the
+// transmit capacity of the host (the share). We can report the
+// following statistics for each of these conditions exported directly
+// from the Linux Traffic Control Queueing Discipline.
+//
+// id         : name of the limiter, e.g. 'tx_bw_cap'
+// backlog    : number of packets currently delayed
+// bytes      : total bytes seen
+// drops      : number of packets dropped in total
+// overlimits : number of packets which exceeded allocation
+// packets    : total packets seen
+// qlen       : number of packets currently queued
+// rate_bps   : throughput in bytes/sec
+// rate_pps   : throughput in packets/sec
+// requeues   : number of times a packet has been delayed due to
+//              locking or device contention issues
+//
+// More information on the operation of Linux Traffic Control can be
+// found at http://www.lartc.org/lartc.html.
+message TrafficControlStatistics {
+  required string id = 1;
+  optional uint64 backlog = 2;
+  optional uint64 bytes = 3;
+  optional uint64 drops = 4;
+  optional uint64 overlimits = 5;
+  optional uint64 packets = 6;
+  optional uint64 qlen = 7;
+  optional uint64 ratebps = 8;
+  optional uint64 ratepps = 9;
+  optional uint64 requeues = 10;
+}
+
 
 /*
  * A snapshot of resource usage statistics.
@@ -513,15 +566,42 @@ message ResourceStatistics {
   optional double cpus_throttled_time_secs = 9;
 
   // Memory Usage Information:
-  optional uint64 mem_rss_bytes = 5; // Resident Set Size.
 
-  // Amount of memory resources allocated.
+  // mem_total_bytes was added in 0.23.0 to represent the total memory
+  // of a process in RAM (as opposed to in Swap). This was previously
+  // reported as mem_rss_bytes, which was also changed in 0.23.0 to
+  // represent only the anonymous memory usage, to keep in sync with
+  // Linux kernel's (arguably erroneous) use of terminology.
+  optional uint64 mem_total_bytes = 36;
+
+  // Total memory + swap usage. This is set if swap is enabled.
+  optional uint64 mem_total_memsw_bytes = 37;
+
+  // Hard memory limit for a container.
   optional uint64 mem_limit_bytes = 6;
 
-  // Broken out memory usage information (files, anonymous, and mmaped files)
+  // Soft memory limit for a container.
+  optional uint64 mem_soft_limit_bytes = 38;
+
+  // Broken out memory usage information: pagecache, rss (anonymous),
+  // mmaped files and swap.
+
+  // TODO(chzhcn) mem_file_bytes and mem_anon_bytes are deprecated in
+  // 0.23.0 and will be removed in 0.24.0.
   optional uint64 mem_file_bytes = 10;
   optional uint64 mem_anon_bytes = 11;
+
+  // mem_cache_bytes is added in 0.23.0 to represent page cache usage.
+  optional uint64 mem_cache_bytes = 39;
+
+  // Since 0.23.0, mem_rss_bytes is changed to represent only
+  // anonymous memory usage. Note that neither its requiredness, type,
+  // name nor numeric tag has been changed.
+  optional uint64 mem_rss_bytes = 5;
+
   optional uint64 mem_mapped_file_bytes = 12;
+  // This is only set if swap is enabled.
+  optional uint64 mem_swap_bytes = 40;
 
   // Number of occurrences of different levels of memory pressure
   // events reported by memory cgroup. Pressure listening (re)starts
@@ -558,34 +638,33 @@ message ResourceStatistics {
 
   optional double net_tcp_active_connections = 28;
   optional double net_tcp_time_wait_connections = 29;
+
+  // Network traffic flowing into or out of a container can be delayed
+  // or dropped due to congestion or policy inside and outside the
+  // container.
+  repeated TrafficControlStatistics net_traffic_control_statistics = 35;
 }
 
 
 /**
- * Describes a snapshot of the resource usage for an executor.
- *
- * TODO(bmahler): Note that we want to be sending this information
- * to the master, and subsequently to the relevant scheduler. So
- * this proto is designed to be easy for the scheduler to use, this
- * is why we provide the slave id, executor info / task info.
+ * Describes a snapshot of the resource usage for executors.
  */
 message ResourceUsage {
-  required SlaveID slave_id = 1;
-  required FrameworkID framework_id = 2;
+  message Executor {
+    required ExecutorInfo executor_info = 1;
 
-  // Resource usage is for an executor. For tasks launched with
-  // an explicit executor, the executor id is provided. For tasks
-  // launched without an executor, our internal executor will be
-  // used. In this case, we provide the task id here instead, in
-  // order to make this message easier for schedulers to work with.
+    // This includes resources used by the executor itself
+    // as well as its active tasks.
+    repeated Resource allocated = 2;
 
-  optional ExecutorID executor_id = 3; // If present, this executor was
-  optional string executor_name = 4;   // explicitly specified.
+    // Current resource usage. If absent, the containerizer
+    // cannot provide resource usage.
+    optional ResourceStatistics statistics = 3;
+  }
 
-  optional TaskID task_id = 5; // If present, the task did not have an executor.
+  repeated Executor executors = 1;
 
-  // If missing, the isolation module cannot provide resource usage.
-  optional ResourceStatistics statistics = 6;
+  // TODO(jieyu): Include slave's total resources here.
 }
 
 
@@ -804,6 +883,7 @@ message TaskStatus {
   // (e.g. unhealthy vs. unregistered for maintenance).
   enum Reason {
     REASON_COMMAND_EXECUTOR_FAILED = 0;
+    REASON_EXECUTOR_PREEMPTED = 17;
     REASON_EXECUTOR_TERMINATED = 1;
     REASON_EXECUTOR_UNREGISTERED = 2;
     REASON_FRAMEWORK_REMOVED = 3;
@@ -813,6 +893,7 @@ message TaskStatus {
     REASON_MASTER_DISCONNECTED = 7;
     REASON_MEMORY_LIMIT = 8;
     REASON_RECONCILIATION = 9;
+    REASON_RESOURCES_UNKNOWN = 18;
     REASON_SLAVE_DISCONNECTED = 10;
     REASON_SLAVE_REMOVED = 11;
     REASON_SLAVE_RESTARTED = 12;

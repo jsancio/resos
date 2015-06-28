@@ -1,14 +1,13 @@
 [package]
 name = "mesos"
 version = "0.0.1"
-authors = ["Connor Doyle <connor@mesosphere.io>", "Nandor Kracser <bonifaido@gmail.com>"]
+authors = ["Connor Doyle <connor@mesosphere.io>",
+           "Nandor Kracser <bonifaido@gmail.com>"]
 
 [dependencies]
 hyper = "0.5"
 log = "0.3"
-
-[dependencies.protobuf]
-git = "https://github.com/stepancheg/rust-protobuf.git"
+protobuf = "1.0"
 
 [dependencies.proto]
 path = "proto"

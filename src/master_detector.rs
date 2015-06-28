@@ -21,7 +21,7 @@ pub struct MasterDetector {
 }
 
 impl MasterDetector {
-    pub fn new(connect_string: &str, ) -> Result<MasterDetector, ZkError> {
+    pub fn new(connect_string: &str) -> Result<MasterDetector, ZkError> {
         let zk = try!(ZooKeeper::connect(connect_string,
                                          Duration::from_secs(ZK_SESSION_TIMEOUT),
                                          MasterDetectorWatcher));

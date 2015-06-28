@@ -1,7 +1,7 @@
 use libprocess::{Handler, LibProcess};
 use master_detector::MasterDetector;
 use proto::{ExecutorID, Filters, FrameworkInfo, OfferID, Request, SlaveID, Status, TaskID, TaskInfo};
-use proto::internal::{RegisterFrameworkMessage, FrameworkRegisteredMessage};
+use proto::internal::{FrameworkRegisteredMessage, RegisterFrameworkMessage, UnregisterFrameworkMessage};
 use protobuf;
 use scheduler::Scheduler;
 use std::sync::{Arc, Barrier, Mutex};
@@ -213,14 +213,13 @@ impl <S> SchedulerDriver for MesosSchedulerDriver<S> {
         let mut status = self.status.lock().unwrap();
         if *status == Status::DRIVER_NOT_STARTED {
             let mut libprocess = self.libprocess.lock().unwrap();
-            let mut register_framework = RegisterFrameworkMessage::new();
-            register_framework.set_framework(self.framework.lock().unwrap().clone());
+            let mut message = RegisterFrameworkMessage::new();
+            message.set_framework(self.framework.lock().unwrap().clone());
             let mut master_detector = self.master_detector.lock().unwrap();
             master_detector.start();
             let master = master_detector.master().unwrap();
             debug!("Registering with master {}", master);
-            let resp = libprocess.send(&master, &register_framework);
-            match resp {
+            match libprocess.send(&master, &message) {
                 Ok(_) => *status = Status::DRIVER_RUNNING,
                 Err(_) => error!("Failed to start driver")
             }
@@ -229,9 +228,23 @@ impl <S> SchedulerDriver for MesosSchedulerDriver<S> {
     }
 
     fn stop(&self, failover: bool) -> Status {
-        let mut libprocess = self.libprocess.lock().unwrap();
-        libprocess.close();
-        Status::DRIVER_STOPPED
+        let mut status = self.status.lock().unwrap();
+        if *status == Status::DRIVER_RUNNING {
+            let mut libprocess = self.libprocess.lock().unwrap();
+            if failover {
+                let mut message = UnregisterFrameworkMessage::new();
+                message.set_framework_id(self.framework.lock().unwrap().take_id());
+                let master_detector = self.master_detector.lock().unwrap();
+                let master = master_detector.master().unwrap();
+                debug!("Unregistering with master {}", master);
+                match libprocess.send(&master, &message) {
+                    Ok(_) => *status = Status::DRIVER_STOPPED,
+                    Err(_) => error!("Failed to stop driver")
+                }
+            }
+            libprocess.close();
+        }
+        *status
     }
 
     fn abort(&self) -> Status {
@@ -279,11 +292,12 @@ impl <S> SchedulerDriver for MesosSchedulerDriver<S> {
                               executor_id: &ExecutorID,
                               slave_id: &SlaveID,
                               data: &Vec<u8>) -> Status {
-        Status::DRIVER_RUNNING        
+        Status::DRIVER_RUNNING
     }
 }
 
 impl <S: Scheduler + Send + Sync> Handler for MesosSchedulerDriver<S> {
+
     fn handle(&self, name: &str, data: &Vec<u8>) {
         match name {
             "mesos.internal.FrameworkRegisteredMessage" => {
@@ -293,7 +307,7 @@ impl <S: Scheduler + Send + Sync> Handler for MesosSchedulerDriver<S> {
                         self.scheduler.registered(self, msg.get_framework_id(), msg.get_master_info());
                     },
                     Err(_) => {
-                        error!("Failed to parse protobuf message");
+                        error!("Failed to parse protobuf message from master");
                     }
                 }
             },
