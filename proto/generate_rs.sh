@@ -3,6 +3,7 @@
 brew install protobuf
 git clone git@github.com:stepancheg/rust-protobuf
 cd rust-protobuf
+git pull
 cargo build
 PATH="`pwd`/target/debug:$PATH"
 cd ..

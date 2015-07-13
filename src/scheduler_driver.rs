@@ -248,7 +248,9 @@ impl <S> SchedulerDriver for MesosSchedulerDriver<S> {
     }
 
     fn abort(&self) -> Status {
-        Status::DRIVER_ABORTED
+        let mut status = self.status.lock().unwrap();
+        *status = Status::DRIVER_ABORTED;
+        *status
     }
 
     fn join(&self) -> Status {

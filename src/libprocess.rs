@@ -84,8 +84,9 @@ impl LibProcess {
         // Mutex needed because of Sync contstraint on Handler
         let sender = Mutex::new(tx);
 
-        server::Server::http(move |req: server::Request,
-                              mut resp: server::Response| {
+        server::Server::http("0.0.0.0:0")
+        .unwrap().handle(move |req: server::Request,
+                          mut resp: server::Response| {
             let (_, _, _, uri, _, mut body) = req.deconstruct();
             // TODO
             // - match for POST
@@ -110,7 +111,7 @@ impl LibProcess {
                     warn!("Unhandled {:?}", uri);
                 }
             }
-        }).listen("0.0.0.0:0").unwrap()
+        }).unwrap()
     }
 
     pub fn send(&mut self,
