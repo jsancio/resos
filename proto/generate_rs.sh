@@ -6,8 +6,13 @@ cd rust-protobuf
 git pull
 cargo build
 PATH="`pwd`/target/debug:$PATH"
+
+cd ../proto/mesos
+curl -O https://raw.githubusercontent.com/apache/mesos/master/include/mesos/mesos.proto
 cd ..
-# scheduler.proto from the mesos distribution is mesos/mesos.proto
+curl -O https://raw.githubusercontent.com/apache/mesos/master/src/messages/messages.proto
+cd ..
+
 protoc --rust_out src proto/mesos/mesos.proto
 protoc --rust_out src --proto_path=proto proto/messages.proto
 cd src

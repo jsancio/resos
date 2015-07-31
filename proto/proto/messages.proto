@@ -71,7 +71,11 @@ message StatusUpdate {
   optional SlaveID slave_id = 3;
   required TaskStatus status = 4;
   required double timestamp = 5;
-  required bytes uuid = 6;
+
+  // This is being deprecated in favor of TaskStatus.uuid. In 0.23.0,
+  // we set the TaskStatus 'uuid' in the executor driver for all
+  // retryable status updates.
+  optional bytes uuid = 6;
 
   // This corresponds to the latest state of the task according to the
   // slave. Note that this state might be different than the state in
@@ -189,8 +193,15 @@ message RunTaskMessage {
   // TODO(karya): Remove framework_id after MESOS-2559 has shipped.
   optional FrameworkID framework_id = 1 [deprecated = true];
   required FrameworkInfo framework = 2;
-  required string pid = 3;
   required TaskInfo task = 4;
+
+  // The pid of the framework. This was moved to 'optional' in
+  // 0.24.0 to support schedulers using the HTTP API. For now, we
+  // continue to always set pid since it was required in 0.23.x.
+  // When 'pid' is unset, or set to empty string, the slave will
+  // forward executor messages through the master. For schedulers
+  // still using the driver, this will remain set.
+  optional string pid = 3;
 }
 
 
@@ -276,6 +287,7 @@ message ReregisterSlaveMessage {
 
 message SlaveRegisteredMessage {
   required SlaveID slave_id = 1;
+  optional MasterSlaveConnection connection = 2;
 }
 
 
@@ -283,11 +295,20 @@ message SlaveReregisteredMessage {
   required SlaveID slave_id = 1;
 
   repeated ReconcileTasksMessage reconciliations = 2;
+  optional MasterSlaveConnection connection = 3;
 }
 
 
 message UnregisterSlaveMessage {
   required SlaveID slave_id = 1;
+}
+
+
+message MasterSlaveConnection {
+  // Product of max_slave_ping_timeouts * slave_ping_timeout.
+  // If no pings are received within the total timeout,
+  // the master will remove the slave.
+  optional double total_ping_timeout_seconds = 1;
 }
 
 
@@ -321,7 +342,9 @@ message ShutdownExecutorMessage {
 
 message UpdateFrameworkMessage {
   required FrameworkID framework_id = 1;
-  required string pid = 2;
+
+  // See the comment on RunTaskMessage.pid.
+  optional string pid = 2;
 }
 
 
