@@ -1,11 +1,11 @@
-use libprocess::LibProcess;
+use libprocess::{LibProcess, UPID};
 use master_detector::MasterDetector;
 use proto::{ExecutorID, Filters, FrameworkInfo, OfferID, Request, SlaveID, Status, TaskID, TaskInfo};
 use proto::internal::{FrameworkRegisteredMessage, RegisterFrameworkMessage, UnregisterFrameworkMessage};
 use protobuf;
 use scheduler::Scheduler;
+use std::collections::HashMap;
 use std::sync::{Arc, Barrier, Mutex};
-use std::thread;
 
 /// Abstract interface for connecting a scheduler to Mesos. This
 /// interface is used both to manage the scheduler's lifecycle (start
@@ -179,7 +179,7 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
                framework: FrameworkInfo,
                master: &str) -> MesosSchedulerDriver<S> {
 
-        let (libprocess, rx) = LibProcess::new(framework.get_name());
+        let libprocess = LibProcess::new(framework.get_name());
 
         let master_detector = MasterDetector::new(master).unwrap();
 
@@ -192,18 +192,17 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
             join: Arc::new(Barrier::new(2))
         };
 
-        let driver_clone = driver.clone();
+        let mut handlers = HashMap::new();
+        handlers.insert("mesos.internal.FrameworkRegisteredMessage".to_string(), Self::registered);
 
-        thread::spawn(move || {
-            loop {
-                match rx.recv() {
-                    Some((name, sender, data)) => driver.handle(&name, &data),
-                    None => { driver.join.wait(); }
-                };
-            }
-        });
+        driver.libprocess.lock().unwrap().start(driver.clone(), handlers);
 
-        driver_clone
+        driver
+    }
+
+    fn registered(sender: &UPID, msg: &FrameworkRegisteredMessage, driver: &MesosSchedulerDriver<S>) {
+        debug!("FrameworkRegisteredMessage {:?}", msg);
+        driver.scheduler.registered(driver, msg.get_framework_id(), msg.get_master_info());
     }
 }
 
@@ -298,9 +297,10 @@ impl <S> SchedulerDriver for MesosSchedulerDriver<S> {
     }
 }
 
+// TODO delete me
 impl <S: Scheduler + Send + Sync> MesosSchedulerDriver<S> {
 
-    fn handle(&self, name: &str, data: &Vec<u8>) {
+    fn handle(&self, name: &str, sender: &UPID, data: &Vec<u8>) {
         match name {
             "mesos.internal.FrameworkRegisteredMessage" => {
                 match protobuf::parse_from_bytes::<FrameworkRegisteredMessage>(data) {

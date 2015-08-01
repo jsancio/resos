@@ -5,10 +5,12 @@ use hyper::header::{Connection, ContentType, Headers};
 use hyper::status::StatusCode;
 use hyper::uri::RequestUri::AbsolutePath;
 use protobuf;
+use std::collections::HashMap;
 use std::fmt::{Display, Error, Formatter};
 use std::io::Read;
 use std::net::SocketAddr;
 use std::str::FromStr;
+use std::thread;
 
 header! {
     (LibprocessFrom, "Libprocess-From") => [UPID]
@@ -62,20 +64,21 @@ pub struct UPIDError;
 pub struct LibProcess {
     http_server: server::Listening,
     http_client: client::Client,
-    pid: UPID
+    pid: UPID,
+    rx: chan::Receiver<(String, UPID, Vec<u8>)>
 }
 
 impl LibProcess {
-    pub fn new(id: &str) -> (LibProcess, chan::Receiver<(String, UPID, Vec<u8>)>) {
+    pub fn new(id: &str) -> LibProcess {
         let (tx, rx) = chan::async();
         let http_server = LibProcess::new_server(id, tx);
         let http_client = client::Client::new();
         let pid = UPID::new(id, http_server.socket.clone());
 
-        (LibProcess{http_server: http_server,
-                    http_client: http_client,
-                    pid: pid},
-                    rx)
+        LibProcess{http_server: http_server,
+                   http_client: http_client,
+                   pid: pid,
+                   rx: rx}
     }
 
     fn new_server(myid: &str, tx: chan::Sender<(String, UPID, Vec<u8>)>) -> server::Listening {
@@ -130,9 +133,9 @@ impl LibProcess {
         let data = message.write_to_bytes().unwrap();
 
         let resp = self.http_client.post(&url)
-              .headers(headers)
-              .body(&data[..])
-              .send();
+                                   .headers(headers)
+                                   .body(&data[..])
+                                   .send();
 
         match resp {
             Ok(client::Response{status: StatusCode::Accepted, ..}) => Ok(()),
@@ -140,7 +143,31 @@ impl LibProcess {
         }
     }
 
+    pub fn start<T: Send + 'static, F1, M>(&self, context: T, handlers: HashMap<String, F1>)
+    where F1: Fn(&UPID, &M, &T) + Send + 'static,
+           M: protobuf::Message + protobuf::MessageStatic {
+        let rx = self.rx.clone();
+        thread::spawn(move || {
+            loop {
+                match rx.recv() {
+                    Some((name, sender, data)) => match protobuf::parse_from_bytes::<M>(&data) {
+                        Ok(msg) => match handlers.get(&name) {
+                            Some(handler) => handler(&sender, &msg, &context),
+                            None => ()
+                        },
+                        Err(_) => error!("Failed to parse protobuf message from master")
+                    },
+                    None => () // context.join.wait(), handle error
+                };
+            }
+        });
+    }
+
     pub fn close(&mut self) {
         self.http_server.close().unwrap();
     }
+}
+
+trait LibProcessHandler<T>: Send {
+    fn handle(&self, sender: &UPID, data: &Vec<u8>, context: &T);
 }

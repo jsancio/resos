@@ -57,7 +57,7 @@ impl MasterDetector {
                 match String::from_utf8(data) {
                     Ok(json) => match json::decode(&json) {
                         Ok(master_info) => Ok(master_info),
-                        Err(err) => Err(ZkError::MarshallingError)
+                        Err(_) => Err(ZkError::MarshallingError)
                     },
                     Err(_) => Err(ZkError::MarshallingError)
                 }
