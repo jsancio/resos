@@ -1,3 +1,4 @@
+use chan;
 use hyper::server;
 use hyper::client;
 use hyper::header::{Connection, ContentType, Headers};
@@ -8,14 +9,14 @@ use std::fmt::{Display, Error, Formatter};
 use std::io::Read;
 use std::net::SocketAddr;
 use std::str::FromStr;
-use std::sync::mpsc;
-use std::sync::Mutex;
 
 header! {
     (LibprocessFrom, "Libprocess-From") => [UPID]
 }
 
-static PROTOBUF: &'static str = "application/x-protobuf";
+lazy_static! {
+    static ref ContentTypeProtobuf: ContentType = ContentType("application/x-protobuf".parse().unwrap());
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct UPID {
@@ -65,8 +66,8 @@ pub struct LibProcess {
 }
 
 impl LibProcess {
-    pub fn new(id: &str) -> (LibProcess, mpsc::Receiver<(String, Vec<u8>)>) {
-        let (tx, rx) = mpsc::channel();
+    pub fn new(id: &str) -> (LibProcess, chan::Receiver<(String, UPID, Vec<u8>)>) {
+        let (tx, rx) = chan::async();
         let http_server = LibProcess::new_server(id, tx);
         let http_client = client::Client::new();
         let pid = UPID::new(id, http_server.socket.clone());
@@ -77,34 +78,34 @@ impl LibProcess {
                     rx)
     }
 
-    fn new_server(myid: &str,
-                  tx: mpsc::Sender<(String, Vec<u8>)>) -> server::Listening {
+    fn new_server(myid: &str, tx: chan::Sender<(String, UPID, Vec<u8>)>) -> server::Listening {
         let myid_len = myid.len() + 2;
 
-        // Mutex needed because of Sync contstraint on Handler
-        let sender = Mutex::new(tx);
-
-        server::Server::http("0.0.0.0:0")
-        .unwrap().handle(move |req: server::Request,
+        server::Server::http("0.0.0.0:0").unwrap()
+                 .handle(move |req: server::Request,
                           mut resp: server::Response| {
-            let (_, _, _, uri, _, mut body) = req.deconstruct();
+            let (_, _, headers, uri, _, mut body) = req.deconstruct();
             // TODO
             // - match for POST
             // - put sender into the message
             match uri {
                 AbsolutePath(path) => {
-                    let mut data = Vec::new();
                     let id = &path[..myid_len];
+                    let mut data = Vec::new();
                     if let Err(e) = body.read_to_end(&mut data) {
                         warn!("Failed to read message for {}: {}", id, e);
                         *resp.status_mut() = StatusCode::BadRequest;
                         return
                     }
-                    let sender = sender.lock().unwrap();
+
                     let name = path[myid_len..].to_string();
-                    if let Err(e) = sender.send((name, data)) {
-                        warn!("Failed to send message to {}: {}", id, e);
-                    }
+                    let sender = match headers.get() {
+                        Some(&LibprocessFrom(ref upid)) => upid.clone(),
+                        None => panic!("No LibprocessFrom in header")
+                    };
+
+                    tx.send((name, sender, data));
+
                     *resp.status_mut() = StatusCode::Accepted;
                 },
                 _ => {
@@ -123,7 +124,7 @@ impl LibProcess {
 
         let mut headers = Headers::new();
         headers.set(Connection::keep_alive());
-        headers.set(ContentType(PROTOBUF.parse().unwrap()));
+        headers.set(ContentTypeProtobuf.clone());
         headers.set(LibprocessFrom(self.pid.clone()));
 
         let data = message.write_to_bytes().unwrap();
@@ -142,9 +143,4 @@ impl LibProcess {
     pub fn close(&mut self) {
         self.http_server.close().unwrap();
     }
-}
-
-// TODO I don't think it's needed here
-pub trait Handler : Send + Sync {
-    fn handle(&self, name: &str, data: &Vec<u8>);
 }

@@ -1,11 +1,16 @@
 use libprocess::UPID;
-use protobuf;
-use proto::{MasterInfo};
+use rustc_serialize::json;
 use zookeeper::{Watcher, WatchedEvent, ZkError, ZkResult, ZooKeeper};
 use std::str::FromStr;
 use std::time::Duration;
 
 static ZK_SESSION_TIMEOUT: u64 = 10000;
+static MASTER_INFO_JSON_LABEL: &'static str = "json.info";
+
+#[derive(RustcDecodable)]
+struct MasterInfo {
+    pid: String
+}
 
 struct MasterDetectorWatcher;
 
@@ -30,16 +35,16 @@ impl MasterDetector {
 
     pub fn start(&mut self) {
         match self.get_master() {
-            Ok(master_info) => self.master = Some(FromStr::from_str(master_info.get_pid()).unwrap()),
-            Err(e) => error!("Failed to find leader in ZK {}", e)
+            Ok(master_info) => self.master = Some(FromStr::from_str(&master_info.pid).unwrap()),
+            Err(e) => error!("Failed to find leader in ZK: {}", e)
         }
     }
 
     fn get_master(&self) -> ZkResult<MasterInfo> {
         let children = try!(self.zk.get_children("/", true));
-        
+
         let mut contenders: Vec<_> = children.iter()
-                                             .filter(|child| child.starts_with("info"))
+                                             .filter(|child| child.starts_with(MASTER_INFO_JSON_LABEL))
                                              .collect();
         contenders.sort();
 
@@ -49,9 +54,12 @@ impl MasterDetector {
             Some(leader) => {
                 let leader_path = "/".to_string() + leader;
                 let (data, _acl) = try!(self.zk.get_data(&leader_path, true));
-                match protobuf::parse_from_bytes(&data) {
-                    Ok(master_info) => Ok(master_info),
-                    Err(err) => Err(ZkError::MarshallingError)
+                match String::from_utf8(data) {
+                    Ok(json) => match json::decode(&json) {
+                        Ok(master_info) => Ok(master_info),
+                        Err(err) => Err(ZkError::MarshallingError)
+                    },
+                    Err(_) => Err(ZkError::MarshallingError)
                 }
             }
             None => Err(ZkError::NoNode)

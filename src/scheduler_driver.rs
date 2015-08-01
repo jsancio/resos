@@ -1,4 +1,4 @@
-use libprocess::{Handler, LibProcess};
+use libprocess::LibProcess;
 use master_detector::MasterDetector;
 use proto::{ExecutorID, Filters, FrameworkInfo, OfferID, Request, SlaveID, Status, TaskID, TaskInfo};
 use proto::internal::{FrameworkRegisteredMessage, RegisterFrameworkMessage, UnregisterFrameworkMessage};
@@ -197,8 +197,8 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
         thread::spawn(move || {
             loop {
                 match rx.recv() {
-                    Ok((name, data)) => driver.handle(&name, &data),
-                    Err(_) => { driver.join.wait(); }
+                    Some((name, sender, data)) => driver.handle(&name, &data),
+                    None => { driver.join.wait(); }
                 };
             }
         });
@@ -217,7 +217,7 @@ impl <S> SchedulerDriver for MesosSchedulerDriver<S> {
             message.set_framework(self.framework.lock().unwrap().clone());
             let mut master_detector = self.master_detector.lock().unwrap();
             master_detector.start();
-            let master = master_detector.master().unwrap();
+            let master = master_detector.master().expect("No master found by detector");
             debug!("Registering with master {}", master);
             match libprocess.send(&master, &message) {
                 Ok(_) => *status = Status::DRIVER_RUNNING,
@@ -298,7 +298,7 @@ impl <S> SchedulerDriver for MesosSchedulerDriver<S> {
     }
 }
 
-impl <S: Scheduler + Send + Sync> Handler for MesosSchedulerDriver<S> {
+impl <S: Scheduler + Send + Sync> MesosSchedulerDriver<S> {
 
     fn handle(&self, name: &str, data: &Vec<u8>) {
         match name {
