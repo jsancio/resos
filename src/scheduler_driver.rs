@@ -160,7 +160,7 @@ pub struct MesosSchedulerDriver<S> {
 
 // TODO why do I need to do this??
 impl <S> Clone for MesosSchedulerDriver<S> {
-    fn clone(&self) -> MesosSchedulerDriver<S> {
+    fn clone(&self) -> Self {
         MesosSchedulerDriver{
             scheduler: self.scheduler.clone(),
             libprocess: self.libprocess.clone(),
@@ -176,7 +176,7 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
 
     pub fn new(scheduler: S,
                framework: FrameworkInfo,
-               master: &str) -> MesosSchedulerDriver<S> {
+               master: &str) -> Self {
 
         let libprocess = LibProcess::new(framework.get_name()).unwrap();
 
@@ -200,11 +200,11 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
         driver
     }
 
-    fn registered(sender: UPID, msg: FrameworkRegisteredMessage, driver: &MesosSchedulerDriver<S>) {
+    fn registered(_sender: UPID, msg: FrameworkRegisteredMessage, driver: &Self) {
         driver.scheduler.registered(driver, msg.get_framework_id(), msg.get_master_info());
     }
 
-    fn reregistered(sender: UPID, msg: FrameworkReregisteredMessage, driver: &MesosSchedulerDriver<S>) {
+    fn reregistered(_sender: UPID, msg: FrameworkReregisteredMessage, driver: &Self) {
         driver.scheduler.reregistered(driver, msg.get_master_info());
     }
 }

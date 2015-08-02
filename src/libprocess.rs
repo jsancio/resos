@@ -28,7 +28,7 @@ pub struct UPID {
 }
 
 impl UPID {
-    fn new(id: &str, address: SocketAddr) -> UPID {
+    fn new(id: &str, address: SocketAddr) -> Self {
         UPID{id: id.to_string(), address: address}
     }
 
@@ -93,9 +93,9 @@ pub struct LibProcess {
 }
 
 impl LibProcess {
-    pub fn new(id: &str) -> Result<LibProcess> {
+    pub fn new(id: &str) -> Result<Self> {
         let (tx, rx) = chan::async();
-        let http_server = try!(LibProcess::new_server(id, tx));
+        let http_server = try!(Self::new_server(id, tx));
         let http_client = client::Client::new();
         let pid = UPID::new(id, http_server.socket.clone());
 
