@@ -1,4 +1,5 @@
 use chan;
+use hyper;
 use hyper::server;
 use hyper::client;
 use hyper::header::{Connection, ContentType, Headers};
@@ -61,7 +62,7 @@ impl FromStr for UPID {
 
 #[derive(Debug)]
 pub enum Error {
-    Http,
+    Http(hyper::error::Error),
     Upid,
     Serialization
 }
@@ -108,7 +109,7 @@ impl LibProcess {
     fn new_server(myid: &str, tx: chan::Sender<(String, UPID, Vec<u8>)>) -> Result<server::Listening> {
         let myid_len = myid.len() + 2;
 
-        let server = try!(server::Server::http("0.0.0.0:0").map_err(|_| Error::Http));
+        let server = try!(server::Server::http("0.0.0.0:0").map_err(Error::Http));
 
         server.handle(move |req: server::Request, mut resp: server::Response| {
             match req.deconstruct() {
@@ -135,7 +136,7 @@ impl LibProcess {
                     warn!("Unhandled {:?}", uri);
                 }
             }
-        }).map_err(|_| Error::Http)
+        }).map_err(Error::Http)
     }
 
     pub fn send(&mut self,
@@ -159,7 +160,8 @@ impl LibProcess {
 
         match resp {
             Ok(client::Response{status: StatusCode::Accepted, ..}) => Ok(()),
-            _ => Err(Error::Http)
+            Ok(_) => Err(Error::Http(hyper::error::Error::Status)),
+            Err(e) => Err(Error::Http(e))
         }
     }
 
@@ -181,6 +183,6 @@ impl LibProcess {
     }
 
     pub fn close(&mut self) -> Result<()> {
-        self.http_server.close().map_err(|_| Error::Http)
+        self.http_server.close().map_err(Error::Http)
     }
 }
