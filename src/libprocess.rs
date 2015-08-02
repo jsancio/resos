@@ -2,6 +2,7 @@ use chan;
 use hyper::server;
 use hyper::client;
 use hyper::header::{Connection, ContentType, Headers};
+use hyper::method::Method::Post;
 use hyper::status::StatusCode;
 use hyper::uri::RequestUri::AbsolutePath;
 use protobuf;
@@ -87,12 +88,9 @@ impl LibProcess {
         server::Server::http("0.0.0.0:0").unwrap()
                  .handle(move |req: server::Request,
                           mut resp: server::Response| {
-            let (_, _, headers, uri, _, mut body) = req.deconstruct();
-            // TODO
-            // - match for POST
-            // - put sender into the message
-            match uri {
-                AbsolutePath(path) => {
+
+            match req.deconstruct() {
+                (_, Post, headers, AbsolutePath(path), _, mut body) => {
                     let id = &path[..myid_len];
                     let mut data = Vec::new();
                     if let Err(e) = body.read_to_end(&mut data) {
@@ -111,7 +109,7 @@ impl LibProcess {
 
                     *resp.status_mut() = StatusCode::Accepted;
                 },
-                _ => {
+                (_, _, _, uri, _, _) => {
                     warn!("Unhandled {:?}", uri);
                 }
             }
@@ -144,16 +142,17 @@ impl LibProcess {
     }
 
     pub fn start<T: Send + 'static, F1, M>(&self, context: T, handlers: HashMap<String, F1>)
-    where F1: Fn(&UPID, &M, &T) + Send + 'static,
+    where F1: Fn(UPID, M, &T) + Send + 'static,
            M: protobuf::Message + protobuf::MessageStatic {
+
         let rx = self.rx.clone();
         thread::spawn(move || {
             loop {
                 match rx.recv() {
                     Some((name, sender, data)) => match protobuf::parse_from_bytes::<M>(&data) {
                         Ok(msg) => match handlers.get(&name) {
-                            Some(handler) => handler(&sender, &msg, &context),
-                            None => ()
+                            Some(handler) => handler(sender, msg, &context),
+                            None => warn!("Unahandled message: {}", name)
                         },
                         Err(_) => error!("Failed to parse protobuf message from master")
                     },
@@ -169,5 +168,5 @@ impl LibProcess {
 }
 
 trait LibProcessHandler<T>: Send {
-    fn handle(&self, sender: &UPID, data: &Vec<u8>, context: &T);
+    fn handle(sender: &UPID, data: &Vec<u8>, context: &T);
 }

@@ -1,8 +1,7 @@
 use libprocess::{LibProcess, UPID};
 use master_detector::MasterDetector;
 use proto::{ExecutorID, Filters, FrameworkInfo, OfferID, Request, SlaveID, Status, TaskID, TaskInfo};
-use proto::internal::{FrameworkRegisteredMessage, RegisterFrameworkMessage, UnregisterFrameworkMessage};
-use protobuf;
+use proto::internal::{FrameworkRegisteredMessage, FrameworkReregisteredMessage, RegisterFrameworkMessage, UnregisterFrameworkMessage};
 use scheduler::Scheduler;
 use std::collections::HashMap;
 use std::sync::{Arc, Barrier, Mutex};
@@ -194,15 +193,19 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
 
         let mut handlers = HashMap::new();
         handlers.insert("mesos.internal.FrameworkRegisteredMessage".to_string(), Self::registered);
+        //handlers.insert("mesos.internal.FrameworkReregisteredMessage".to_string(), Self::reregistered);
 
         driver.libprocess.lock().unwrap().start(driver.clone(), handlers);
 
         driver
     }
 
-    fn registered(sender: &UPID, msg: &FrameworkRegisteredMessage, driver: &MesosSchedulerDriver<S>) {
+    fn registered(sender: UPID, msg: FrameworkRegisteredMessage, driver: &MesosSchedulerDriver<S>) {
         debug!("FrameworkRegisteredMessage {:?}", msg);
         driver.scheduler.registered(driver, msg.get_framework_id(), msg.get_master_info());
+    }
+
+    fn reregistered(sender: UPID, msg: FrameworkReregisteredMessage, driver: &MesosSchedulerDriver<S>) {
     }
 }
 
@@ -294,28 +297,5 @@ impl <S> SchedulerDriver for MesosSchedulerDriver<S> {
                               slave_id: &SlaveID,
                               data: &Vec<u8>) -> Status {
         Status::DRIVER_RUNNING
-    }
-}
-
-// TODO delete me
-impl <S: Scheduler + Send + Sync> MesosSchedulerDriver<S> {
-
-    fn handle(&self, name: &str, sender: &UPID, data: &Vec<u8>) {
-        match name {
-            "mesos.internal.FrameworkRegisteredMessage" => {
-                match protobuf::parse_from_bytes::<FrameworkRegisteredMessage>(data) {
-                    Ok(msg) => {
-                        debug!("FrameworkRegisteredMessage {:?}", msg);
-                        self.scheduler.registered(self, msg.get_framework_id(), msg.get_master_info());
-                    },
-                    Err(_) => {
-                        error!("Failed to parse protobuf message from master");
-                    }
-                }
-            },
-            msg => {
-                warn!("Unhandled {:?}", msg);
-            }
-        }
     }
 }
