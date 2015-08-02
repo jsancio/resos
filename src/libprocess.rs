@@ -7,7 +7,7 @@ use hyper::status::StatusCode;
 use hyper::uri::RequestUri::AbsolutePath;
 use protobuf;
 use std::collections::HashMap;
-use std::fmt::{Display, Error, Formatter};
+use std::fmt;
 use std::io::Read;
 use std::net::SocketAddr;
 use std::str::FromStr;
@@ -37,36 +37,41 @@ impl UPID {
     }
 }
 
-impl Display for UPID {
-    fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
+impl fmt::Display for UPID {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> ::std::result::Result<(), fmt::Error> {
         write!(fmt, "{}@{}", self.id, self.address)
     }
 }
 
 impl FromStr for UPID {
-    type Err = UPIDError;
-    fn from_str(pid: &str) -> Result<UPID, Self::Err> {
+    type Err = Error;
+    fn from_str(pid: &str) -> Result<UPID> {
         let mut split = pid.split("@");
         match (split.nth(0), split.nth(0)) {
             (Some(id), Some(address)) => {
                 match FromStr::from_str(address) {
                     Ok(address) => Ok(UPID::new(id, address)),
-                    Err(_) => Err(UPIDError)
+                    Err(_) => Err(Error::Upid)
                 }
             },
-            _ => Err(UPIDError)
+            _ => Err(Error::Upid)
         }
     }
 }
 
 #[derive(Debug)]
-pub struct UPIDError;
+pub enum Error {
+    Http,
+    Upid,
+    Serialization
+}
 
+pub type Result<T> = ::std::result::Result<T, Error>;
 pub type Handler<C> = Box<Fn(UPID, Vec<u8>, &C) + Send>;
 
 pub fn handler<F, M, C>(fun: F) -> Handler<C>
     where F: Fn(UPID, M, &C) + Send + 'static,
-          M: protobuf::Message + protobuf::MessageStatic,
+          M: protobuf::MessageStatic,
           C: Send + 'static {
 
     Box::new(move |sender: UPID, data: Vec<u8>, context: &C| {
@@ -88,25 +93,24 @@ pub struct LibProcess {
 }
 
 impl LibProcess {
-    pub fn new(id: &str) -> LibProcess {
+    pub fn new(id: &str) -> Result<LibProcess> {
         let (tx, rx) = chan::async();
-        let http_server = LibProcess::new_server(id, tx);
+        let http_server = try!(LibProcess::new_server(id, tx));
         let http_client = client::Client::new();
         let pid = UPID::new(id, http_server.socket.clone());
 
-        LibProcess{http_server: http_server,
-                   http_client: http_client,
-                   pid: pid,
-                   rx: rx}
+        Ok(LibProcess{http_server: http_server,
+                      http_client: http_client,
+                      pid: pid,
+                      rx: rx})
     }
 
-    fn new_server(myid: &str, tx: chan::Sender<(String, UPID, Vec<u8>)>) -> server::Listening {
+    fn new_server(myid: &str, tx: chan::Sender<(String, UPID, Vec<u8>)>) -> Result<server::Listening> {
         let myid_len = myid.len() + 2;
 
-        server::Server::http("0.0.0.0:0").unwrap()
-                 .handle(move |req: server::Request,
-                          mut resp: server::Response| {
+        let server = try!(server::Server::http("0.0.0.0:0").map_err(|_| Error::Http));
 
+        server.handle(move |req: server::Request, mut resp: server::Response| {
             match req.deconstruct() {
                 (_, Post, headers, AbsolutePath(path), _, mut body) => {
                     let id = &path[..myid_len];
@@ -131,12 +135,12 @@ impl LibProcess {
                     warn!("Unhandled {:?}", uri);
                 }
             }
-        }).unwrap()
+        }).map_err(|_| Error::Http)
     }
 
     pub fn send(&mut self,
                 pid: &UPID,
-                message: &protobuf::Message) -> Result<(), ()> {
+                message: &protobuf::Message) -> Result<()> {
 
         let mut url = pid.to_url();
         url.push_str(message.descriptor().full_name());
@@ -146,7 +150,7 @@ impl LibProcess {
         headers.set(ContentTypeProtobuf.clone());
         headers.set(LibprocessFrom(self.pid.clone()));
 
-        let data = message.write_to_bytes().unwrap();
+        let data = try!(message.write_to_bytes().map_err(|_| Error::Serialization));
 
         let resp = self.http_client.post(&url)
                                    .headers(headers)
@@ -155,7 +159,7 @@ impl LibProcess {
 
         match resp {
             Ok(client::Response{status: StatusCode::Accepted, ..}) => Ok(()),
-            _ => Err(())
+            _ => Err(Error::Http)
         }
     }
 
@@ -176,7 +180,7 @@ impl LibProcess {
         });
     }
 
-    pub fn close(&mut self) {
-        self.http_server.close().unwrap();
+    pub fn close(&mut self) -> Result<()> {
+        self.http_server.close().map_err(|_| Error::Http)
     }
 }

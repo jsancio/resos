@@ -178,7 +178,7 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
                framework: FrameworkInfo,
                master: &str) -> MesosSchedulerDriver<S> {
 
-        let libprocess = LibProcess::new(framework.get_name());
+        let libprocess = LibProcess::new(framework.get_name()).unwrap();
 
         let master_detector = MasterDetector::new(master).unwrap();
 
