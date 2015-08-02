@@ -1,4 +1,4 @@
-use libprocess::{LibProcess, UPID};
+use libprocess::{LibProcess, UPID, handler};
 use master_detector::MasterDetector;
 use proto::{ExecutorID, Filters, FrameworkInfo, OfferID, Request, SlaveID, Status, TaskID, TaskInfo};
 use proto::internal::{FrameworkRegisteredMessage, FrameworkReregisteredMessage, RegisterFrameworkMessage, UnregisterFrameworkMessage};
@@ -192,20 +192,20 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
         };
 
         let mut handlers = HashMap::new();
-        handlers.insert("mesos.internal.FrameworkRegisteredMessage".to_string(), Self::registered);
-        //handlers.insert("mesos.internal.FrameworkReregisteredMessage".to_string(), Self::reregistered);
+        handlers.insert("mesos.internal.FrameworkRegisteredMessage".to_string(), handler(Self::registered));
+        handlers.insert("mesos.internal.FrameworkReregisteredMessage".to_string(), handler(Self::reregistered));
 
-        driver.libprocess.lock().unwrap().start(driver.clone(), handlers);
+        driver.libprocess.lock().unwrap().start(handlers, driver.clone());
 
         driver
     }
 
     fn registered(sender: UPID, msg: FrameworkRegisteredMessage, driver: &MesosSchedulerDriver<S>) {
-        debug!("FrameworkRegisteredMessage {:?}", msg);
         driver.scheduler.registered(driver, msg.get_framework_id(), msg.get_master_info());
     }
 
     fn reregistered(sender: UPID, msg: FrameworkReregisteredMessage, driver: &MesosSchedulerDriver<S>) {
+        driver.scheduler.reregistered(driver, msg.get_master_info());
     }
 }
 

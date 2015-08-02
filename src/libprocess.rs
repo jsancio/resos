@@ -62,6 +62,24 @@ impl FromStr for UPID {
 #[derive(Debug)]
 pub struct UPIDError;
 
+pub type Handler<C> = Box<Fn(UPID, Vec<u8>, &C) + Send>;
+
+pub fn handler<F, M, C>(fun: F) -> Handler<C>
+    where F: Fn(UPID, M, &C) + Send + 'static,
+          M: protobuf::Message + protobuf::MessageStatic,
+          C: Send + 'static {
+
+    Box::new(move |sender: UPID, data: Vec<u8>, context: &C| {
+        match protobuf::parse_from_bytes::<M>(&data) {
+            Ok(message) => {
+                debug!("Received {} {:?}", message.descriptor().name(), message);
+                fun(sender, message, context);
+            },
+            _ => error!("Failed to parse protobuf message from master")
+        }
+    })
+}
+
 pub struct LibProcess {
     http_server: server::Listening,
     http_client: client::Client,
@@ -141,23 +159,19 @@ impl LibProcess {
         }
     }
 
-    pub fn start<T: Send + 'static, F1, M>(&self, context: T, handlers: HashMap<String, F1>)
-    where F1: Fn(UPID, M, &T) + Send + 'static,
-           M: protobuf::Message + protobuf::MessageStatic {
+    pub fn start<C>(&self, handlers: HashMap<String, Handler<C>>, context: C)
+    where C: Send + 'static {
 
         let rx = self.rx.clone();
         thread::spawn(move || {
             loop {
                 match rx.recv() {
-                    Some((name, sender, data)) => match protobuf::parse_from_bytes::<M>(&data) {
-                        Ok(msg) => match handlers.get(&name) {
-                            Some(handler) => handler(sender, msg, &context),
-                            None => warn!("Unahandled message: {}", name)
-                        },
-                        Err(_) => error!("Failed to parse protobuf message from master")
+                    Some((name, sender, data)) => match handlers.get(&name) {
+                        Some(handler) => handler(sender, data, &context),
+                        None => warn!("Unahandled message: {}", name)
                     },
-                    None => () // context.join.wait(), handle error
-                };
+                    None => return
+                }
             }
         });
     }
@@ -165,8 +179,4 @@ impl LibProcess {
     pub fn close(&mut self) {
         self.http_server.close().unwrap();
     }
-}
-
-trait LibProcessHandler<T>: Send {
-    fn handle(sender: &UPID, data: &Vec<u8>, context: &T);
 }
