@@ -148,14 +148,19 @@ pub trait SchedulerDriver {
 /// <mesos>/src/logging/flags.hpp. Mesos flags can also be set via environment
 /// variables, prefixing the flag name with "MESOS_", e.g.,
 /// "MESOS_QUIET=1".
+
+struct DriverInternal {
+    libprocess: LibProcess,
+    master_detector: MasterDetector,
+    framework: FrameworkInfo,
+    status: Status,
+    join: Barrier // TODO we need a CountDownLatch maybe
+}
+
 //#[derive(Clone)]
 pub struct MesosSchedulerDriver<S> {
     scheduler: Arc<S>,
-    libprocess: Arc<Mutex<LibProcess>>,
-    master_detector: Arc<Mutex<MasterDetector>>,
-    framework: Arc<Mutex<FrameworkInfo>>,
-    status: Arc<Mutex<Status>>,
-    join: Arc<Barrier> // TODO we need a CountDownLatch maybe
+    internal: Arc<Mutex<DriverInternal>>
 }
 
 // TODO why do I need to do this??
@@ -163,11 +168,7 @@ impl <S> Clone for MesosSchedulerDriver<S> {
     fn clone(&self) -> Self {
         MesosSchedulerDriver{
             scheduler: self.scheduler.clone(),
-            libprocess: self.libprocess.clone(),
-            master_detector: self.master_detector.clone(),
-            framework: self.framework.clone(),
-            status: self.status.clone(),
-            join: self.join.clone()
+            internal: self.internal.clone()
         }
     }
 }
@@ -182,20 +183,24 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
 
         let master_detector = MasterDetector::new(master).unwrap();
 
+        let internal = DriverInternal{
+            libprocess: libprocess,
+            master_detector: master_detector,
+            framework: framework,
+            status: Status::DRIVER_NOT_STARTED,
+            join: Barrier::new(2)
+        };
+
         let driver = MesosSchedulerDriver{
             scheduler: Arc::new(scheduler),
-            libprocess: Arc::new(Mutex::new(libprocess)),
-            master_detector: Arc::new(Mutex::new(master_detector)),
-            framework: Arc::new(Mutex::new(framework)),
-            status: Arc::new(Mutex::new(Status::DRIVER_NOT_STARTED)),
-            join: Arc::new(Barrier::new(2))
+            internal: Arc::new(Mutex::new(internal))
         };
 
         let mut handlers = HashMap::new();
         handlers.insert("mesos.internal.FrameworkRegisteredMessage".to_string(), handler(Self::registered));
         handlers.insert("mesos.internal.FrameworkReregisteredMessage".to_string(), handler(Self::reregistered));
 
-        driver.libprocess.lock().unwrap().start(handlers, driver.clone());
+        driver.internal.lock().unwrap().libprocess.start(handlers, driver.clone());
 
         driver
     }
@@ -212,51 +217,47 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
 impl <S> SchedulerDriver for MesosSchedulerDriver<S> {
 
     fn start(&self) -> Status {
-        let mut status = self.status.lock().unwrap();
-        if *status == Status::DRIVER_NOT_STARTED {
-            let mut libprocess = self.libprocess.lock().unwrap();
+        let mut internal = self.internal.lock().unwrap();
+        if internal.status == Status::DRIVER_NOT_STARTED {
             let mut message = RegisterFrameworkMessage::new();
-            message.set_framework(self.framework.lock().unwrap().clone());
-            let mut master_detector = self.master_detector.lock().unwrap();
-            master_detector.start();
-            let master = master_detector.master().expect("No master found by detector");
+            message.set_framework(internal.framework.clone());
+            internal.master_detector.start();
+            let master = internal.master_detector.master().expect("No master found by detector");
             debug!("Registering with master {}", master);
-            match libprocess.send(&master, &message) {
-                Ok(_) => *status = Status::DRIVER_RUNNING,
+            match internal.libprocess.send(&master, &message) {
+                Ok(_) => internal.status = Status::DRIVER_RUNNING,
                 Err(_) => error!("Failed to start driver")
             }
         }
-        *status
+        internal.status
     }
 
     fn stop(&self, failover: bool) -> Status {
-        let mut status = self.status.lock().unwrap();
-        if *status == Status::DRIVER_RUNNING {
-            let mut libprocess = self.libprocess.lock().unwrap();
+        let mut internal = self.internal.lock().unwrap();
+        if internal.status == Status::DRIVER_RUNNING {
             if failover {
                 let mut message = UnregisterFrameworkMessage::new();
-                message.set_framework_id(self.framework.lock().unwrap().take_id());
-                let master_detector = self.master_detector.lock().unwrap();
-                let master = master_detector.master().unwrap();
+                message.set_framework_id(internal.framework.take_id());
+                let master = internal.master_detector.master().unwrap();
                 debug!("Unregistering with master {}", master);
-                match libprocess.send(&master, &message) {
-                    Ok(_) => *status = Status::DRIVER_STOPPED,
+                match internal.libprocess.send(&master, &message) {
+                    Ok(_) => internal.status = Status::DRIVER_STOPPED,
                     Err(_) => error!("Failed to stop driver")
                 }
             }
-            libprocess.close();
+            internal.libprocess.close();
         }
-        *status
+        internal.status
     }
 
     fn abort(&self) -> Status {
-        let mut status = self.status.lock().unwrap();
-        *status = Status::DRIVER_ABORTED;
-        *status
+        let mut internal = self.internal.lock().unwrap();
+        internal.status = Status::DRIVER_ABORTED;
+        internal.status
     }
 
     fn join(&self) -> Status {
-        self.join.wait();
+        self.internal.lock().unwrap().join.wait();
         Status::DRIVER_RUNNING
     }
 

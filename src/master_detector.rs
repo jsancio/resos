@@ -66,7 +66,7 @@ impl MasterDetector {
         }
     }
 
-    pub fn master(&self) -> Option<&UPID> {
-        self.master.as_ref()
+    pub fn master(&self) -> Option<UPID> {
+        self.master.clone()
     }
 }
