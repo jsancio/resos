@@ -1,9 +1,8 @@
-use libprocess::{LibProcess, UPID, handler};
+use libprocess::{LibProcess, UPID, HandlerMap};
 use master_detector::MasterDetector;
 use proto::{ExecutorID, Filters, FrameworkInfo, OfferID, Request, SlaveID, Status, TaskID, TaskInfo};
 use proto::internal::{FrameworkRegisteredMessage, FrameworkReregisteredMessage, RegisterFrameworkMessage, UnregisterFrameworkMessage};
 use scheduler::Scheduler;
-use std::collections::HashMap;
 use std::sync::{Arc, Barrier, Mutex};
 
 /// Abstract interface for connecting a scheduler to Mesos. This
@@ -196,13 +195,18 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
             internal: Arc::new(Mutex::new(internal))
         };
 
-        let mut handlers = HashMap::new();
-        handlers.insert("mesos.internal.FrameworkRegisteredMessage".to_string(), handler(Self::registered));
-        handlers.insert("mesos.internal.FrameworkReregisteredMessage".to_string(), handler(Self::reregistered));
+        let handlers = Self::handler_map(driver.clone());
 
-        driver.internal.lock().unwrap().libprocess.start(handlers, driver.clone());
+        driver.internal.lock().unwrap().libprocess.start(handlers);
 
         driver
+    }
+
+    fn handler_map(context: Self) -> HandlerMap<Self> {
+        let mut map = HandlerMap::new(context);
+        map.on("mesos.internal.FrameworkRegisteredMessage", Self::registered);
+        map.on("mesos.internal.FrameworkReregisteredMessage", Self::reregistered);
+        map
     }
 
     fn registered(_sender: UPID, msg: FrameworkRegisteredMessage, driver: &Self) {
@@ -219,11 +223,14 @@ impl <S> SchedulerDriver for MesosSchedulerDriver<S> {
     fn start(&self) -> Status {
         let mut internal = self.internal.lock().unwrap();
         if internal.status == Status::DRIVER_NOT_STARTED {
+
+            internal.master_detector.start();
+            let master = internal.master_detector.master().expect("No master found by MasterDetector");
+            debug!("Registering with master {}", master);
+
             let mut message = RegisterFrameworkMessage::new();
             message.set_framework(internal.framework.clone());
-            internal.master_detector.start();
-            let master = internal.master_detector.master().expect("No master found by detector");
-            debug!("Registering with master {}", master);
+
             match internal.libprocess.send(&master, &message) {
                 Ok(_) => internal.status = Status::DRIVER_RUNNING,
                 Err(_) => error!("Failed to start driver")

@@ -12,7 +12,7 @@ use std::fmt;
 use std::io::Read;
 use std::net::SocketAddr;
 use std::str::FromStr;
-use std::thread;
+use std::thread::{JoinHandle, spawn};
 
 header! {
     (LibprocessFrom, "Libprocess-From") => [UPID]
@@ -68,22 +68,40 @@ pub enum Error {
 }
 
 pub type Result<T> = ::std::result::Result<T, Error>;
-pub type Handler<C> = Box<Fn(UPID, Vec<u8>, &C) + Send>;
 
-pub fn handler<F, M, C>(fun: F) -> Handler<C>
-    where F: Fn(UPID, M, &C) + Send + 'static,
-          M: protobuf::MessageStatic,
-          C: Send + 'static {
+type Handler<Context> = Box<Fn(UPID, Vec<u8>, &Context) + Send>;
 
-    Box::new(move |sender: UPID, data: Vec<u8>, context: &C| {
-        match protobuf::parse_from_bytes::<M>(&data) {
-            Ok(message) => {
-                debug!("Received {} {:?}", message.descriptor().name(), message);
-                fun(sender, message, context);
-            },
-            _ => error!("Failed to parse protobuf message from master")
-        }
-    })
+pub struct HandlerMap<Context> {
+    map: HashMap<String, Handler<Context>>,
+    context: Context
+}
+
+impl<Context> HandlerMap<Context> {
+    pub fn new(context: Context) -> Self {
+        HandlerMap{map: HashMap::new(), context: context}
+    }
+
+    pub fn on<F, M>(&mut self, name: &str, handler: F)
+    where F: Fn(UPID, M, &Context) + Send + 'static,
+          M: protobuf::MessageStatic {
+
+        self.map.insert(name.to_string(), Self::wrap(handler));
+    }
+
+    fn wrap<F, M>(handler: F) -> Handler<Context>
+    where F: Fn(UPID, M, &Context) + Send + 'static,
+          M: protobuf::MessageStatic {
+
+        Box::new(move |sender: UPID, data: Vec<u8>, context: &Context| {
+            match protobuf::parse_from_bytes::<M>(&data) {
+                Ok(message) => {
+                    debug!("Received {} {:?}", message.descriptor().name(), message);
+                    handler(sender, message, context);
+                },
+                _ => error!("Failed to parse protobuf message from master")
+            }
+        })
+    }
 }
 
 pub struct LibProcess {
@@ -165,21 +183,21 @@ impl LibProcess {
         }
     }
 
-    pub fn start<C>(&self, handlers: HashMap<String, Handler<C>>, context: C)
-    where C: Send + 'static {
+    pub fn start<Context>(&self, handlers: HandlerMap<Context>) -> JoinHandle<()>
+    where Context: Send + 'static {
 
         let rx = self.rx.clone();
-        thread::spawn(move || {
+        spawn(move || {
             loop {
                 match rx.recv() {
-                    Some((name, sender, data)) => match handlers.get(&name) {
-                        Some(handler) => handler(sender, data, &context),
+                    Some((name, sender, data)) => match handlers.map.get(&name) {
+                        Some(handler) => handler(sender, data, &handlers.context),
                         None => warn!("Unahandled message: {}", name)
                     },
                     None => return
                 }
             }
-        });
+        })
     }
 
     pub fn close(&mut self) -> Result<()> {

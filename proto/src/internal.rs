@@ -44,6 +44,7 @@ use super::ACL;
 use super::ACLs;
 use super::RateLimit;
 use super::RateLimits;
+use super::Image;
 use super::Volume;
 use super::ContainerInfo;
 use super::Labels;

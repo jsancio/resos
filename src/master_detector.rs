@@ -36,19 +36,20 @@ impl MasterDetector {
     pub fn start(&mut self) {
         match self.get_master() {
             Ok(master_info) => self.master = Some(FromStr::from_str(&master_info.pid).unwrap()),
-            Err(e) => error!("Failed to find leader in ZK: {}", e)
+            Err(e) => error!("Failed to find leader in ZK: {:?}", e)
         }
     }
 
     fn get_master(&self) -> ZkResult<MasterInfo> {
         let children = try!(self.zk.get_children("/", true));
 
-        let mut contenders: Vec<_> = children.iter()
-                                             .filter(|child| child.starts_with(MASTER_INFO_JSON_LABEL))
-                                             .collect();
+        let mut contenders: Vec<&String> = children
+                                            .iter()
+                                            .filter(|child| child.starts_with(MASTER_INFO_JSON_LABEL))
+                                            .collect();
         contenders.sort();
 
-        debug!("contenders -> {:?}", contenders);
+        debug!("Contenders: {:?}", contenders);
 
         match contenders.first() {
             Some(leader) => {
