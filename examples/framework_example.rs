@@ -43,7 +43,7 @@ fn main() {
     env_logger::init().unwrap();
 
     let scheduler = MyScheduler;
-    let master = "localhost:2181/mesos"; // TODO should start with zk://
+    let master = "zk://localhost:2181/mesos";
     let mut framework = FrameworkInfo::new();
 
     framework.set_name("rustframework".to_string());

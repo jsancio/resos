@@ -1,7 +1,13 @@
 use libprocess::{LibProcess, UPID, HandlerMap};
 use master_detector::MasterDetector;
 use proto::{ExecutorID, Filters, FrameworkInfo, OfferID, Request, SlaveID, Status, TaskID, TaskInfo};
-use proto::internal::{FrameworkRegisteredMessage, FrameworkReregisteredMessage, RegisterFrameworkMessage, UnregisterFrameworkMessage};
+use proto::internal::{FrameworkToExecutorMessage,
+                      FrameworkRegisteredMessage,
+                      FrameworkReregisteredMessage,
+                      RegisterFrameworkMessage,
+                      UnregisterFrameworkMessage,
+                      ResourceRequestMessage};
+use protobuf::RepeatedField;
 use scheduler::Scheduler;
 use std::sync::{Arc, Barrier, Mutex};
 
@@ -73,7 +79,7 @@ pub trait SchedulerDriver {
     /// @param requests    The resource requests.
     ///
     /// @return            The state of the driver after the call.
-    fn request_resources(&self, requests_data: &Request) -> Status;
+    fn request_resources(&self, requests_data: &Vec<Request>) -> Status;
 
     /// Declines an offer in its entirety and applies the specified
     /// filters on the resources (see mesos.proto for a description of
@@ -180,7 +186,9 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
 
         let libprocess = LibProcess::new(framework.get_name()).unwrap();
 
-        let master_detector = MasterDetector::new(master).unwrap();
+        assert!(master.starts_with("zk://"), "Only zk masters are allowed");
+
+        let master_detector = MasterDetector::new(&master[5..]).unwrap();
 
         let internal = DriverInternal{
             libprocess: libprocess,
@@ -244,12 +252,12 @@ impl <S> SchedulerDriver for MesosSchedulerDriver<S> {
         if internal.status == Status::DRIVER_RUNNING {
             if failover {
                 let mut message = UnregisterFrameworkMessage::new();
-                message.set_framework_id(internal.framework.take_id());
+                message.set_framework_id(internal.framework.get_id().clone());
                 let master = internal.master_detector.master().unwrap();
                 debug!("Unregistering with master {}", master);
                 match internal.libprocess.send(&master, &message) {
                     Ok(_) => internal.status = Status::DRIVER_STOPPED,
-                    Err(_) => error!("Failed to stop driver")
+                    Err(e) => error!("Failed to stop driver {:?}", e)
                 }
             }
             internal.libprocess.close();
@@ -275,8 +283,18 @@ impl <S> SchedulerDriver for MesosSchedulerDriver<S> {
         }
     }
 
-    fn request_resources(&self, request_data: &Request) -> Status {
-        Status::DRIVER_RUNNING
+    fn request_resources(&self, requests: &Vec<Request>) -> Status {
+        let mut internal = self.internal.lock().unwrap();
+        if internal.status == Status::DRIVER_RUNNING {
+            let mut message = ResourceRequestMessage::new();
+            message.set_framework_id(internal.framework.get_id().clone());
+            message.set_requests(RepeatedField::from_vec(requests.clone()));
+            let master = internal.master_detector.master().unwrap();
+            if let Err(e) = internal.libprocess.send(&master, &message) {
+                error!("Failed to send resorce request message {:?}", e)
+            }
+        }
+        internal.status
     }
 
     fn decline_offer(&self,
@@ -304,6 +322,18 @@ impl <S> SchedulerDriver for MesosSchedulerDriver<S> {
                               executor_id: &ExecutorID,
                               slave_id: &SlaveID,
                               data: &Vec<u8>) -> Status {
-        Status::DRIVER_RUNNING
+        let mut internal = self.internal.lock().unwrap();
+        if internal.status == Status::DRIVER_RUNNING {
+            let mut message = FrameworkToExecutorMessage::new();
+            message.set_slave_id(slave_id.clone());
+            message.set_framework_id(internal.framework.get_id().clone());
+            message.set_executor_id(executor_id.clone());
+            message.set_data(data.clone());
+            let master = internal.master_detector.master().unwrap();
+            if let Err(e) = internal.libprocess.send(&master, &message) {
+                error!("Failed to send framework message {:?}", e)
+            }
+        }
+        internal.status
     }
 }
