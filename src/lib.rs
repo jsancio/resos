@@ -1,5 +1,4 @@
 #![deny(unused_mut)]
-#![feature(duration)]
 extern crate chan;
 #[macro_use]
 extern crate hyper;

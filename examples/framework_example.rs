@@ -50,6 +50,6 @@ fn main() {
     framework.set_user("bonifaido".to_string());
     framework.set_failover_timeout(60.0);
 
-    let driver = MesosSchedulerDriver::new(scheduler, framework, master);
+    let driver = MesosSchedulerDriver::new(scheduler, framework, master).unwrap();
     driver.run();
 }
