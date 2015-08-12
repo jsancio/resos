@@ -11,6 +11,8 @@ extern crate lazy_static;
 #[macro_use]
 extern crate log;
 extern crate rustc_serialize;
+extern crate time;
+extern crate uuid;
 
 mod master_detector;
 pub mod scheduler;

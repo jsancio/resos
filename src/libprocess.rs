@@ -107,7 +107,7 @@ impl<Context> HandlerMap<Context> {
 pub struct LibProcess {
     http_server: server::Listening,
     http_client: client::Client,
-    pid: UPID,
+    pub pid: UPID,
     rx: chan::Receiver<(String, UPID, Vec<u8>)>
 }
 
