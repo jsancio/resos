@@ -40,8 +40,6 @@ use super::Parameter;
 use super::Parameters;
 use super::Credential;
 use super::Credentials;
-use super::ACL;
-use super::ACLs;
 use super::RateLimit;
 use super::RateLimits;
 use super::Image;
@@ -52,6 +50,7 @@ use super::Label;
 use super::Port;
 use super::Ports;
 use super::DiscoveryInfo;
+use super::AppcImageManifest;
 use super::Status;
 use super::TaskState;
 

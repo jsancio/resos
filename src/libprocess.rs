@@ -81,11 +81,11 @@ impl<Context> HandlerMap<Context> {
         HandlerMap{map: HashMap::new(), context: context}
     }
 
-    pub fn on<F, M>(&mut self, name: &str, handler: F)
+    pub fn on<F, M>(&mut self, handler: F)
     where F: Fn(&UPID, M, &Context) + Send + 'static,
           M: protobuf::MessageStatic {
-
-        self.map.insert(name.to_string(), Self::wrap(handler));
+        let descriptor = protobuf::reflect::MessageDescriptor::for_type::<M>();
+        self.map.insert(descriptor.full_name().to_string(), Self::wrap(handler));
     }
 
     fn wrap<F, M>(handler: F) -> Handler<Context>

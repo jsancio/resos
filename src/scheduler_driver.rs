@@ -20,13 +20,16 @@ use proto::internal::{DeactivateFrameworkMessage,
                       RegisterFrameworkMessage,
                       UnregisterFrameworkMessage,
                       ReconcileTasksMessage,
+                      RescindResourceOfferMessage,
                       ResourceRequestMessage,
+                      ResourceOffersMessage,
                       ReviveOffersMessage,
                       StatusUpdate,
                       StatusUpdateMessage};
 use protobuf::RepeatedField;
 use scheduler::Scheduler;
-use std::sync::{Arc, Barrier, Mutex};
+use std::sync::{Arc, Mutex};
+use std::thread;
 use time::now_utc;
 use uuid::Uuid;
 
@@ -186,8 +189,7 @@ struct DriverInternal {
     libprocess: LibProcess,
     master_detector: MasterDetector,
     framework: FrameworkInfo,
-    status: Status,
-    join: Barrier // TODO we need a CountDownLatch maybe
+    status: Status
 }
 
 //#[derive(Clone)]
@@ -230,8 +232,7 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
             libprocess: libprocess,
             master_detector: master_detector,
             framework: framework,
-            status: Status::DRIVER_NOT_STARTED,
-            join: Barrier::new(2)
+            status: Status::DRIVER_NOT_STARTED
         };
 
         let driver = MesosSchedulerDriver{
@@ -248,17 +249,31 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
 
     fn handler_map(context: Self) -> HandlerMap<Self> {
         let mut map = HandlerMap::new(context);
-        map.on("mesos.internal.FrameworkRegisteredMessage", Self::registered);
-        map.on("mesos.internal.FrameworkReregisteredMessage", Self::reregistered);
+        map.on(Self::registered);
+        map.on(Self::reregistered);
+        map.on(Self::offer_rescinded);
+        map.on(Self::resource_offers);
         map
     }
 
     fn registered(_sender: &UPID, msg: FrameworkRegisteredMessage, driver: &Self) {
+        {
+            let mut internal = driver.internal.lock().unwrap();
+            internal.framework.set_id(msg.get_framework_id().clone());
+        }
         driver.scheduler.registered(driver, msg.get_framework_id(), msg.get_master_info());
     }
 
     fn reregistered(_sender: &UPID, msg: FrameworkReregisteredMessage, driver: &Self) {
         driver.scheduler.reregistered(driver, msg.get_master_info());
+    }
+
+    fn offer_rescinded(_sender: &UPID, msg: RescindResourceOfferMessage, driver: &Self) {
+        driver.scheduler.offer_rescinded(driver, msg.get_offer_id());
+    }
+
+    fn resource_offers(_sender: &UPID, msg: ResourceOffersMessage, driver: &Self) {
+        driver.scheduler.resource_offers(driver, &msg.get_offers().to_vec());
     }
 
     fn status_update(_sender: &UPID, msg: StatusUpdateMessage, driver: &Self) {
@@ -342,7 +357,7 @@ impl <S: Scheduler + Send + Sync + 'static> SchedulerDriver for MesosSchedulerDr
     }
 
     fn join(&self) -> Status {
-        self.internal.lock().unwrap().join.wait();
+        thread::sleep_ms(999999999);
         Status::DRIVER_RUNNING
     }
 
@@ -372,6 +387,8 @@ impl <S: Scheduler + Send + Sync + 'static> SchedulerDriver for MesosSchedulerDr
                      filters: &Filters) -> Status {
         let mut internal = self.internal.lock().unwrap();
         if internal.status == Status::DRIVER_RUNNING {
+
+            // Launching an empty task list will decline the offer
             let mut msg = LaunchTasksMessage::new();
             msg.set_framework_id(internal.framework.get_id().clone());
             msg.mut_offer_ids().push(offer_id.clone());

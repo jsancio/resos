@@ -1,4 +1,6 @@
 extern crate env_logger;
+#[macro_use]
+extern crate log;
 extern crate mesos;
 extern crate proto;
 
@@ -21,16 +23,22 @@ impl Scheduler for MyScheduler {
     fn framework_message(&self, driver: &SchedulerDriver, executor_id: &ExecutorID, slave_id: &SlaveID, data: &[u8]) {}
 
     // Invoked when an offer is no longer valid (e.g., the slave was lost or another framework used resources in the offer).
-    fn offer_rescinded(&self, driver: &SchedulerDriver, offer_id: &OfferID) {}
+    fn offer_rescinded(&self, driver: &SchedulerDriver, offer_id: &OfferID) {
+        info!("Offer rescinded {:?}", offer_id);
+    }
 
     // Invoked when the scheduler successfully registers with a Mesos master.
-    fn registered(&self, driver: &SchedulerDriver, framework_id: &FrameworkID, master_info: &MasterInfo) {}
+    fn registered(&self, driver: &SchedulerDriver, framework_id: &FrameworkID, master_info: &MasterInfo) {
+        info!("Registered {:?} {:?}", framework_id, master_info);
+    }
 
     // Invoked when the scheduler re-registers with a newly elected Mesos master.
     fn reregistered(&self, driver: &SchedulerDriver, master_info: &MasterInfo) {}
 
     // Invoked when resources have been offered to this framework.
-    fn resource_offers(&self, driver: &SchedulerDriver, offers: &Vec<Offer>) {}
+    fn resource_offers(&self, driver: &SchedulerDriver, offers: &Vec<Offer>) {
+        info!("Resources offered {:?}", offers);
+    }
 
     // Invoked when a slave has been determined unreachable (e.g., machine failure, network partition).
     fn slave_lost(&self, driver: &SchedulerDriver, slave_id: &SlaveID) {}
