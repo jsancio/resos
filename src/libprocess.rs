@@ -195,7 +195,7 @@ impl LibProcess {
                 match rx.recv() {
                     Some((name, sender, data)) => match handlers.map.get(&name) {
                         Some(handler) => handler(&sender, data, &handlers.context),
-                        None => warn!("Unahandled message: {}", name)
+                        None => warn!("Unhandled message: {}", name)
                     },
                     None => return
                 }
