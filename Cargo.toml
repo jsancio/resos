@@ -6,12 +6,15 @@ authors = ["Connor Doyle <connor@mesosphere.io>",
 
 [dependencies]
 chan = "0.1"
-hyper = "0.6"
 lazy_static = "0.1"
 log = "0.3"
 rustc-serialize = "0.3"
 time = "0.1"
 uuid = "0.1"
+
+[dependencies.hyper]
+git = "https://github.com/bonifaido/hyper.git"
+branch = "httparse_empty_line_fix"
 
 [dependencies.proto]
 path = "proto"

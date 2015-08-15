@@ -37,7 +37,7 @@ impl Scheduler for MyScheduler {
 
     // Invoked when resources have been offered to this framework.
     fn resource_offers(&self, driver: &SchedulerDriver, offers: &Vec<Offer>) {
-        info!("Resources offered {:?}", offers);
+        info!("Resources offered: {:?} offer", offers.len());
     }
 
     // Invoked when a slave has been determined unreachable (e.g., machine failure, network partition).

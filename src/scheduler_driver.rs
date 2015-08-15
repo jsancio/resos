@@ -261,6 +261,7 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
             let mut internal = driver.internal.lock().unwrap();
             internal.framework.set_id(msg.get_framework_id().clone());
         }
+        info!("Framework registered with id {}", msg.get_framework_id().get_value());
         driver.scheduler.registered(driver, msg.get_framework_id(), msg.get_master_info());
     }
 

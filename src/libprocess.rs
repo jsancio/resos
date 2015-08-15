@@ -95,7 +95,10 @@ impl<Context> HandlerMap<Context> {
         Box::new(move |sender: &UPID, data: Vec<u8>, context: &Context| {
             match protobuf::parse_from_bytes::<M>(&data) {
                 Ok(message) => {
-                    debug!("Received {} {:?}", message.descriptor().name(), message);
+                    // rust-protobuf has issues with messages with rust keywords as field names
+                    // see: https://github.com/stepancheg/rust-protobuf/issues/105
+                    // so right now messages shouldn't be printed (like proto::Resource)
+                    debug!("Received {}", message.descriptor().name());
                     handler(&sender, message, context);
                 },
                 _ => error!("Failed to parse protobuf message from master")
