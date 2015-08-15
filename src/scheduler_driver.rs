@@ -253,6 +253,7 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
         map.on(Self::reregistered);
         map.on(Self::offer_rescinded);
         map.on(Self::resource_offers);
+        map.on(Self::status_update);
         map
     }
 
@@ -417,7 +418,7 @@ impl <S: Scheduler + Send + Sync + 'static> SchedulerDriver for MesosSchedulerDr
 
             // Set TaskInfo.executor.framework_id, if it's missing.
             for task in msg.mut_tasks().iter_mut() {
-                if !task.get_executor().has_framework_id() {
+                if task.has_executor() && !task.get_executor().has_framework_id() {
                     task.mut_executor().set_framework_id(internal.framework.get_id().clone());
                 }
             }
