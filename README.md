@@ -4,6 +4,8 @@
 
 Rust library for [Apache Mesos](http://mesos.apache.org).
 
+*Warning:* This library is in a very early stage, it is not recomended for production and all APIs are subject to change.
+
 ## Prerequisites
 
 - [Apache Mesos](http://mesos.apache.org)
