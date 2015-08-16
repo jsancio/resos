@@ -25,8 +25,9 @@ use proto::internal::{DeactivateFrameworkMessage,
                       ResourceOffersMessage,
                       ReviveOffersMessage,
                       StatusUpdate,
-                      StatusUpdateMessage};
-use protobuf::RepeatedField;
+                      StatusUpdateMessage,
+                      StatusUpdateAcknowledgementMessage};
+use protobuf::{Message, RepeatedField};
 use scheduler::Scheduler;
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -56,13 +57,13 @@ pub trait SchedulerDriver {
     /// @param tasks   The collection of tasks to be launched.
     ///
     /// @return            The state of the driver after the call.
-    fn reconcile_tasks(&self, statuses: &Vec<TaskStatus>) -> Status;
+    fn reconcile_tasks(&self, statuses: &Vec<TaskStatus>) -> Result<Status>;
 
     /// Starts the scheduler driver. This needs to be called before any
     /// other driver calls are made.
     ///
     /// @return            The state of the driver after the call.
-    fn start(&self) -> Status;
+    fn start(&self) -> Result<Status>;
 
     /// Stops the scheduler driver. If the 'failover' flag is set to
     /// false then it is expected that this framework will never
@@ -76,7 +77,7 @@ pub trait SchedulerDriver {
     /// @param failover    Whether framework failover is expected.
     ///
     /// @return            The state of the driver after the call.
-    fn stop(&self, failover: bool) -> Status;
+    fn stop(&self, failover: bool) -> Result<Status>;
 
     /// Aborts the driver so that no more callbacks can be made to the
     /// scheduler. The semantics of abort and stop have deliberately been
@@ -86,7 +87,7 @@ pub trait SchedulerDriver {
     /// process).
     ///
     /// @return The state of the driver after the call.
-    fn abort(&self) -> Status;
+    fn abort(&self) -> Result<Status>;
 
     /// Waits for the driver to be stopped or aborted, possibly
     /// _blocking_ the current thread indefinitely. The return status of
@@ -94,12 +95,12 @@ pub trait SchedulerDriver {
     /// (see mesos.proto for a description of Status).
     ///
     /// @return The state of the driver after the call.
-    fn join(&self) -> Status;
+    fn join(&self) -> Result<Status>;
 
     /// Starts and immediately joins (i.e., blocks on) the driver.
     ///
     /// @return The state of the driver after the call.
-    fn run(&self) -> Status;
+    fn run(&self) -> Result<Status>;
 
     /// Requests resources from Mesos (see mesos.proto for a description
     /// of Request and how, for example, to request resources
@@ -110,7 +111,7 @@ pub trait SchedulerDriver {
     /// @param requests    The resource requests.
     ///
     /// @return            The state of the driver after the call.
-    fn request_resources(&self, requests_data: &Vec<Request>) -> Status;
+    fn request_resources(&self, requests_data: &Vec<Request>) -> Result<Status>;
 
     /// Declines an offer in its entirety and applies the specified
     /// filters on the resources (see mesos.proto for a description of
@@ -123,8 +124,8 @@ pub trait SchedulerDriver {
     ///
     /// @return        The state of the driver after the call.
     fn decline_offer(&self,
-        offer_id: &OfferID,
-        filters: &Filters) -> Status;
+                     offer_id: &OfferID,
+                     filters: &Filters) -> Result<Status>;
 
     /// Kills the specified task. Note that attempting to kill a task is
     /// currently not reliable. If, for example, a scheduler fails over
@@ -135,14 +136,14 @@ pub trait SchedulerDriver {
     /// @param taskId  The ID of the task to be killed.
     ///
     /// @return        The state of the driver after the call.
-    fn kill_task(&self, task_id: &TaskID) -> Status;
+    fn kill_task(&self, task_id: &TaskID) -> Result<Status>;
 
     /// Removes all filters, previously set by the framework (via {@link
     /// #launchTasks}). This enables the framework to receive offers
     /// from those filtered slaves.
     ///
     /// @return    The state of the driver after the call.
-    fn revive_offers(&self) -> Status;
+    fn revive_offers(&self) -> Result<Status>;
 
     /// Sends a message from the framework to one of its executors. These
     /// messages are best effort; do not expect a framework message to be
@@ -154,9 +155,9 @@ pub trait SchedulerDriver {
     ///
     /// @return            The state of the driver after the call.
     fn send_framework_message(&self,
-        executor_id: &ExecutorID,
-        slave_id: &SlaveID,
-        data: &Vec<u8>) -> Status;
+                              executor_id: &ExecutorID,
+                              slave_id: &SlaveID,
+                              data: &Vec<u8>) -> Result<Status>;
 
     // fn destroy(driver: *mut libc::c_void, scheduler: *mut libc::c_void);
 }
@@ -190,6 +191,25 @@ struct DriverInternal {
     master_detector: MasterDetector,
     framework: FrameworkInfo,
     status: Status
+}
+
+impl DriverInternal {
+    fn send_master(&mut self, msg: &Message) -> Result<()> {
+        match self.master_detector.master() {
+            Some(master) => {
+                if let Err(e) = self.libprocess.send(&master, msg) {
+                    error!("Failed to send {} to {:?} error: {:?}", msg.descriptor().name(), master, e);
+                    Err(Error::LibProcess)
+                } else {
+                    Ok(())
+                }
+            },
+            None => {
+                error!("Failed to send {}, master is not available", msg.descriptor().name());
+                Err(Error::Zk)
+            }
+        }
+    }
 }
 
 //#[derive(Clone)]
@@ -278,10 +298,16 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
         driver.scheduler.resource_offers(driver, &msg.get_offers().to_vec());
     }
 
-    fn status_update(_sender: &UPID, msg: StatusUpdateMessage, driver: &Self) {
+    fn status_update(sender: &UPID, msg: StatusUpdateMessage, driver: &Self) {
         driver.scheduler.status_update(driver, msg.get_update().get_status());
-        if msg.has_pid() {
-            // TODO send ACK if needed
+        let mut internal = driver.internal.lock().unwrap();
+        if *sender != internal.libprocess.pid {
+            let mut ack = StatusUpdateAcknowledgementMessage::new();
+            ack.set_framework_id(internal.framework.get_id().clone());
+            ack.set_slave_id(msg.get_update().get_slave_id().clone());
+            ack.set_task_id(msg.get_update().get_status().get_task_id().clone());
+            ack.set_uuid(msg.get_update().get_uuid().to_vec());
+            let _ = internal.send_master(&ack);
         }
     }
 
@@ -308,7 +334,7 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
 
 impl <S: Scheduler + Send + Sync + 'static> SchedulerDriver for MesosSchedulerDriver<S> {
 
-    fn start(&self) -> Status {
+    fn start(&self) -> Result<Status> {
         let mut internal = self.internal.lock().unwrap();
         if internal.status == Status::DRIVER_NOT_STARTED {
 
@@ -319,74 +345,63 @@ impl <S: Scheduler + Send + Sync + 'static> SchedulerDriver for MesosSchedulerDr
             let mut msg = RegisterFrameworkMessage::new();
             msg.set_framework(internal.framework.clone());
 
-            match internal.libprocess.send(&master, &msg) {
-                Ok(_) => internal.status = Status::DRIVER_RUNNING,
-                Err(e) => error!("Failed to start driver {:?}", e)
-            }
+            try!(internal.send_master(&msg));
+            internal.status = Status::DRIVER_RUNNING;
         }
-        internal.status
+        Ok(internal.status)
     }
 
-    fn stop(&self, failover: bool) -> Status {
+    fn stop(&self, failover: bool) -> Result<Status> {
         let mut internal = self.internal.lock().unwrap();
         if internal.status == Status::DRIVER_RUNNING {
             if failover {
                 let mut msg = UnregisterFrameworkMessage::new();
                 msg.set_framework_id(internal.framework.get_id().clone());
-                let master = internal.master_detector.master().unwrap();
-                match internal.libprocess.send(&master, &msg) {
-                    Ok(_) => internal.status = Status::DRIVER_STOPPED,
-                    Err(e) => error!("Failed to stop driver {:?}", e)
-                }
+                try!(internal.send_master(&msg));
             }
-            internal.libprocess.close().unwrap();
+            try!(internal.libprocess.close().map_err(|_| Error::LibProcess));
+            internal.status = Status::DRIVER_STOPPED;
         }
-        internal.status
+        Ok(internal.status)
     }
 
-    fn abort(&self) -> Status {
+    fn abort(&self) -> Result<Status> {
         let mut internal = self.internal.lock().unwrap();
         if internal.status == Status::DRIVER_RUNNING {
             let mut msg = DeactivateFrameworkMessage::new();
             msg.set_framework_id(internal.framework.get_id().clone());
-            let master = internal.master_detector.master().unwrap();
-            if let Err(e) = internal.libprocess.send(&master, &msg) {
-                error!("Failed to send deactivate framework message {:?}", e)
-            }
+            try!(internal.send_master(&msg));
             internal.status = Status::DRIVER_ABORTED;
         }
-        internal.status
+        Ok(internal.status)
     }
 
-    fn join(&self) -> Status {
-        thread::sleep_ms(999999999);
-        Status::DRIVER_RUNNING
+    fn join(&self) -> Result<Status> {
+        thread::sleep_ms(999999999); // TODO
+        Ok(Status::DRIVER_RUNNING)
     }
 
-    fn run(&self) -> Status {
+    fn run(&self) -> Result<Status> {
         match self.start() {
-            Status::DRIVER_RUNNING => self.join(),
+            Ok(Status::DRIVER_RUNNING) => self.join(),
             status => status
         }
     }
 
-    fn request_resources(&self, requests: &Vec<Request>) -> Status {
+    fn request_resources(&self, requests: &Vec<Request>) -> Result<Status> {
         let mut internal = self.internal.lock().unwrap();
         if internal.status == Status::DRIVER_RUNNING {
             let mut msg = ResourceRequestMessage::new();
             msg.set_framework_id(internal.framework.get_id().clone());
             msg.set_requests(RepeatedField::from_vec(requests.clone()));
-            let master = internal.master_detector.master().unwrap();
-            if let Err(e) = internal.libprocess.send(&master, &msg) {
-                error!("Failed to send resorce request message {:?}", e)
-            }
+            try!(internal.send_master(&msg));
         }
-        internal.status
+        Ok(internal.status)
     }
 
     fn decline_offer(&self,
                      offer_id: &OfferID,
-                     filters: &Filters) -> Status {
+                     filters: &Filters) -> Result<Status> {
         let mut internal = self.internal.lock().unwrap();
         if internal.status == Status::DRIVER_RUNNING {
 
@@ -395,12 +410,9 @@ impl <S: Scheduler + Send + Sync + 'static> SchedulerDriver for MesosSchedulerDr
             msg.set_framework_id(internal.framework.get_id().clone());
             msg.mut_offer_ids().push(offer_id.clone());
             msg.set_filters(filters.clone());
-            let master = internal.master_detector.master().unwrap();
-            if let Err(e) = internal.libprocess.send(&master, &msg) {
-                error!("Failed to send decline offer message {:?}", e)
-            }
+            try!(internal.send_master(&msg));
         }
-        internal.status
+        Ok(internal.status)
     }
 
     fn launch_tasks(&self,
@@ -423,66 +435,51 @@ impl <S: Scheduler + Send + Sync + 'static> SchedulerDriver for MesosSchedulerDr
                 }
             }
 
-            match internal.master_detector.master() {
-                Some(master) => {
-                    if let Err(e) = internal.libprocess.send(&master, &msg) {
-                        error!("Failed to send launch tasks message {:?}", e);
-                        self.loose_tasks(&internal, tasks, &format!("Unable to launch tasks: {:?}", e));
-                    }
-                }
-                None => {
-                    self.loose_tasks(&internal, tasks, "Master is disconnected");
-                }
+            if let Err(e) = internal.send_master(&msg) {
+                self.loose_tasks(&internal, tasks, &format!("Unable to launch tasks: {:?}", e));
+                return Err(e)
             }
         }
+
         Ok(internal.status)
     }
 
-    fn reconcile_tasks(&self, statuses: &Vec<TaskStatus>) -> Status {
+    fn reconcile_tasks(&self, statuses: &Vec<TaskStatus>) -> Result<Status> {
         let mut internal = self.internal.lock().unwrap();
         if internal.status == Status::DRIVER_RUNNING {
             let mut msg = ReconcileTasksMessage::new();
             msg.set_framework_id(internal.framework.get_id().clone());
             msg.set_statuses(RepeatedField::from_vec(statuses.clone()));
-            let master = internal.master_detector.master().unwrap();
-            if let Err(e) = internal.libprocess.send(&master, &msg) {
-                error!("Failed to send kill task message {:?}", e)
-            }
+            try!(internal.send_master(&msg));
         }
-        internal.status
+        Ok(internal.status)
     }
 
-    fn kill_task(&self, task_id: &TaskID) -> Status {
+    fn kill_task(&self, task_id: &TaskID) -> Result<Status> {
         let mut internal = self.internal.lock().unwrap();
         if internal.status == Status::DRIVER_RUNNING {
             let mut msg = KillTaskMessage::new();
             msg.set_framework_id(internal.framework.get_id().clone());
             msg.set_task_id(task_id.clone());
-            let master = internal.master_detector.master().unwrap();
-            if let Err(e) = internal.libprocess.send(&master, &msg) {
-                error!("Failed to send kill task message {:?}", e)
-            }
+            try!(internal.send_master(&msg));
         }
-        internal.status
+        Ok(internal.status)
     }
 
-    fn revive_offers(&self) -> Status {
+    fn revive_offers(&self) -> Result<Status> {
         let mut internal = self.internal.lock().unwrap();
         if internal.status == Status::DRIVER_RUNNING {
             let mut msg = ReviveOffersMessage::new();
             msg.set_framework_id(internal.framework.get_id().clone());
-            let master = internal.master_detector.master().unwrap();
-            if let Err(e) = internal.libprocess.send(&master, &msg) {
-                error!("Failed to send revive offers message {:?}", e)
-            }
+            try!(internal.send_master(&msg));
         }
-        internal.status
+        Ok(internal.status)
     }
 
     fn send_framework_message(&self,
                               executor_id: &ExecutorID,
                               slave_id: &SlaveID,
-                              data: &Vec<u8>) -> Status {
+                              data: &Vec<u8>) -> Result<Status> {
         let mut internal = self.internal.lock().unwrap();
         if internal.status == Status::DRIVER_RUNNING {
             let mut msg = FrameworkToExecutorMessage::new();
@@ -490,11 +487,8 @@ impl <S: Scheduler + Send + Sync + 'static> SchedulerDriver for MesosSchedulerDr
             msg.set_framework_id(internal.framework.get_id().clone());
             msg.set_executor_id(executor_id.clone());
             msg.set_data(data.clone());
-            let master = internal.master_detector.master().unwrap();
-            if let Err(e) = internal.libprocess.send(&master, &msg) {
-                error!("Failed to send framework message {:?}", e)
-            }
+            try!(internal.send_master(&msg));
         }
-        internal.status
+        Ok(internal.status)
     }
 }
