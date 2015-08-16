@@ -5,6 +5,8 @@ extern crate mesos;
 extern crate proto;
 extern crate uuid;
 
+use std::env;
+
 use proto::{CommandInfo, ExecutorID, Filters, FrameworkID, FrameworkInfo,
             MasterInfo, Offer, OfferID, Resource, SlaveID, TaskID, TaskInfo,
             TaskStatus, Value_Scalar, Value_Type};
@@ -94,8 +96,10 @@ fn main() {
     let master = "zk://localhost:2181/mesos";
     let mut framework = FrameworkInfo::new();
 
+    let user_name = env::var("USER").unwrap();
+
     framework.set_name("rustframework".to_string());
-    framework.set_user("bonifaido".to_string());
+    framework.set_user(user_name);
     framework.set_failover_timeout(60.0);
 
     let driver = MesosSchedulerDriver::new(scheduler, framework, master).unwrap();
