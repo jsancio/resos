@@ -487,7 +487,7 @@ impl <S: Scheduler + Send + Sync + 'static> SchedulerDriver for MesosSchedulerDr
             msg.set_framework_id(internal.framework.get_id().clone());
             msg.set_executor_id(executor_id.clone());
             msg.set_data(data.clone());
-            try!(internal.send_master(&msg));
+            try!(internal.send_master(&msg)); // TODO check what the Go driver does here
         }
         Ok(internal.status)
     }

@@ -99,5 +99,5 @@ fn main() {
     framework.set_failover_timeout(60.0);
 
     let driver = MesosSchedulerDriver::new(scheduler, framework, master).unwrap();
-    driver.run();
+    driver.run().unwrap();
 }
