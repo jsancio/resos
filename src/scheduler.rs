@@ -9,7 +9,7 @@ pub trait Scheduler {
     fn error(&self, driver: &SchedulerDriver, message: &str);
 
     // Invoked when an executor has exited/terminated.
-    fn executor_lost(&self, driver: &SchedulerDriver, executor_id: &ExecutorID, slave_id: &SlaveID, status: isize);
+    fn executor_lost(&self, driver: &SchedulerDriver, executor_id: &ExecutorID, slave_id: &SlaveID, status: i32);
 
     // Invoked when an executor sends a message.
     fn framework_message(&self, driver: &SchedulerDriver, executor_id: &ExecutorID, slave_id: &SlaveID, data: &[u8]);

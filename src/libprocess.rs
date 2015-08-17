@@ -69,7 +69,7 @@ pub enum Error {
 
 pub type Result<T> = ::std::result::Result<T, Error>;
 
-type Handler<Context> = Box<Fn(&UPID, Vec<u8>, &Context) + Send>;
+type Handler<Context> = Box<Fn(&Context, &UPID, Vec<u8>) + Send>;
 
 pub struct HandlerMap<Context> {
     map: HashMap<String, Handler<Context>>,
@@ -82,24 +82,25 @@ impl<Context> HandlerMap<Context> {
     }
 
     pub fn on<F, M>(&mut self, handler: F)
-    where F: Fn(&UPID, M, &Context) + Send + 'static,
+    where F: Fn(&Context, &UPID, M) + Send + 'static,
           M: protobuf::MessageStatic {
         let descriptor = protobuf::reflect::MessageDescriptor::for_type::<M>();
-        self.map.insert(descriptor.full_name().to_string(), Self::wrap(handler));
+        let handler = Self::wrap(handler);
+        assert!(self.map.insert(descriptor.full_name().to_string(), handler).is_none());
     }
 
     fn wrap<F, M>(handler: F) -> Handler<Context>
-    where F: Fn(&UPID, M, &Context) + Send + 'static,
+    where F: Fn(&Context, &UPID, M) + Send + 'static,
           M: protobuf::MessageStatic {
 
-        Box::new(move |sender: &UPID, data: Vec<u8>, context: &Context| {
+        Box::new(move |context: &Context, from: &UPID, data: Vec<u8>| {
             match protobuf::parse_from_bytes::<M>(&data) {
                 Ok(message) => {
                     // rust-protobuf has issues with messages with rust keywords as field names
                     // see: https://github.com/stepancheg/rust-protobuf/issues/105
                     // so right now messages shouldn't be printed (like proto::Resource)
                     debug!("Received {}", message.descriptor().name());
-                    handler(&sender, message, context);
+                    handler(context, &from, message);
                 },
                 _ => error!("Failed to parse protobuf message from master")
             }
@@ -144,12 +145,12 @@ impl LibProcess {
                     }
 
                     let name = path[myid_len..].to_string();
-                    let sender = match headers.get() {
+                    let from = match headers.get() {
                         Some(&LibprocessFrom(ref upid)) => upid.clone(),
                         None => panic!("No LibprocessFrom in header")
                     };
 
-                    tx.send((name, sender, data));
+                    tx.send((name, from, data));
 
                     *resp.status_mut() = StatusCode::Accepted;
                 },
@@ -193,8 +194,8 @@ impl LibProcess {
         spawn(move || {
             loop {
                 match rx.recv() {
-                    Some((name, sender, data)) => match handlers.map.get(&name) {
-                        Some(handler) => handler(&sender, data, &handlers.context),
+                    Some((name, from, data)) => match handlers.map.get(&name) {
+                        Some(handler) => handler(&handlers.context, &from, data),
                         None => warn!("Unhandled message: {}", name)
                     },
                     None => return

@@ -12,11 +12,15 @@ use proto::{ExecutorID,
             TaskState,
             TaskStatus};
 use proto::internal::{DeactivateFrameworkMessage,
+                      ExecutorToFrameworkMessage,
+                      ExitedExecutorMessage,
+                      FrameworkErrorMessage,
                       FrameworkToExecutorMessage,
                       FrameworkRegisteredMessage,
                       FrameworkReregisteredMessage,
                       KillTaskMessage,
                       LaunchTasksMessage,
+                      LostSlaveMessage,
                       RegisterFrameworkMessage,
                       UnregisterFrameworkMessage,
                       ReconcileTasksMessage,
@@ -157,7 +161,7 @@ pub trait SchedulerDriver {
     fn send_framework_message(&self,
                               executor_id: &ExecutorID,
                               slave_id: &SlaveID,
-                              data: &Vec<u8>) -> Result<Status>;
+                              data: &[u8]) -> Result<Status>;
 
     // fn destroy(driver: *mut libc::c_void, scheduler: *mut libc::c_void);
 }
@@ -273,11 +277,15 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
         map.on(Self::reregistered);
         map.on(Self::offer_rescinded);
         map.on(Self::resource_offers);
+        map.on(Self::error);
+        map.on(Self::executor_lost);
+        map.on(Self::slave_lost);
         map.on(Self::status_update);
+        map.on(Self::framework_message);
         map
     }
 
-    fn registered(_sender: &UPID, msg: FrameworkRegisteredMessage, driver: &Self) {
+    fn registered(driver: &Self, _from: &UPID, msg: FrameworkRegisteredMessage) {
         {
             let mut internal = driver.internal.lock().unwrap();
             internal.framework.set_id(msg.get_framework_id().clone());
@@ -286,22 +294,22 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
         driver.scheduler.registered(driver, msg.get_framework_id(), msg.get_master_info());
     }
 
-    fn reregistered(_sender: &UPID, msg: FrameworkReregisteredMessage, driver: &Self) {
+    fn reregistered(driver: &Self, _from: &UPID, msg: FrameworkReregisteredMessage) {
         driver.scheduler.reregistered(driver, msg.get_master_info());
     }
 
-    fn offer_rescinded(_sender: &UPID, msg: RescindResourceOfferMessage, driver: &Self) {
+    fn offer_rescinded(driver: &Self, _from: &UPID, msg: RescindResourceOfferMessage) {
         driver.scheduler.offer_rescinded(driver, msg.get_offer_id());
     }
 
-    fn resource_offers(_sender: &UPID, msg: ResourceOffersMessage, driver: &Self) {
+    fn resource_offers(driver: &Self, _from: &UPID, msg: ResourceOffersMessage) {
         driver.scheduler.resource_offers(driver, &msg.get_offers().to_vec());
     }
 
-    fn status_update(sender: &UPID, msg: StatusUpdateMessage, driver: &Self) {
+    fn status_update(driver: &Self, from: &UPID, msg: StatusUpdateMessage) {
         driver.scheduler.status_update(driver, msg.get_update().get_status());
         let mut internal = driver.internal.lock().unwrap();
-        if *sender != internal.libprocess.pid {
+        if *from != internal.libprocess.pid {
             let mut ack = StatusUpdateAcknowledgementMessage::new();
             ack.set_framework_id(internal.framework.get_id().clone());
             ack.set_slave_id(msg.get_update().get_slave_id().clone());
@@ -309,6 +317,22 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
             ack.set_uuid(msg.get_update().get_uuid().to_vec());
             let _ = internal.send_master(&ack);
         }
+    }
+
+    fn framework_message(driver: &Self, _from: &UPID, msg: ExecutorToFrameworkMessage) {
+        driver.scheduler.framework_message(driver, &msg.get_executor_id(), &msg.get_slave_id(), &msg.get_data());
+    }
+
+    fn error(driver: &Self, _from: &UPID, msg: FrameworkErrorMessage) {
+        driver.scheduler.error(driver, msg.get_message());
+    }
+
+    fn executor_lost(driver: &Self, _from: &UPID, msg: ExitedExecutorMessage) {
+        driver.scheduler.executor_lost(driver, &msg.get_executor_id(), &msg.get_slave_id(), msg.get_status());
+    }
+
+    fn slave_lost(driver: &Self, _from: &UPID, msg: LostSlaveMessage) {
+        driver.scheduler.slave_lost(driver, &msg.get_slave_id());
     }
 
     fn loose_tasks(&self, internal: &DriverInternal, tasks: &Vec<TaskInfo>, message: &str) {
@@ -327,7 +351,7 @@ impl <S: Scheduler + Send + Sync + 'static> MesosSchedulerDriver<S> {
             update.set_uuid(Uuid::new_v4().as_bytes().to_vec());
             msg.set_update(update);
 
-            Self::status_update(&internal.libprocess.pid, msg, self);
+            Self::status_update(self, &internal.libprocess.pid, msg);
         }
     }
 }
@@ -479,14 +503,14 @@ impl <S: Scheduler + Send + Sync + 'static> SchedulerDriver for MesosSchedulerDr
     fn send_framework_message(&self,
                               executor_id: &ExecutorID,
                               slave_id: &SlaveID,
-                              data: &Vec<u8>) -> Result<Status> {
+                              data: &[u8]) -> Result<Status> {
         let mut internal = self.internal.lock().unwrap();
         if internal.status == Status::DRIVER_RUNNING {
             let mut msg = FrameworkToExecutorMessage::new();
             msg.set_slave_id(slave_id.clone());
             msg.set_framework_id(internal.framework.get_id().clone());
             msg.set_executor_id(executor_id.clone());
-            msg.set_data(data.clone());
+            msg.set_data(data.to_vec());
             try!(internal.send_master(&msg)); // TODO check what the Go driver does here
         }
         Ok(internal.status)
