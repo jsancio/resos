@@ -7,9 +7,9 @@ extern crate uuid;
 
 use std::env;
 
-use proto::{CommandInfo, ExecutorID, Filters, FrameworkID, FrameworkInfo,
-            MasterInfo, Offer, OfferID, Resource, SlaveID, TaskID, TaskInfo,
-            TaskStatus, Value_Scalar, Value_Type};
+use proto::mesos::{AgentID, CommandInfo, ExecutorID, Filters, FrameworkID,
+                   FrameworkInfo, Offer, OfferID, Offer_Operation, Offer_Operation_Launch, Offer_Operation_Type,
+                   Resource, TaskID, TaskInfo, TaskStatus, Value_Scalar, Value_Type};
 use mesos::scheduler::Scheduler;
 use mesos::scheduler_driver::{SchedulerDriver, MesosSchedulerDriver};
 
@@ -22,10 +22,13 @@ impl Scheduler for MyScheduler {
     fn error(&self, driver: &SchedulerDriver, message: &str) {}
 
     // Invoked when an executor has exited/terminated.
-    fn executor_lost(&self, driver: &SchedulerDriver, executor_id: &ExecutorID, slave_id: &SlaveID, status: i32) {}
+    fn executor_lost(&self, driver: &SchedulerDriver, agent_id: &AgentID, executor_id: &ExecutorID, status: i32) {}
+
+    // Invoked when a slave has been determined unreachable (e.g., machine failure, network partition).
+    fn agent_lost(&self, driver: &SchedulerDriver, agent_id: &AgentID) {}
 
     // Invoked when an executor sends a message.
-    fn framework_message(&self, driver: &SchedulerDriver, executor_id: &ExecutorID, slave_id: &SlaveID, data: &[u8]) {}
+    fn framework_message(&self, driver: &SchedulerDriver, agent_id: &AgentID, executor_id: &ExecutorID, data: &[u8]) {}
 
     // Invoked when an offer is no longer valid (e.g., the slave was lost or another framework used resources in the offer).
     fn offer_rescinded(&self, driver: &SchedulerDriver, offer_id: &OfferID) {
@@ -33,12 +36,12 @@ impl Scheduler for MyScheduler {
     }
 
     // Invoked when the scheduler successfully registers with a Mesos master.
-    fn registered(&self, driver: &SchedulerDriver, framework_id: &FrameworkID, master_info: &MasterInfo) {
-        info!("Registered {:?} {:?}", framework_id, master_info);
+    fn registered(&self, driver: &SchedulerDriver, framework_id: &FrameworkID) {
+        info!("Registered {:?}", framework_id);
     }
 
     // Invoked when the scheduler re-registers with a newly elected Mesos master.
-    fn reregistered(&self, driver: &SchedulerDriver, master_info: &MasterInfo) {}
+    fn reregistered(&self, driver: &SchedulerDriver) {}
 
     // Invoked when resources have been offered to this framework.
     fn resource_offers(&self, driver: &SchedulerDriver, offers: &Vec<Offer>) {
@@ -69,19 +72,22 @@ impl Scheduler for MyScheduler {
             let mut task = TaskInfo::new();
             task.set_name(format!("task {:?}", task_id));
             task.set_task_id(task_id);
-            task.set_slave_id(offer.get_slave_id().clone());
+            task.set_agent_id(offer.get_agent_id().clone());
             task.mut_resources().push(resource1);
             task.mut_resources().push(resource2);
             task.set_command(command);
 
             info!("Launching task {:?}", task.get_task_id());
 
-            driver.launch_tasks(&vec![offer.get_id().clone()], &vec![task], &Filters::new()).unwrap();
+            let mut operation = Offer_Operation::new();
+            operation.set_field_type(Offer_Operation_Type::LAUNCH);
+            let mut launch = Offer_Operation_Launch::new();
+            launch.mut_task_infos().push(task);
+            operation.set_launch(launch);
+
+            driver.accept(&vec![offer.get_id().clone()], &vec![operation], &Filters::new()).unwrap();
         }
     }
-
-    // Invoked when a slave has been determined unreachable (e.g., machine failure, network partition).
-    fn slave_lost(&self, driver: &SchedulerDriver, slave_id: &SlaveID) {}
 
     // Invoked when the status of a task has changed (e.g., a slave is lost and so the task is lost, a task finishes and an executor sends a status update saying so, etc).
     fn status_update(&self, driver: &SchedulerDriver, status: &TaskStatus) {

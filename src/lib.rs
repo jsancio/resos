@@ -1,5 +1,5 @@
-#![deny(unused_mut)]
-extern crate chan;
+//#![deny(unused_mut)]
+#![feature(io)]
 #[macro_use]
 extern crate hyper;
 extern crate protobuf;
@@ -19,4 +19,4 @@ pub mod scheduler_driver;
 mod executor;
 mod executor_driver;
 #[allow(non_upper_case_globals)]
-mod libprocess;
+mod http_api;
