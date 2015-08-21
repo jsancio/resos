@@ -4,7 +4,7 @@ use hyper::status::StatusCode;
 use protobuf;
 use protobuf::error::ProtobufError;
 use std::io::{Read, BufRead, BufReader};
-use std::thread::{JoinHandle, spawn};
+use std::thread::spawn;
 
 const PROTOBUF: &'static str = "application/x-protobuf";
 
@@ -17,8 +17,7 @@ lazy_static! {
 pub enum Error {
     Io(hyper::Error),
     Status(StatusCode, String),
-    Serialization(ProtobufError),
-    Join
+    Serialization(ProtobufError)
 }
 
 pub type Result<T> = ::std::result::Result<T, Error>;
@@ -26,7 +25,6 @@ pub type Result<T> = ::std::result::Result<T, Error>;
 pub struct HttpApi {
     http_client: hyper::Client,
     endpoint: String,
-    join_handle: Option<JoinHandle<()>>
 }
 
 pub trait HttpHandler<Event: protobuf::MessageStatic> {
@@ -38,10 +36,10 @@ impl HttpApi {
     pub fn new(endpoint: &str) -> Result<Self> {
         let http_client = hyper::Client::new();
 
-        Ok(HttpApi{http_client: http_client, endpoint: endpoint.to_string(), join_handle: None})
+        Ok(HttpApi{http_client: http_client, endpoint: endpoint.to_string()})
     }
 
-    pub fn send(&mut self,
+    pub fn send(&self,
                 to: &String,
                 message: &protobuf::Message) -> Result<()> {
         match self.send_internal(to, message) {
@@ -51,16 +49,12 @@ impl HttpApi {
         }
     }
 
-    pub fn join(&mut self) -> Result<()> {
-        match self.join_handle.take() {
-            Some(join_handle) => Ok(try!(join_handle.join().map_err(|_|Error::Join))),
-            None => Ok(())
-        }
-    }
-
-    fn send_internal(&mut self,
+    fn send_internal(&self,
                      to: &String,
                      message: &protobuf::Message) -> Result<hyper::client::Response> {
+
+        //info!("Fields {:?}", message.descriptor().fields().iter().map(|f| f.name()).collect::<Vec<&str>>());
+        //info!("Sending {:?}", message.descriptor().field_by_name("field_type").get_enum(message).name());
 
         let mut url = "http://".to_string();
         url.push_str(to);
@@ -79,7 +73,7 @@ impl HttpApi {
                         .map_err(Error::Io)
     }
 
-    pub fn subscribe<Subscribe, Event, Handler>(&mut self,
+    pub fn subscribe<Subscribe, Event, Handler>(&self,
                                                 to: &String,
                                                 subscribe: Subscribe,
                                                 handler: Handler)-> Result<()>
@@ -89,7 +83,7 @@ impl HttpApi {
 
         let resp = try!(self.send_internal(to, &subscribe));
         if resp.status == StatusCode::Ok {
-            self.join_handle = Some(spawn(move || {
+            spawn(move || {
                 let mut stream = BufReader::new(resp);
                 loop {
                     match stream.read_message::<Event>() {
@@ -97,7 +91,7 @@ impl HttpApi {
                         Err(err) => handler.on_error(Error::Serialization(err))
                     }
                 }
-            }));
+            });
             Ok(())
         } else {
             Err(Error::Status(resp.status, resp.chars().map(|c| c.unwrap()).collect()))
@@ -111,12 +105,9 @@ trait ChunkedEncodedProtobufReader {
 
 impl <R: BufRead> ChunkedEncodedProtobufReader for R {
     fn read_message<M: protobuf::Message + protobuf::MessageStatic>(&mut self) -> protobuf::ProtobufResult<M> {
-        let mut line = String::new();
-        let len_len = try!(self.read_line(&mut line).map_err(ProtobufError::IoError));
-        let len: usize = try!(line[..len_len-1].parse().map_err(|_|ProtobufError::WireError("".to_string())));
-        let mut buf = vec![0; len];
-        let read_len = try!(self.read(&mut buf).map_err(ProtobufError::IoError));
-        debug!("len = {:?} read_len = {:?}", len, read_len);
-        protobuf::parse_from_bytes(&buf)
+        let len_str = try!(self.lines().next().expect("LINE").map_err(ProtobufError::IoError));
+        let len: u64 = try!(len_str.parse().map_err(|_|ProtobufError::WireError("".to_string())));
+        trace!("protobuf.len = {:?}", len);
+        protobuf::parse_from_reader(&mut self.take(len))
     }
 }

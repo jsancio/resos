@@ -8,18 +8,14 @@ authors = ["Connor Doyle <connor@mesosphere.io>",
 hyper = "0.6"
 lazy_static = "0.1"
 log = "0.3"
+protobuf = "1.0"
 rustc-serialize = "0.3"
-time = "0.1"
-uuid = "0.1"
+zookeeper = "0.1"
 
 [dependencies.proto]
 path = "proto"
 
-[dependencies.protobuf]
-git = "https://github.com/stepancheg/rust-protobuf.git"
-
-[dependencies.zookeeper]
-git = "https://github.com/bonifaido/rust-zookeeper.git"
-
 [dev-dependencies]
 env_logger = "0.3"
+time = "0.1"
+uuid = "0.1"

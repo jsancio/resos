@@ -1,4 +1,3 @@
-use hyper;
 use http_api;
 use http_api::{HttpApi, HttpHandler};
 use master_detector::MasterDetector;
@@ -10,15 +9,19 @@ use proto::mesos::{AgentID,
                    Offer_Operation,
                    Request,
                    Status,
-                   TaskID,
-                   TaskInfo,
-                   TaskState,
-                   TaskStatus};
+                   TaskID};
 use proto::scheduler::{Call,
                        Call_Type,
                        Call_Subscribe,
                        Call_Accept,
                        Call_Acknowledge,
+                       Call_Decline,
+                       Call_Kill,
+                       Call_Shutdown,
+                       Call_Reconcile,
+                       Call_Reconcile_Task,
+                       Call_Message,
+                       Call_Request,
                        Event,
                        Event_Type,
                        Event_Subscribed,
@@ -30,10 +33,8 @@ use proto::scheduler::{Call,
                        Event_Error};
 use protobuf::{Message, RepeatedField};
 use scheduler::Scheduler;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Barrier, Mutex};
 use std::thread;
-use time::now_utc;
-use uuid::Uuid;
 use zookeeper::ZkError;
 
 /// Abstract interface for connecting a scheduler to Mesos. This
@@ -42,30 +43,11 @@ use zookeeper::ZkError;
 /// (e.g., launch tasks, kill tasks, etc.).
 pub trait SchedulerDriver {
 
-    /// Launches the given set of tasks.
-    ///
-    /// @param offerIds      The offer IDs.
-    /// @param operations    The collection of tasks to be launched.
-    /// @param filters       The filters to set for any remaining resources.
-    ///
-    /// @return            The state of the driver after the call.
-    fn accept(&self,
-              offer_ids: &Vec<OfferID>,
-              operations: &Vec<Offer_Operation>,
-              filters: &Filters) -> Result<Status>;
-
-    /// Allows the framework to query the status for non-terminal tasks.
-    ///
-    /// @param tasks   The collection of tasks to be launched.
-    ///
-    /// @return            The state of the driver after the call.
-    fn reconcile_tasks(&self, statuses: &Vec<TaskStatus>) -> Result<Status>;
-
     /// Starts the scheduler driver. This needs to be called before any
     /// other driver calls are made.
     ///
     /// @return            The state of the driver after the call.
-    fn start(&self) -> Result<Status>;
+    fn start(&mut self) -> Result<Status>;
 
     /// Stops the scheduler driver. If the 'failover' flag is set to
     /// false then it is expected that this framework will never
@@ -79,7 +61,7 @@ pub trait SchedulerDriver {
     /// @param failover    Whether framework failover is expected.
     ///
     /// @return            The state of the driver after the call.
-    fn stop(&self, failover: bool) -> Result<Status>;
+    fn stop(&mut self, failover: bool) -> Result<Status>;
 
     /// Aborts the driver so that no more callbacks can be made to the
     /// scheduler. The semantics of abort and stop have deliberately been
@@ -89,7 +71,7 @@ pub trait SchedulerDriver {
     /// process).
     ///
     /// @return The state of the driver after the call.
-    fn abort(&self) -> Result<Status>;
+    fn abort(&mut self) -> Result<Status>;
 
     /// Waits for the driver to be stopped or aborted, possibly
     /// _blocking_ the current thread indefinitely. The return status of
@@ -102,7 +84,26 @@ pub trait SchedulerDriver {
     /// Starts and immediately joins (i.e., blocks on) the driver.
     ///
     /// @return The state of the driver after the call.
-    fn run(&self) -> Result<Status>;
+    fn run(&mut self) -> Result<Status>;
+
+    /// Accept the given set of offers.
+    ///
+    /// @param offer_ids   The offer IDs.
+    /// @param operations  The collection of operations to be launched.
+    /// @param filters     The filters to set for any remaining resources.
+    ///
+    /// @return            The state of the driver after the call.
+    fn accept_offers(&self,
+                     offer_ids: &Vec<OfferID>,
+                     operations: &Vec<Offer_Operation>,
+                     filters: &Filters) -> Result<Status>;
+
+    /// Allows the scheduler to query the status for non-terminal tasks.
+    ///
+    /// @param tasks   The collection of tasks to be reconciled.
+    ///
+    /// @return        The state of the driver after the call.
+    fn reconcile_tasks(&self, tasks: &Vec<TaskID>) -> Result<Status>;
 
     /// Requests resources from Mesos (see mesos.proto for a description
     /// of Request and how, for example, to request resources
@@ -113,7 +114,7 @@ pub trait SchedulerDriver {
     /// @param requests    The resource requests.
     ///
     /// @return            The state of the driver after the call.
-    fn request_resources(&self, requests_data: &Vec<Request>) -> Result<Status>;
+    fn request_resources(&self, requests: &Vec<Request>) -> Result<Status>;
 
     /// Declines an offer in its entirety and applies the specified
     /// filters on the resources (see mesos.proto for a description of
@@ -121,12 +122,12 @@ pub trait SchedulerDriver {
     /// necessary to do this within the {@link Scheduler#resourceOffers}
     /// callback.
     ///
-    /// @param offerId The ID of the offer to be declined.
-    /// @param filters The filters to set for any remaining resources.
+    /// @param offer_ids The IDs of the offers to be declined.
+    /// @param filters   The filters to set for any remaining resources.
     ///
-    /// @return        The state of the driver after the call.
+    /// @return          The state of the driver after the call.
     fn decline_offer(&self,
-                     offer_id: &OfferID,
+                     offer_ids: &Vec<OfferID>,
                      filters: &Filters) -> Result<Status>;
 
     /// Kills the specified task. Note that attempting to kill a task is
@@ -135,14 +136,26 @@ pub trait SchedulerDriver {
     /// the future Likewise, if unregistered / disconnected, the request
     /// will be dropped (these semantics may be changed in the future).
     ///
-    /// @param taskId  The ID of the task to be killed.
+    /// @param task_id  The ID of the task to be killed.
     ///
-    /// @return        The state of the driver after the call.
+    /// @return         The state of the driver after the call.
     fn kill_task(&self, task_id: &TaskID) -> Result<Status>;
 
+    /// Shutdown a specific custom executor. When an executor gets a shutdown
+    /// event, it is expected to kill all its tasks (and send TASK_KILLED
+    /// updates) and terminate.
+    ///
+    /// @param executor_id  The ID of the executor to be shutdown.
+    /// @param agent_id     The ID of the agent the executor is running on.
+    ///
+    /// @return             The state of the driver after the call.
+    fn shutdown_executor(&self,
+                         executor_id: &ExecutorID,
+                         agent_id: &AgentID) -> Result<Status>;
+
     /// Removes all filters, previously set by the framework (via {@link
-    /// #launchTasks}). This enables the framework to receive offers
-    /// from those filtered slaves.
+    /// #accept_offers} or {@link #decline_offers} calls}). This enables
+    /// the framework to receive offers from those filtered agents.
     ///
     /// @return    The state of the driver after the call.
     fn revive_offers(&self) -> Result<Status>;
@@ -151,17 +164,15 @@ pub trait SchedulerDriver {
     /// messages are best effort; do not expect a framework message to be
     /// retransmitted in any reliable fashion.
     ///
-    /// @param executorId  The ID of the executor to send the message to.
-    /// @param slaveId     The ID of the slave that is running the executor.
-    /// @param data        The message.
+    /// @param agent_id     The ID of the agent that is running the executor.
+    /// @param executor_id  The ID of the executor to send the message to.
+    /// @param data         The message.
     ///
-    /// @return            The state of the driver after the call.
+    /// @return             The state of the driver after the call.
     fn send_framework_message(&self,
+                              agent_id: &AgentID,
                               executor_id: &ExecutorID,
-                              slave_id: &AgentID,
                               data: &[u8]) -> Result<Status>;
-
-    // fn destroy(driver: *mut libc::c_void, scheduler: *mut libc::c_void);
 }
 
 /// Concrete implementation of a SchedulerDriver that connects a
@@ -188,6 +199,22 @@ pub trait SchedulerDriver {
 /// variables, prefixing the flag name with "MESOS_", e.g.,
 /// "MESOS_QUIET=1".
 
+pub struct MesosSchedulerDriver<S> {
+    scheduler: Arc<S>,
+    internal: Arc<Mutex<DriverInternal>>,
+    start_stop: Arc<Barrier>
+}
+
+impl <S> Clone for MesosSchedulerDriver<S> {
+    fn clone(&self) -> Self {
+        MesosSchedulerDriver{
+            scheduler: self.scheduler.clone(),
+            internal: self.internal.clone(),
+            start_stop: self.start_stop.clone()
+        }
+    }
+}
+
 struct DriverInternal {
     http_api: HttpApi,
     master_detector: MasterDetector,
@@ -196,26 +223,10 @@ struct DriverInternal {
 }
 
 impl DriverInternal {
-    fn send_master(&mut self, msg: &Message) -> Result<()> {
+    fn send_master(&self, msg: &Message) -> Result<()> {
         let master = try!(self.master_detector.master().map_err(Error::Zk));
         try!(self.http_api.send(&master, msg).map_err(Error::HttpApi));
         Ok(())
-    }
-}
-
-//#[derive(Clone)]
-pub struct MesosSchedulerDriver<S> {
-    scheduler: Arc<S>,
-    internal: Arc<Mutex<DriverInternal>>
-}
-
-// TODO why do I need to do this??
-impl <S> Clone for MesosSchedulerDriver<S> {
-    fn clone(&self) -> Self {
-        MesosSchedulerDriver{
-            scheduler: self.scheduler.clone(),
-            internal: self.internal.clone()
-        }
     }
 }
 
@@ -248,7 +259,8 @@ impl <S: Scheduler + Sync + Send + 'static> MesosSchedulerDriver<S> {
 
         let driver = MesosSchedulerDriver{
             scheduler: Arc::new(scheduler),
-            internal: Arc::new(Mutex::new(internal))
+            internal: Arc::new(Mutex::new(internal)),
+            start_stop: Arc::new(Barrier::new(2))
         };
 
         Ok(driver)
@@ -259,6 +271,7 @@ impl <S: Scheduler + Sync + Send + 'static> MesosSchedulerDriver<S> {
             let mut internal = self.internal.lock().unwrap();
             internal.framework.set_id(msg.get_framework_id().clone());
         }
+        self.start_stop.wait();
         info!("Framework registered with id {}", msg.get_framework_id().get_value());
         self.scheduler.registered(self, msg.get_framework_id());
     }
@@ -275,7 +288,7 @@ impl <S: Scheduler + Sync + Send + 'static> MesosSchedulerDriver<S> {
         let status = msg.get_status();
         self.scheduler.status_update(self, status);
         if status.has_uuid() {
-            let mut internal = self.internal.lock().unwrap();
+            let internal = self.internal.lock().unwrap();
             let mut call = Call::new();
             call.set_field_type(Call_Type::ACKNOWLEDGE);
             call.set_framework_id(internal.framework.get_id().clone());
@@ -306,30 +319,10 @@ impl <S: Scheduler + Sync + Send + 'static> MesosSchedulerDriver<S> {
 
     fn heartbeat(&self) {
         info!("Heartbeat")
-    }    
+    }
 
-    // fn reregistered(driver: &Self, _from: &UPID, msg: FrameworkReregisteredMessage) {
-    //     driver.scheduler.reregistered(driver, msg.get_master_info());
-    // }
-
-    // fn loose_tasks(&self, internal: &DriverInternal, tasks: &Vec<TaskInfo>, message: &str) {
-    //     for task in tasks {
-    //         let mut msg = StatusUpdateMessage::new();
-    //         let mut update = StatusUpdate::new();
-    //         update.set_framework_id(internal.framework.get_id().clone());
-    //         update.set_slave_id(task.get_slave_id().clone());
-    //         update.set_executor_id(task.get_executor().get_executor_id().clone());
-    //         let mut status = TaskStatus::new();
-    //         status.set_task_id(task.get_task_id().clone());
-    //         status.set_state(TaskState::TASK_LOST);
-    //         status.set_message(message.to_string());
-    //         update.set_status(status);
-    //         update.set_timestamp(now_utc().to_timespec().sec as f64);
-    //         update.set_uuid(Uuid::new_v4().as_bytes().to_vec());
-    //         msg.set_update(update);
-
-    //         Self::status_update(self, &internal.libprocess.pid, msg);
-    //     }
+    // fn reregistered(&self) {
+    //     self.scheduler.reregistered(self);
     // }
 }
 
@@ -356,41 +349,42 @@ impl <S: Scheduler + Sync + Send + 'static> HttpHandler<Event> for MesosSchedule
 
 impl <S: Scheduler + Sync + Send + 'static> SchedulerDriver for MesosSchedulerDriver<S> {
 
-    fn start(&self) -> Result<Status> {
-        let mut internal = self.internal.lock().unwrap();
-        if internal.status == Status::DRIVER_NOT_STARTED {
-
-            internal.master_detector.start();
-            let master = try!(internal.master_detector.master().map_err(Error::Zk));
-            debug!("Registering with master {}", master);
-
-            let mut call = Call::new();
-            call.set_field_type(Call_Type::SUBSCRIBE);
-            let mut subscribe = Call_Subscribe::new();
-            subscribe.set_framework_info(internal.framework.clone());
-            subscribe.set_force(true);
-            call.set_subscribe(subscribe);
-            let master = internal.master_detector.master().unwrap();
-            try!(internal.http_api.subscribe(&master, call, self.clone()).map_err(Error::HttpApi));
-            internal.status = Status::DRIVER_RUNNING;
-        }
-        Ok(internal.status)
+    fn start(&mut self) -> Result<Status> {
+        let status = {
+            let mut internal = self.internal.lock().unwrap();
+            if internal.status == Status::DRIVER_NOT_STARTED {
+                internal.master_detector.start();
+                let master = try!(internal.master_detector.master().map_err(Error::Zk));
+                debug!("Registering with master {}", master);
+                let mut call = Call::new();
+                call.set_field_type(Call_Type::SUBSCRIBE);
+                let mut subscribe = Call_Subscribe::new();
+                subscribe.set_framework_info(internal.framework.clone());
+                subscribe.set_force(true);
+                call.set_subscribe(subscribe);
+                let master = internal.master_detector.master().unwrap();
+                try!(internal.http_api.subscribe(&master, call, self.clone()).map_err(Error::HttpApi));
+                internal.status = Status::DRIVER_RUNNING;
+            }
+            internal.status
+        };
+        self.start_stop.wait();
+        Ok(status)
     }
 
-    fn stop(&self, failover: bool) -> Result<Status> {
+    fn stop(&mut self, failover: bool) -> Result<Status> {
         let mut internal = self.internal.lock().unwrap();
         if internal.status == Status::DRIVER_RUNNING {
             let mut call = Call::new();
             call.set_field_type(Call_Type::TEARDOWN);
             call.set_framework_id(internal.framework.get_id().clone());
             try!(internal.send_master(&call));
-            try!(internal.http_api.join().map_err(Error::HttpApi));
             internal.status = Status::DRIVER_STOPPED;
         }
         Ok(internal.status)
     }
 
-    fn abort(&self) -> Result<Status> {
+    fn abort(&mut self) -> Result<Status> {
         panic!("Unimplemented")
     }
 
@@ -399,20 +393,19 @@ impl <S: Scheduler + Sync + Send + 'static> SchedulerDriver for MesosSchedulerDr
         Ok(Status::DRIVER_RUNNING)
     }
 
-    fn run(&self) -> Result<Status> {
+    fn run(&mut self) -> Result<Status> {
         match self.start() {
             Ok(Status::DRIVER_RUNNING) => self.join(),
             status => status
         }
     }
 
-    fn accept(&self,
-              offer_ids: &Vec<OfferID>,
-              operations: &Vec<Offer_Operation>,
-              filters: &Filters) -> Result<Status> {
-        let mut internal = self.internal.lock().unwrap();
+    fn accept_offers(&self,
+                     offer_ids: &Vec<OfferID>,
+                     operations: &Vec<Offer_Operation>,
+                     filters: &Filters) -> Result<Status> {
+        let internal = self.internal.lock().unwrap();
         if internal.status == Status::DRIVER_RUNNING {
-
             let mut call = Call::new();
             call.set_field_type(Call_Type::ACCEPT);
             call.set_framework_id(internal.framework.get_id().clone());
@@ -421,88 +414,116 @@ impl <S: Scheduler + Sync + Send + 'static> SchedulerDriver for MesosSchedulerDr
             accept.set_operations(RepeatedField::from_vec(operations.clone()));
             accept.set_filters(filters.clone());
             call.set_accept(accept);
-
             try!(internal.send_master(&call));
+        }
+        Ok(internal.status)
+    }
 
-            // if let Err(e) =  {
-            //     self.loose_tasks(&internal, tasks, &format!("Unable to launch tasks: {:?}", e));
-            //     return Err(e)
-            // }
+    fn decline_offer(&self,
+                     offer_ids: &Vec<OfferID>,
+                     filters: &Filters) -> Result<Status> {
+        let internal = self.internal.lock().unwrap();
+        if internal.status == Status::DRIVER_RUNNING {
+            let mut call = Call::new();
+            call.set_field_type(Call_Type::DECLINE);
+            call.set_framework_id(internal.framework.get_id().clone());
+            let mut decline = Call_Decline::new();
+            decline.set_offer_ids(RepeatedField::from_vec(offer_ids.clone()));
+            decline.set_filters(filters.clone());
+            call.set_decline(decline);
+            try!(internal.send_master(&call));
+        }
+        Ok(internal.status)
+    }
+
+    fn revive_offers(&self) -> Result<Status> {
+        let internal = self.internal.lock().unwrap();
+        if internal.status == Status::DRIVER_RUNNING {
+            let mut call = Call::new();
+            call.set_field_type(Call_Type::REVIVE);
+            call.set_framework_id(internal.framework.get_id().clone());
+            try!(internal.send_master(&call));
+        }
+        Ok(internal.status)
+    }
+
+    fn kill_task(&self, task_id: &TaskID) -> Result<Status> {
+        let internal = self.internal.lock().unwrap();
+        if internal.status == Status::DRIVER_RUNNING {
+            let mut call = Call::new();
+            call.set_field_type(Call_Type::KILL);
+            call.set_framework_id(internal.framework.get_id().clone());
+            let mut kill = Call_Kill::new();
+            kill.set_task_id(task_id.clone());
+            call.set_kill(kill);
+            try!(internal.send_master(&call));
+        }
+        Ok(internal.status)
+    }
+
+    fn shutdown_executor(&self, executor_id: &ExecutorID, agent_id: &AgentID) -> Result<Status> {
+        let internal = self.internal.lock().unwrap();
+        if internal.status == Status::DRIVER_RUNNING {
+            let mut call = Call::new();
+            call.set_field_type(Call_Type::SHUTDOWN);
+            call.set_framework_id(internal.framework.get_id().clone());
+            let mut shutdown = Call_Shutdown::new();
+            shutdown.set_executor_id(executor_id.clone());
+            shutdown.set_agent_id(agent_id.clone());
+            call.set_shutdown(shutdown);
+            try!(internal.send_master(&call));
+        }
+        Ok(internal.status)
+    }
+
+    fn reconcile_tasks(&self, tasks: &Vec<TaskID>) -> Result<Status> {
+        let internal = self.internal.lock().unwrap();
+        if internal.status == Status::DRIVER_RUNNING {
+            let mut call = Call::new();
+            call.set_field_type(Call_Type::RECONCILE);
+            call.set_framework_id(internal.framework.get_id().clone());
+            let mut reconcile = Call_Reconcile::new();
+            reconcile.set_tasks(tasks.iter().map(|task_id| {
+                let mut task = Call_Reconcile_Task::new();
+                task.set_task_id(task_id.clone());
+                task
+            }).collect());
+            call.set_reconcile(reconcile);
+            try!(internal.send_master(&call));
         }
         Ok(internal.status)
     }
 
     fn request_resources(&self, requests: &Vec<Request>) -> Result<Status> {
-        let mut internal = self.internal.lock().unwrap();
-        // if internal.status == Status::DRIVER_RUNNING {
-        //     let mut msg = ResourceRequestMessage::new();
-        //     msg.set_framework_id(internal.framework.get_id().clone());
-        //     msg.set_requests(RepeatedField::from_vec(requests.clone()));
-        //     try!(internal.send_master(&msg));
-        // }
-        Ok(internal.status)
-    }
-
-    fn decline_offer(&self,
-                     offer_id: &OfferID,
-                     filters: &Filters) -> Result<Status> {
-        let mut internal = self.internal.lock().unwrap();
-        // if internal.status == Status::DRIVER_RUNNING {
-        //     // Launching an empty task list will decline the offer
-        //     let mut msg = LaunchTasksMessage::new();
-        //     msg.set_framework_id(internal.framework.get_id().clone());
-        //     msg.mut_offer_ids().push(offer_id.clone());
-        //     msg.set_filters(filters.clone());
-        //     try!(internal.send_master(&msg));
-        // }
-        Ok(internal.status)
-    }
-
-    fn reconcile_tasks(&self, statuses: &Vec<TaskStatus>) -> Result<Status> {
-        let mut internal = self.internal.lock().unwrap();
-        // if internal.status == Status::DRIVER_RUNNING {
-        //     let mut msg = ReconcileTasksMessage::new();
-        //     msg.set_framework_id(internal.framework.get_id().clone());
-        //     msg.set_statuses(RepeatedField::from_vec(statuses.clone()));
-        //     try!(internal.send_master(&msg));
-        // }
-        Ok(internal.status)
-    }
-
-    fn kill_task(&self, task_id: &TaskID) -> Result<Status> {
-        let mut internal = self.internal.lock().unwrap();
-        // if internal.status == Status::DRIVER_RUNNING {
-        //     let mut msg = KillTaskMessage::new();
-        //     msg.set_framework_id(internal.framework.get_id().clone());
-        //     msg.set_task_id(task_id.clone());
-        //     try!(internal.send_master(&msg));
-        // }
-        Ok(internal.status)
-    }
-
-    fn revive_offers(&self) -> Result<Status> {
-        let mut internal = self.internal.lock().unwrap();
-        // if internal.status == Status::DRIVER_RUNNING {
-        //     let mut msg = ReviveOffersMessage::new();
-        //     msg.set_framework_id(internal.framework.get_id().clone());
-        //     try!(internal.send_master(&msg));
-        // }
+        let internal = self.internal.lock().unwrap();
+        if internal.status == Status::DRIVER_RUNNING {
+            let mut call = Call::new();
+            call.set_field_type(Call_Type::REQUEST);
+            call.set_framework_id(internal.framework.get_id().clone());
+            let mut request = Call_Request::new();
+            request.set_requests(RepeatedField::from_vec(requests.clone()));
+            call.set_request(request);
+            try!(internal.send_master(&call));
+        }
         Ok(internal.status)
     }
 
     fn send_framework_message(&self,
+                              agent_id: &AgentID,
                               executor_id: &ExecutorID,
-                              slave_id: &AgentID,
                               data: &[u8]) -> Result<Status> {
-        let mut internal = self.internal.lock().unwrap();
-        // if internal.status == Status::DRIVER_RUNNING {
-        //     let mut msg = FrameworkToExecutorMessage::new();
-        //     msg.set_slave_id(slave_id.clone());
-        //     msg.set_framework_id(internal.framework.get_id().clone());
-        //     msg.set_executor_id(executor_id.clone());
-        //     msg.set_data(data.to_vec());
-        //     try!(internal.send_master(&msg)); // TODO check what the Go driver does here
-        // }
+        let internal = self.internal.lock().unwrap();
+        if internal.status == Status::DRIVER_RUNNING {
+            let mut call = Call::new();
+            call.set_field_type(Call_Type::MESSAGE);
+            call.set_framework_id(internal.framework.get_id().clone());
+            let mut message = Call_Message::new();
+            message.set_agent_id(agent_id.clone());
+            message.set_executor_id(executor_id.clone());
+            message.set_data(data.to_vec());
+            call.set_message(message);
+            try!(internal.send_master(&call));
+        }
         Ok(internal.status)
     }
 }

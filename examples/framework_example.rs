@@ -85,7 +85,7 @@ impl Scheduler for MyScheduler {
             launch.mut_task_infos().push(task);
             operation.set_launch(launch);
 
-            driver.accept(&vec![offer.get_id().clone()], &vec![operation], &Filters::new()).unwrap();
+            driver.accept_offers(&vec![offer.get_id().clone()], &vec![operation], &Filters::new()).unwrap();
         }
     }
 
@@ -108,6 +108,9 @@ fn main() {
     framework.set_user(user_name);
     framework.set_failover_timeout(60.0);
 
-    let driver = MesosSchedulerDriver::new(scheduler, framework, master).unwrap();
-    driver.run().unwrap();
+    let mut driver = MesosSchedulerDriver::new(scheduler, framework, master).unwrap();
+
+    driver.start().unwrap();
+
+    driver.stop(false).unwrap();
 }
