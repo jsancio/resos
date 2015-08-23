@@ -1,4 +1,3 @@
-use libprocess::UPID;
 use rustc_serialize::json;
 use zookeeper::{Watcher, WatchedEvent, ZkError, ZkResult, ZooKeeper};
 use std::str::FromStr;
@@ -22,7 +21,7 @@ impl Watcher for MasterDetectorWatcher {
 
 pub struct MasterDetector {
     zk: ZooKeeper,
-    master: Option<UPID>
+    master: Option<String>
 }
 
 impl MasterDetector {
@@ -35,7 +34,10 @@ impl MasterDetector {
 
     pub fn start(&mut self) {
         match self.get_master() {
-            Ok(master_info) => self.master = Some(FromStr::from_str(&master_info.pid).unwrap()),
+            Ok(master_info) => {
+                let address = master_info.pid.split('@').last().unwrap();
+                self.master = Some(FromStr::from_str(address).unwrap())
+            },
             Err(e) => error!("Failed to find leader in ZK: {:?}", e)
         }
     }
@@ -67,7 +69,10 @@ impl MasterDetector {
         }
     }
 
-    pub fn master(&self) -> Option<UPID> {
-        self.master.clone()
+    pub fn master(&self) -> ZkResult<String> {
+        match self.master {
+            Some(ref master) => Ok(master.clone()),
+            None => Err(ZkError::NoNode)
+        }
     }
 }

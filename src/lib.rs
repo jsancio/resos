@@ -1,5 +1,5 @@
 #![deny(unused_mut)]
-extern crate chan;
+#![feature(io)]
 #[macro_use]
 extern crate hyper;
 extern crate protobuf;
@@ -10,8 +10,6 @@ extern crate lazy_static;
 #[macro_use]
 extern crate log;
 extern crate rustc_serialize;
-extern crate time;
-extern crate uuid;
 
 mod master_detector;
 pub mod scheduler;
@@ -19,4 +17,4 @@ pub mod scheduler_driver;
 mod executor;
 mod executor_driver;
 #[allow(non_upper_case_globals)]
-mod libprocess;
+mod http_api;

@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package mesos;
+package mesos.v1;
 
-option java_package = "org.apache.mesos";
+option java_package = "org.apache.mesos.v1";
 option java_outer_classname = "Protos";
 
 
@@ -52,11 +52,11 @@ message OfferID {
 
 
 /**
- * A unique ID assigned to a slave. Currently, a slave gets a new ID
+ * A unique ID assigned to an agent. Currently, an agent gets a new ID
  * whenever it (re)registers with Mesos. Framework writers shouldn't
- * assume any binding between a slave ID and and a hostname.
+ * assume any binding between an agent ID and and a hostname.
  */
-message SlaveID {
+message AgentID {
   required string value = 1;
 }
 
@@ -74,7 +74,7 @@ message TaskID {
 
 /**
  * A framework generated ID to distinguish an executor. Only one
- * executor with the same ID can be active on the same slave at a
+ * executor with the same ID can be active on the same agent at a
  * time.
  */
 message ExecutorID {
@@ -83,10 +83,10 @@ message ExecutorID {
 
 
 /**
- * A slave generated ID to distinguish a container. The ID must be unique
- * between any active or completed containers on the slave. In particular,
- * containers for different runs of the same (framework, executor) pair must be
- * unique.
+ * An agent generated ID to distinguish a container. The ID must be
+ * unique between any active or completed containers on the agent. In
+ * particular, containers for different runs of the same (framework,
+ * executor) pair must be unique.
  */
 message ContainerID {
   required string value = 1;
@@ -145,8 +145,8 @@ message FrameworkInfo {
   optional double failover_timeout = 4 [default = 0.0];
 
   // If set, framework pid, executor pids and status updates are
-  // checkpointed to disk by the slaves. Checkpointing allows a
-  // restarted slave to reconnect with old executors and recover
+  // checkpointed to disk by the agents. Checkpointing allows a
+  // restarted agent to reconnect with old executors and recover
   // status updates, at the cost of disk I/O.
   optional bool checkpoint = 5 [default = false];
 
@@ -345,13 +345,15 @@ message ExecutorInfo {
   repeated Resource resources = 5;
   optional string name = 9;
 
-  // Source is an identifier style string used by frameworks to track
-  // the source of an executor. This is useful when it's possible for
-  // different executor ids to be related semantically.
-  // NOTE: Source is exposed alongside the resource usage of the
-  // executor via JSON on the slave. This allows users to import
-  // usage information into a time series database for monitoring.
+  // 'source' is an identifier style string used by frameworks to
+  // track the source of an executor. This is useful when it's
+  // possible for different executor ids to be related semantically.
+  //
+  // NOTE: 'source' is exposed alongside the resource usage of the
+  // executor via JSON on the agent. This allows users to import usage
+  // information into a time series database for monitoring.
   optional string source = 10;
+
   optional bytes data = 4;
 
   // Service discovery information for the executor. It is not
@@ -402,21 +404,18 @@ message MasterInfo {
 
 
 /**
- * Describes a slave. Note that the 'id' field is only available after
- * a slave is registered with the master, and is made available here
- * to facilitate re-registration.  If checkpoint is set, the slave is
- * checkpointing its own information and potentially frameworks'
- * information (if a framework has checkpointing enabled).
+ * Describes an agent. Note that the 'id' field is only available
+ * after an agent is registered with the master, and is made available
+ * here to facilitate re-registration.  If checkpoint is set, the
+ * agent is checkpointing its own information and potentially
+ * frameworks' information (if a framework has checkpointing enabled).
  */
-message SlaveInfo {
+message AgentInfo {
   required string hostname = 1;
   optional int32 port = 8 [default = 5051];
   repeated Resource resources = 3;
   repeated Attribute attributes = 5;
-  optional SlaveID id = 6;
-  // TODO(joerg84): Remove checkpoint field as with 0.22.0
-  // slave checkpointing is enabled for all slaves (MESOS-2317).
-  optional bool checkpoint = 7 [default = false];
+  optional AgentID id = 6;
 }
 
 
@@ -518,7 +517,7 @@ message Resource {
   message DiskInfo {
     // Describes a persistent disk volume.
     // A persistent disk volume will not be automatically garbage
-    // collected if the task/executor/slave terminates, but is
+    // collected if the task/executor/agent terminates, but is
     // re-offered to the framework(s) belonging to the 'role'.
     // A framework can set the ID (if it is not set yet) to express
     // the intention to create a new persistent disk volume from a
@@ -529,7 +528,7 @@ message Resource {
     // without a reservation (i.e., 'role' should not be '*').
     message Persistence {
       // A unique ID for the persistent disk volume.
-      // NOTE: The ID needs to be unique per role on each slave.
+      // NOTE: The ID needs to be unique per role on each agent.
       required string id = 1;
     }
 
@@ -658,11 +657,10 @@ message ResourceStatistics {
   optional uint64 mem_mapped_file_bytes = 12;
   // This is only set if swap is enabled.
   optional uint64 mem_swap_bytes = 40;
-  optional uint64 mem_unevictable_bytes = 41;
 
   // Number of occurrences of different levels of memory pressure
   // events reported by memory cgroup. Pressure listening (re)starts
-  // with these values set to 0 when slave (re)starts. See
+  // with these values set to 0 when agent (re)starts. See
   // https://www.kernel.org/doc/Documentation/cgroups/memory.txt for
   // more details.
   optional uint64 mem_low_pressure_counter = 32;
@@ -721,7 +719,7 @@ message ResourceUsage {
 
   repeated Executor executors = 1;
 
-  // Slave's total resources including checkpointed dynamic
+  // Agent's total resources including checkpointed dynamic
   // reservations and persistent volumes.
   repeated Resource total = 2;
 }
@@ -804,27 +802,27 @@ message PerfStatistics {
 
 /**
  * Describes a request for resources that can be used by a framework
- * to proactively influence the allocator.  If 'slave_id' is provided
+ * to proactively influence the allocator.  If 'agent_id' is provided
  * then this request is assumed to only apply to resources on that
- * slave.
+ * agent.
  */
 message Request {
-  optional SlaveID slave_id = 1;
+  optional AgentID agent_id = 1;
   repeated Resource resources = 2;
 }
 
 
 /**
- * Describes some resources available on a slave. An offer only
- * contains resources from a single slave.
+ * Describes some resources available on a agent. An offer only
+ * contains resources from a single agent.
  */
 message Offer {
   required OfferID id = 1;
   required FrameworkID framework_id = 2;
-  required SlaveID slave_id = 3;
+  required AgentID agent_id = 3;
   required string hostname = 4;
 
-  // URL for reaching the slave running on the host.
+  // URL for reaching the agent running on the host.
   optional URL url = 8;
 
   repeated Resource resources = 5;
@@ -881,7 +879,7 @@ message Offer {
 message TaskInfo {
   required string name = 1;
   required TaskID task_id = 2;
-  required SlaveID slave_id = 3;
+  required AgentID agent_id = 3;
   repeated Resource resources = 4;
   optional ExecutorInfo executor = 5;
   optional CommandInfo command = 7;
@@ -894,9 +892,9 @@ message TaskInfo {
   optional HealthCheck health_check = 8;
 
   // Labels are free-form key value pairs which are exposed through
-  // master and slave endpoints. Labels will not be interpreted or
+  // master and agent endpoints. Labels will not be interpreted or
   // acted upon by Mesos itself. As opposed to the data field, labels
-  // will be kept in memory on master and slave processes. Therefore,
+  // will be kept in memory on master and agent processes. Therefore,
   // labels should be used to tag tasks with light-weight meta-data.
   optional Labels labels = 10;
 
@@ -934,13 +932,13 @@ message TaskStatus {
   // Describes the source of the task status update.
   enum Source {
     SOURCE_MASTER = 0;
-    SOURCE_SLAVE = 1;
+    SOURCE_AGENT = 1;
     SOURCE_EXECUTOR = 2;
   }
 
   // Detailed reason for the task status update.
   //
-  // TODO(bmahler): Differentiate between slave removal reasons
+  // TODO(bmahler): Differentiate between agent removal reasons
   // (e.g. unhealthy vs. unregistered for maintenance).
   enum Reason {
     REASON_COMMAND_EXECUTOR_FAILED = 0;
@@ -955,10 +953,10 @@ message TaskStatus {
     REASON_MEMORY_LIMIT = 8;
     REASON_RECONCILIATION = 9;
     REASON_RESOURCES_UNKNOWN = 18;
-    REASON_SLAVE_DISCONNECTED = 10;
-    REASON_SLAVE_REMOVED = 11;
-    REASON_SLAVE_RESTARTED = 12;
-    REASON_SLAVE_UNKNOWN = 13;
+    REASON_AGENT_DISCONNECTED = 10;
+    REASON_AGENT_REMOVED = 11;
+    REASON_AGENT_RESTARTED = 12;
+    REASON_AGENT_UNKNOWN = 13;
     REASON_TASK_INVALID = 14;
     REASON_TASK_UNAUTHORIZED = 15;
     REASON_TASK_UNKNOWN = 16;
@@ -970,8 +968,8 @@ message TaskStatus {
   optional Source source = 9;
   optional Reason reason = 10;
   optional bytes data = 3;
-  optional SlaveID slave_id = 5;
-  optional ExecutorID executor_id = 7; // TODO(benh): Use in master/slave.
+  optional AgentID agent_id = 5;
+  optional ExecutorID executor_id = 7; // TODO(benh): Use in master/agent.
   optional double timestamp = 6;
 
   // Statuses that are delivered reliably to the scheduler will
@@ -991,9 +989,9 @@ message TaskStatus {
   optional bool healthy = 8;
 
   // Labels are free-form key value pairs which are exposed through
-  // master and slave endpoints. Labels will not be interpreted or
+  // master and agent endpoints. Labels will not be interpreted or
   // acted upon by Mesos itself. As opposed to the data field, labels
-  // will be kept in memory on master and slave processes. Therefore,
+  // will be kept in memory on master and agent processes. Therefore,
   // labels should be used to tag TaskStatus message with light-weight
   // meta-data.
   optional Labels labels = 12;
@@ -1073,6 +1071,81 @@ message Credentials {
 
 
 /**
+ * ACLs used for authorization.
+ */
+message ACL {
+
+  // Entity is used to describe a subject(s) or an object(s) of an ACL.
+  // NOTE:
+  // To allow everyone access to an Entity set its type to 'ANY'.
+  // To deny access to an Entity set its type to 'NONE'.
+  message Entity {
+    enum Type {
+      SOME = 0;
+      ANY = 1;
+      NONE = 2;
+    }
+    optional Type type = 1 [default = SOME];
+    repeated string values = 2; // Ignored for ANY/NONE.
+  }
+
+  // ACLs.
+  message RegisterFramework {
+    // Subjects.
+    required Entity principals = 1; // Framework principals.
+
+    // Objects.
+    required Entity roles = 2; // Roles for resource offers.
+  }
+
+  message RunTask {
+    // Subjects.
+    required Entity principals = 1; // Framework principals.
+
+    // Objects.
+    required Entity users = 2; // Users to run the tasks/executors as.
+  }
+
+  // Which principals are authorized to shutdown frameworks of other
+  // principals.
+  message ShutdownFramework {
+    // Subjects.
+    required Entity principals = 1;
+
+    // Objects.
+    required Entity framework_principals = 2;
+  }
+}
+
+
+/**
+ * Collection of ACL.
+ *
+ * Each authorization request is evaluated against the ACLs in the order
+ * they are defined.
+ *
+ * For simplicity, the ACLs for a given action are not aggregated even
+ * when they have the same subjects or objects. The first ACL that
+ * matches the request determines whether that request should be
+ * permitted or not. An ACL matches iff both the subjects
+ * (e.g., clients, principals) and the objects (e.g., urls, users,
+ * roles) of the ACL match the request.
+ *
+ * If none of the ACLs match the request, the 'permissive' field
+ * determines whether the request should be permitted or not.
+ *
+ * TODO(vinod): Do aggregation of ACLs when possible.
+ *
+ */
+message ACLs {
+  optional bool permissive = 1 [default = true];
+  repeated ACL.RegisterFramework register_frameworks = 2;
+  repeated ACL.RunTask run_tasks = 3;
+  repeated ACL.ShutdownFramework shutdown_frameworks = 4;
+}
+
+
+/**
  * Rate (queries per second, QPS) limit for messages from a framework to master.
  * Strictly speaking they are the combined rate from all frameworks of the same
  * principal.
@@ -1123,7 +1196,6 @@ message RateLimits {
 message Image {
   enum Type {
     APPC = 1;
-    DOCKER = 2;
   }
 
   // Protobuf for specifying an Appc container image. See:
@@ -1136,15 +1208,10 @@ message Image {
     // "hash" is the hash algorithm used and "value" is the hex
     // encoded string of the digest. Currently the only permitted
     // hash algorithm is sha512.
-    optional string id = 2;
+    required string id = 2;
 
     // Optional labels. Suggested labels: "version", "os", and "arch".
     optional Labels labels = 3;
-  }
-
-  message Docker {
-    // The name of the image. Expected in format repository[:tag].
-    required string name = 1;
   }
 
   required Type type = 1;
@@ -1152,7 +1219,6 @@ message Image {
   // Only one of the following image messages should be set to match
   // the type.
   optional AppC appc = 2;
-  optional Docker docker = 3;
 }
 
 
@@ -1168,10 +1234,7 @@ message Volume {
 
   required Mode mode = 3;
 
-  // Path pointing to a directory or file in the container. If the
-  // path is a relative path, it is relative to the container work
-  // directory. If the path is an absolute path, that path must
-  // already exist.
+  // Absolute path pointing to a directory or file in the container.
   required string container_path = 1;
 
   // The following specifies the source of this volume. At most one of
@@ -1230,7 +1293,7 @@ message ContainerInfo {
 
     // With this flag set to true, the docker containerizer will
     // pull the docker image from the registry even if the image
-    // is already downloaded on the slave.
+    // is already downloaded on the agent.
     optional bool force_pull_image = 6;
   }
 
@@ -1311,37 +1374,4 @@ message DiscoveryInfo {
   optional string version = 5;
   optional Ports ports = 6;
   optional Labels labels = 7;
-}
-
-
-/**
-* Protobuf for the Appc image manifest JSON schema:
-* https://github.com/appc/spec/blob/master/spec/aci.md#image-manifest-schema
-* Where possible, any field required in the schema is required in the protobuf
-* but some cannot be expressed, e.g., a repeated string that has at least one
-* element. Further validation should be performed after parsing the JSON into
-* the protobuf.
-* This version of Appc protobuf is based on Appc spec version 0.6.1.
-* TODO(xujyan): This protobuf currently defines a subset of fields in the spec
-* that Mesos makes use of to avoid confusion. New fields are going to be added
-* when Mesos starts to support them.
-*/
-message AppcImageManifest {
-  required string acKind = 1;
-  required string acVersion = 2;
-  required string name = 3;
-
-  message Label {
-    required string name = 1;
-    required string value = 2;
-  }
-
-  repeated Label labels = 4;
-
-  message Annotation {
-    required string name = 1;
-    required string value = 2;
-  }
-
-  repeated Annotation annotations = 5;
 }
