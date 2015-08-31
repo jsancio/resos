@@ -1,15 +1,15 @@
 use http_api;
 use http_api::{HttpApi, HttpHandler};
 use master_detector::MasterDetector;
-use proto::mesos::{AgentID,
-                   ExecutorID,
-                   Filters,
-                   FrameworkInfo,
-                   OfferID,
-                   Offer_Operation,
-                   Request,
-                   Status,
-                   TaskID};
+use proto::{AgentID,
+            ExecutorID,
+            Filters,
+            FrameworkInfo,
+            OfferID,
+            Offer_Operation,
+            Request,
+            Status,
+            TaskID};
 use proto::scheduler::{Call,
                        Call_Type,
                        Call_Subscribe,

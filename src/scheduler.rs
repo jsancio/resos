@@ -1,4 +1,4 @@
-use proto::mesos::{AgentID, ExecutorID, FrameworkID, Offer, OfferID, TaskStatus};
+use proto::{AgentID, ExecutorID, FrameworkID, Offer, OfferID, TaskStatus};
 use scheduler_driver::SchedulerDriver;
 
 pub trait Scheduler {

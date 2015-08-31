@@ -2,14 +2,13 @@ extern crate env_logger;
 #[macro_use]
 extern crate log;
 extern crate mesos;
-extern crate proto;
 extern crate uuid;
 
 use std::env;
 
-use proto::mesos::{AgentID, CommandInfo, ExecutorID, Filters, FrameworkID,
-                   FrameworkInfo, Offer, OfferID, Offer_Operation, Offer_Operation_Launch, Offer_Operation_Type,
-                   Resource, TaskID, TaskInfo, TaskStatus, Value_Scalar, Value_Type};
+use mesos::proto::{AgentID, CommandInfo, ExecutorID, Filters, FrameworkID, FrameworkInfo,
+                   Offer, OfferID, Offer_Operation, Offer_Operation_Launch, Offer_Operation_Type,
+                   Resource, TaskID, TaskInfo, TaskStatus, Value_Scalar,Value_Type};
 use mesos::scheduler::Scheduler;
 use mesos::scheduler_driver::{SchedulerDriver, MesosSchedulerDriver};
 
