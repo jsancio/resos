@@ -94,6 +94,24 @@ message ContainerID {
 
 
 /**
+ * Represents time since the epoch, in nanoseconds.
+ */
+message TimeInfo {
+  required int64 nanoseconds = 1;
+
+  // TODO(josephw): Add time zone information, if necessary.
+}
+
+
+/**
+ * Represents duration in nanoseconds.
+ */
+message DurationInfo {
+  required int64 nanoseconds = 1;
+}
+
+
+/**
  * A network address.
  *
  * TODO(bmahler): Use this more widely.
@@ -116,6 +134,71 @@ message URL {
   optional string path = 3;
   repeated Parameter query = 4;
   optional string fragment = 5;
+}
+
+
+/**
+ * Represents an interval, from a given start time over a given duration.
+ * This interval pertains to an unavailability event, such as maintenance,
+ * and is not a generic interval.
+ */
+message Unavailability {
+  required TimeInfo start = 1;
+
+  // When added to `start`, this represents the end of the interval.
+  // If unspecified, the duration is assumed to be infinite.
+  optional DurationInfo duration = 2;
+
+  // TODO(josephw): Add additional fields for expressing the purpose and
+  // urgency of the unavailability event.
+}
+
+
+/**
+ * Represents a single machine, which may hold one or more agents.
+ *
+ * NOTE: In order to match an agent to a machine, both the `hostname` and
+ * `ip` must match the values advertised by the agent to the master.
+ * Hostname is not case-sensitive.
+ */
+message MachineID {
+  optional string hostname = 1;
+  optional string ip = 2;
+}
+
+
+/**
+ * Holds information about a single machine, its `mode`, and any other
+ * relevant information which may affect the behavior of the machine.
+ */
+message MachineInfo {
+  // Describes the several states that a machine can be in.  A `Mode`
+  // applies to a machine and to all associated agents on the machine.
+  enum Mode {
+    // In this mode, a machine is behaving normally;
+    // offering resources, executing tasks, etc.
+    UP = 1;
+
+    // In this mode, all agents on the machine are expected to cooperate with
+    // frameworks to drain resources.  In general, draining is done ahead of
+    // a pending `unavailability`.  The resources should be drained so as to
+    // maximize utilization prior to the maintenance but without knowingly
+    // violating the frameworks' requirements.
+    DRAINING = 2;
+
+    // In this mode, a machine is not running any tasks and will not offer
+    // any of its resources.  agents on the machine will not be allowed to
+    // register with the master.
+    DOWN = 3;
+  }
+
+  required MachineID id = 1;
+  optional Mode mode = 2;
+
+  // Signifies that the machine may be unavailable during the given interval.
+  // See comments in `Unavailability` and for the `unavailability` fields
+  // in `Offer` and `InverseOffer` for more information.
+  optional Unavailability unavailability = 3;
 }
 
 
@@ -186,6 +269,11 @@ message FrameworkInfo {
   // capabilities (e.g., ability to receive offers for revocable
   // resources).
   repeated Capability capabilities = 10;
+
+  // Labels are free-form key value pairs supplied by the framework
+  // scheduler (e.g., to describe additional functionality offered by
+  // the framework). These labels are not interpreted by Mesos itself.
+  optional Labels labels = 11;
 }
 
 
@@ -829,6 +917,18 @@ message Offer {
   repeated Attribute attributes = 7;
   repeated ExecutorID executor_ids = 6;
 
+  // Signifies that the resources in this Offer may be unavailable during
+  // the given interval.  Any tasks launched using these resources may be
+  // killed when the interval arrives.  For example, these resources may be
+  // part of a planned maintenance schedule.
+  //
+  // This field only provides information about a planned unavailability.
+  // The unavailability interval may not necessarily start at exactly this
+  // interval, nor last for exactly the duration of this interval.
+  // The unavailability may also be forever!  See comments in
+  // `Unavailability` for more details.
+  optional Unavailability unavailability = 9;
+
   // Defines an operation that can be performed against offers.
   message Operation {
     enum Type {
@@ -866,6 +966,57 @@ message Offer {
     optional Create create = 5;
     optional Destroy destroy = 6;
   }
+}
+
+
+/**
+ * A request to return some resources occupied by a framework.
+ */
+message InverseOffer {
+  // This is the same OfferID as found in normal offers, which allows
+  // re-use of some of the OfferID-only messages.
+  required OfferID id = 1;
+
+  // URL for reaching the agent running on the host.  This enables some
+  // optimizations as described in MESOS-3012, such as allowing the
+  // scheduler driver to bypass the master and talk directly with a agent.
+  optional URL url = 2;
+
+  // The framework that should release its resources.
+  // If no specifics are provided (i.e. which agent), all the framework's
+  // resources are requested back.
+  required FrameworkID framework_id = 3;
+
+  // Specified if the resources need to be released from a particular agent.
+  // All the framework's resources on this agent are requested back,
+  // unless further qualified by the `resources` field.
+  optional AgentID agent_id = 4;
+
+  // This InverseOffer represents a planned unavailability event in the
+  // specified interval.  Any tasks running on the given framework or agent
+  // may be killed when the interval arrives.  Therefore, frameworks should
+  // aim to gracefully terminate tasks prior to the arrival of the interval.
+  //
+  // For reserved resources, the resources are expected to be returned to the
+  // framework after the unavailability interval.  This is an expectation,
+  // not a guarantee.  For example, if the unavailiability duration is not set,
+  // the resources may be removed permenantly.
+  //
+  // For other resources, there is no guarantee that requested resources will
+  // be returned after the unavailiability interval.  The allocator has no
+  // obligation to re-offer these resources to the prior framework after
+  // the unavailability.
+  required Unavailability unavailability = 5;
+
+  // A list of resources being requested back from the framework,
+  // on the agent identified by `agent_id`.  If no resources are specified
+  // then all resources are being requested back.  For the purpose of
+  // maintenance, this field is always empty (maintenance always requests
+  // all resources back).
+  repeated Resource resources = 6;
+
+  // TODO(josephw): Add additional options for narrowing down the resources
+  // being requested back.  Such as specific executors, tasks, etc.
 }
 
 
@@ -1067,81 +1218,6 @@ message Credential {
  */
 message Credentials {
   repeated Credential credentials = 1;
-}
-
-
-/**
- * ACLs used for authorization.
- */
-message ACL {
-
-  // Entity is used to describe a subject(s) or an object(s) of an ACL.
-  // NOTE:
-  // To allow everyone access to an Entity set its type to 'ANY'.
-  // To deny access to an Entity set its type to 'NONE'.
-  message Entity {
-    enum Type {
-      SOME = 0;
-      ANY = 1;
-      NONE = 2;
-    }
-    optional Type type = 1 [default = SOME];
-    repeated string values = 2; // Ignored for ANY/NONE.
-  }
-
-  // ACLs.
-  message RegisterFramework {
-    // Subjects.
-    required Entity principals = 1; // Framework principals.
-
-    // Objects.
-    required Entity roles = 2; // Roles for resource offers.
-  }
-
-  message RunTask {
-    // Subjects.
-    required Entity principals = 1; // Framework principals.
-
-    // Objects.
-    required Entity users = 2; // Users to run the tasks/executors as.
-  }
-
-  // Which principals are authorized to shutdown frameworks of other
-  // principals.
-  message ShutdownFramework {
-    // Subjects.
-    required Entity principals = 1;
-
-    // Objects.
-    required Entity framework_principals = 2;
-  }
-}
-
-
-/**
- * Collection of ACL.
- *
- * Each authorization request is evaluated against the ACLs in the order
- * they are defined.
- *
- * For simplicity, the ACLs for a given action are not aggregated even
- * when they have the same subjects or objects. The first ACL that
- * matches the request determines whether that request should be
- * permitted or not. An ACL matches iff both the subjects
- * (e.g., clients, principals) and the objects (e.g., urls, users,
- * roles) of the ACL match the request.
- *
- * If none of the ACLs match the request, the 'permissive' field
- * determines whether the request should be permitted or not.
- *
- * TODO(vinod): Do aggregation of ACLs when possible.
- *
- */
-message ACLs {
-  optional bool permissive = 1 [default = true];
-  repeated ACL.RegisterFramework register_frameworks = 2;
-  repeated ACL.RunTask run_tasks = 3;
-  repeated ACL.ShutdownFramework shutdown_frameworks = 4;
 }
 
 
