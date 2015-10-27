@@ -2,7 +2,7 @@
 
 brew install protobuf
 if [ ! -d rust-protobuf ]; then
-    git clone git@github.com:stepancheg/rust-protobuf
+    git clone https://github.com/stepancheg/rust-protobuf.git
 fi
 cd rust-protobuf
 git pull
