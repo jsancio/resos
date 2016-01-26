@@ -34,6 +34,7 @@ use proto::scheduler::{Call,
 use protobuf::{Message, RepeatedField};
 use scheduler::Scheduler;
 use std::sync::{Arc, Barrier, Mutex};
+use std::time::Duration;
 use std::thread;
 use zookeeper::ZkError;
 
@@ -389,7 +390,7 @@ impl <S: Scheduler + Sync + Send + 'static> SchedulerDriver for MesosSchedulerDr
     }
 
     fn join(&self) -> Result<Status> {
-        thread::sleep_ms(999999999); // TODO
+        thread::sleep(Duration::new(999999999, 0)); // TODO
         Ok(Status::DRIVER_RUNNING)
     }
 

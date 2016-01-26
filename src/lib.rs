@@ -1,5 +1,4 @@
 #![deny(unused_mut)]
-#![feature(io)]
 #[macro_use]
 extern crate hyper;
 extern crate protobuf;

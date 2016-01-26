@@ -44,7 +44,7 @@ impl HttpApi {
                 message: &protobuf::Message) -> Result<()> {
         match self.send_internal(to, message) {
             Ok(hyper::client::Response{status: StatusCode::Accepted, ..}) => Ok(()),
-            Ok(resp) => Err(Error::Status(resp.status, resp.chars().map(|c| c.unwrap()).collect())),
+            Ok(resp) => Err(Error::Status(resp.status, format!("{:?}", resp))),
             Err(e) => Err(e)
         }
     }
@@ -94,7 +94,7 @@ impl HttpApi {
             });
             Ok(())
         } else {
-            Err(Error::Status(resp.status, resp.chars().map(|c| c.unwrap()).collect()))
+            Err(Error::Status(resp.status, format!("{:?}", resp)))
         }
     }
 }

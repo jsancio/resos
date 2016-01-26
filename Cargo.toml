@@ -9,11 +9,11 @@ lazy_static = "0.1"
 log = "0.3"
 protobuf = "1.0"
 rustc-serialize = "0.3"
-zookeeper = "0.1"
+zookeeper = "0.2"
 
 # to disable openssl for now
 [dependencies.hyper]
-version = "0.6"
+version = "0.7"
 default-features = false
 
 [dependencies.proto]
