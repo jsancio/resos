@@ -1,16 +1,12 @@
 #!/bin/bash
 
 brew install protobuf
-if [ ! -d rust-protobuf ]; then
-    git clone https://github.com/stepancheg/rust-protobuf.git
-fi
-cd rust-protobuf
-git pull
-cargo build
-PATH="`pwd`/target/debug:$PATH"
-VERSION=0.26.0
+cargo install protobuf
 
-cd ../proto/mesos/v1
+PATH="$HOME/.cargo/bin:$PATH"
+VERSION=0.27.0
+
+cd proto/mesos/v1
 curl -O https://raw.githubusercontent.com/apache/mesos/$VERSION/include/mesos/v1/mesos.proto
 cd executor
 curl -O https://raw.githubusercontent.com/apache/mesos/$VERSION/include/mesos/v1/executor/executor.proto
